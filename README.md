@@ -39,13 +39,13 @@ To build the PDF file of the manuscript:
 
 > [!WARNING]
 > Issues in version 1.0:
-> - The ̀\affil[1]{` instruction in `bonds-lievcom.tex` line **136** is always producing an error, and it is required to comment this line to build the PDF.
+> - The ` \affil[1]{ ` instruction in `bonds-lievcom.tex` line **136** is always producing an error, and it is required to comment this line to build the PDF.
 > - On page 6 of 25, now way to print all figures in the same column and then continue the discussion, for some reason(s) the third figure ("Corner of the pixel grid") is always inserted on second column.
 
 This manuscript was written by [Dr. Sébastien Le Roux][slr], research engineer for the [CNRS][cnrs]
 
 <p align="center">
-  <a href="https://www.cnrs.fr/"><img width="100" src="https://www.cnrs.fr/themes/custom/cnrs/logo.svg" alt="CNRS logo" align="center"></a>
+  <a href="https://www.cnrs.fr/"><img width="100" src="https://www.cnrs.fr/sites/default/files/logo/logo.svg" alt="CNRS logo" align="center"></a>
 </p>
 
 [Dr. Sébastien Le Roux][slr] works at the Institut de Physique et Chimie des Matériaux de Strasbourg [IPCMS][ipcms]
