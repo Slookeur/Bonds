@@ -1,0 +1,548 @@
+\documentclass[9pt,bestpractices]{livecoms}
+% Use the 'onehalfspacing' option for 1.5 line spacing
+% Use the 'doublespacing' option for 2.0 line spacing
+% Use the 'lineno' option for adding line numbers.
+% Use the 'pubversion' option for adding the citation and publication information to the document footer, when the DOI is assigned and the article is added to a live issue.
+% The 'bestpractices' option for indicates that this is a best practices guide.
+% Omit the bestpractices option to remove the marking as a LiveCoMS paper.
+% Please note that these options may affect formatting.
+\usepackage[utf8]{inputenc}
+\usepackage{pslatex}
+
+\usepackage{lipsum} % Required to insert dummy text
+\usepackage[version=4]{mhchem}
+\usepackage{siunitx}
+\DeclareSIUnit\Molar{M}
+%\usepackage[italic]{mathastext}
+\graphicspath{{img/}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% IMPORTANT USER CONFIGURATION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\versionnumber}{1.0}  % you should update the minor version number in preprints and major version number of submissions.
+% Do not add a newline in the next command, no matter how long the repository name is, as it will break the link in the PDF.
+\newcommand{\githubrepository}{\url{https://github.com/Slookeur/Bonds}}  %this should be the main github repository for this article.
+
+\newcommand{\cms}{Comp. Mat. Sci.}
+\usepackage{lineno}
+\usepackage{amscd}
+\usepackage{multirow}
+\usepackage{alltt}
+\usepackage{tabls}
+\usepackage{listings}
+\usepackage{blkarray}
+
+\newenvironment{ttenv}{\ttfamily}{\par}
+
+\newsavebox{\cobox}
+\def\script{
+  \noindent \\[0.25cm] \\
+  \begin{lrbox}
+  \cobox
+  \begin{minipage}[l]{16.5cm}
+  \begin{ttenv}}
+\def\endscript{
+  \end{ttenv}
+  \end{minipage}
+  \end{lrbox}
+  \colorbox{lg}{\usebox{\cobox}}
+  \vspace{0.25cm}\par\noindent}
+\newsavebox{\coboxi}
+\def\scripti{
+  \noindent \\[0.25cm] \\
+  \begin{lrbox}
+  \coboxi
+  \begin{minipage}[l]{14.966cm}
+  \begin{alltt}}
+\def\endscripti{
+  \end{alltt}
+  \end{minipage}
+  \end{lrbox}
+  \colorbox{lg}{\usebox{\coboxi}}
+  \vspace{0.25cm}\par\noindent}
+
+%Coloration synthaxique
+\newcommand{\magenta}[1]{\textcolor{magenta}{#1}}
+\newcommand{\mbtt}[1]{{\bf{\texttt{\magenta{#1}}}}}
+\newcommand{\scri}[1]{\textcolor{brown}{{\bf{\texttt{#1}}}}}
+\newcommand{\cyan}[1]{\textcolor{cyan}{#1}}
+
+\newcommand{\bftt}[1]{{\bf{\texttt{#1}}}}
+\definecolor{lg}{rgb}{0.95,0.95,0.95}
+\definecolor{Green4}{rgb}{0.0,0.545,0.0}
+\definecolor{DodgerBlue4}{rgb}{0.064,0.305,0.545}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\newcommand{\orange}[1]{\textcolor{orange}{#1}}
+\newcommand{\violet}[1]{\textcolor{violet}{#1}}
+\newcommand{\dblue}[1]{\textcolor{DodgerBlue4}{#1}}
+\newcommand{\dgreen}[1]{\textcolor{Green4}{#1}}
+\newcommand{\rbtt}[1]{{\bf{\texttt{\red{#1}}}}}
+\newcommand{\dbtt}[1]{{\bf{\texttt{\dblue{#1}}}}}
+\newcommand{\obtt}[1]{{\bf{\texttt{\orange{#1}}}}}
+\newcommand{\vbtt}[1]{{\bf{\texttt{\violet{#1}}}}}
+\newcommand{\cbtt}[1]{{\bf{\texttt{\cyan{#1}}}}}
+
+\newcommand{\isaacs}{I.S.A.A.C.S.}
+\newcommand{\atomes}{{\bf{atomes}}}
+\newcommand{\atomesweb}{https://atomes.ipcms.fr}
+
+\newcommand{\zero}{\mbtt{0}}
+\newcommand{\un}{\mbtt{1}}
+\newcommand{\deux}{\mbtt{2}}
+\newcommand{\trois}{\mbtt{3}}
+
+\newcommand{\ddst}{false}
+
+\newcommand{\boxA}{\textrm{A}}
+\newcommand{\boxB}{\textrm{B}}
+\newcommand{\boxC}{\textrm{C}}
+\newcommand{\Tc}{{\bf{\textrm{T}_c}}}
+\newcommand{\Tf}{{\bf{\textrm{T}_f}}}
+\newcommand{\pwdi}{3.5cm}
+\newcommand{\pwdj}{2.5375cm}
+\newcommand{\rsv}{1.75cm}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\scriptsize\color{blue},
+    keywordstyle=\bf\ttfamily\scriptsize\color{Green4},
+    numberstyle=\tiny\color{brown},
+    stringstyle=\scriptsize\color{red},
+    basicstyle=\ttfamily\scriptsize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle,escapechar=\|}
+
+\title{Efficient evaluation of interatomic distances in large atomic scale models [Artivle v\versionnumber]}
+
+\author[1*]{Sébastien Le Roux}
+\author[1\authfn{1}]{Sébastien Le Roux}
+\corr{sebastien.leroux@ipcms.unistra.fr}
+%\affil[1]{Institut de Physique et Chimie des Matériaux de Strasbourg, Université de Strasbourg, CNRS UMR 7504, 23 rue de Loess, BP 43, F-67034 Strasbourg Cedex 2, France}
+
+\orcid{Sébastien Le Roux}{0000-0002-1912-6960}
+
+\contrib[\authfn{1}]{This author is the sole author of this work}
+
+\blurb{This LiveCoMS document is maintained online on GitHub at \githubrepository; to provide feedback, suggestions, or help improve it, please visit the GitHub repository and participate via the issue tracker.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% PUBLICATION INFORMATION
+%%% Fill out these parameters when available
+%%% These are used when the "pubversion" option is invoked
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pubDOI{10.XXXX/YYYYYYY}
+\pubvolume{<volume>}
+\pubissue{<issue>}
+\pubyear{<year>}
+\articlenum{<number>}
+\datereceived{Day Month Year}
+\dateaccepted{Day Month Year}
+
+%\keyword{Molecular dynamics, MD, {\it ab-initio} molecular dynamics, QM-MM, Crystal, Liquid, Glass, Molecule, 
+%Neutron diffraction/scattering, Neutron structure factor, X-ray diffraction/scattering, X-ray structure factor, 
+%ring statistics, chain statistic, spherical harmonics}
+\begin{document}
+
+\begin{frontmatter}
+\maketitle
+
+\begin{abstract}
+This article describes how lattice mathematical properties can be combined with the 3D space pixelation method 
+to evaluate interatomic distances in large atomic scale 3D models. 
+It aims to be an educative tool for students and researchers who want to develop structural analysis or 3D visualization tools 
+that requires to implement and compute efficiently interatomic bond distances. Examples codes are provided in C, FORTRAN90 and Python. 
+\end{abstract}
+
+\end{frontmatter}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Introduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+\label{intro}
+Every student, every researcher in computational material science, has already spent time calculating interatomic distances. 
+This problem is even likely to be the first one computational material scientists will spend some time over during their studies. 
+As simple as the evaluation of a distance in 3D space could seem to be, the complexity of the problem increases considerably 
+when dealing with the periodicity of non-cubic systems, and even more with the search for performance that is driving the analysis
+and the visualization of atomic scale models with more than tens of thousands of atoms. \\[0.25cm]
+This manuscript illustrates how lattice mathematical properties can be combined with the pixelation of the model box approach, to offer 
+both a general, symmetry independent, methodology, and, an extremely efficient implementation of the search for first neighbor atoms.
+
+\section{Simulation box, lattice parameters and transformation matrices}
+\label{mat}
+Knowledge and understanding of the mathematics of lattice parameters and atomic coordinates is a prerequisite to the general formulation 
+of the calculation of interatomic bond distances in 3D atomic scale models using periodic boundary conditions. \\
+Note that this section can safely be ignored when dealing with non periodic systems. 
+
+\subsection{Simulation box or lattice parameters\label{param}}
+\noindent Box, or lattice parameters can be expressed with two different sets of parameters, using: 
+\begin{itemize}
+\item[1.]\label{abc} Using the box parameters \boxA, \boxB, \boxC\ and the associated angles $\alpha$, $\beta$ and $\gamma$
+\item[2.]\label{uvw} Using the components of the lattice vectors \\
+$\ \vec{a} (a_x, a_y, a_z)$, $\ \vec{b} (b_x, b_y, b_z)\ $ and $\ \vec{c} (c_x, c_y, c_z)$
+\end{itemize}
+Then lattice vectors (\ref{uvw}) can be calculated using box parameters (\ref{abc}) with: \\ 
+\begin{equation}
+\left[ \begin{blockarray}{ccc} 
+ \boxA & 0.0 & 0.0 \\
+ \times \cos{\gamma} & \boxB \times \sin{\gamma} & 0.0 \\
+ \boxC \times \cos{\beta} & \boxC \times L & \boxC \times L^2
+\end{blockarray} \right]
+\end{equation}
+With:
+\begin{equation}
+L = \frac{\cos{\alpha} - \cos{\beta}\times\cos{\gamma}}{\sin{\gamma}}
+\end{equation}
+\\
+While box parameters (\ref{abc}) can be calculated using lattice vectors (\ref{uvw}) with: 
+\begin{equation}
+\boxA = \mid\vec{a}\mid \quad \boxB = \mid\vec{b}\mid \quad \boxC = \mid\vec{c}\mid
+\end{equation}
+and: 
+\begin{equation}
+\alpha = \frac{\vec{c} \cdot \vec{b}}{\boxB \times \boxC} \quad \beta = \frac{\vec{a} \cdot \vec{c}}{\boxA \times \boxC} \quad \gamma = \frac{\vec{a} \cdot \vec{b}}{\boxA \times \boxB}
+\end{equation}
+The lattice volume:
+\begin{equation}
+V = {\vec{a}}\cdot ({\vec{b}}\wedge {\vec{c}})={\vec{b}}\cdot ({\vec{c}}\wedge {\vec{a}})={\vec{c}}\cdot ({\vec{a}}\wedge {\vec{b}})
+\end{equation}
+can then be calculated using:
+\begin{equation}
+V = \boxA \times \boxB \times \boxC \times {\bf{Z}} 
+\end{equation}
+With:
+\begin{equation}
+{\bf{Z}} = \sqrt{1\, -\, \cos\,^2{\alpha}\, -\, \cos\,^2{\beta}\, -\, \cos\,^2{\gamma}\, +\, 2\ \cos{\alpha}\ \cos{\beta}\ \cos{\gamma}}
+\end{equation}
+%\begin{blockarray}{cccc}
+% L_{v} & = &   & (a_y \times b_z - a_z \times b_y) \times c_x  \\
+%       &   & + & (a_z \times b_x - a_x \times b_z) \times c_y  \\
+%       &   & + & (a_x \times b_y - a_y \times b_x) \times c_z  \\
+%\end{blockarray}
+Knowledge of these properties is a basic requirement, from there it possible to compute transformation matrices 
+that allow the conversion from Cartesian $r$ to Fractional $f$ coordinates and the conversion from Fractional to Cartesian coordinates. 
+These mathematical tools are extremely useful, if not almost mandatory prerequisites to the calculation, when dealing with non-cubic periodic systems.
+
+\subsection{From Cartesian to fractional coordinates}
+\noindent For an atom with Cartesian coordinates ($r_x, r_y, r_z$), fractional coordinates ($f_x, f_y, f_z$) can be calculated using:
+\begin{equation}
+\label{c2f}
+\left( \begin{blockarray}{c}
+ f_x \\
+ f_y \\
+ f_z
+\end{blockarray} \right)
+\quad = \quad \Tf 
+\times
+\left( \begin{blockarray}{c}
+ r_x \\
+ r_y \\
+ r_z
+\end{blockarray} \right)
+\end{equation}
+Where the transformation matrix $\Tf$ is defined as:
+\begin{equation}
+\Tf \quad = \quad
+\left[ \begin{blockarray}{ccc} 
+ \frac{1}{\boxA} & - \frac{\cos{\gamma}}{\boxA\,  \sin{\gamma}} & \frac{\cos{\alpha} \, \cos{\gamma}\, -\, \cos{\beta}}{\boxA \, {\bf{Z}}\, \sin{\gamma}} \\
+ 0.0 & \frac{1}{\boxB\ \sin{\gamma}} & \frac{\cos{\alpha} \, \cos{\gamma}\, -\, \cos{\beta}}{\boxB \, {\bf{Z}}} \\  
+ 0.0 & 0.0 & \frac{\sin{\gamma}}{\boxC \, {\bf{Z}}}
+\end{blockarray} \right]
+\end{equation}
+
+\subsection{From fractional to Cartesian coordinates}
+\noindent Similarly fractional coordinates ($f_x, f_y, f_z$) can be converted to Cartesian coordinates ($r_x, r_y, r_z$) using:
+\begin{equation}
+\left( \begin{blockarray}{c}
+ r_x \\
+ r_y \\
+ r_z
+\end{blockarray} \right)
+\quad = \quad \Tc
+\times
+\left( \begin{blockarray}{c}
+ f_x \\
+ f_y \\
+ f_z
+\end{blockarray} \right)
+\end{equation}
+Where the transformation matrix $\Tc$ is defined as:
+\begin{equation}
+\Tc \quad = \quad \Tf^{-1} \quad =
+\left[ \begin{blockarray}{ccc} 
+ \boxA & \boxB \, \cos{\gamma} & \boxC \, \cos{\beta} \\
+ 0.0 & \boxB \, \sin{\gamma} & \boxC \ \frac{\cos{\alpha}\, -\, \cos{\beta} \, \cos{\gamma}}{\sin{\gamma}}  \\
+ 0.0 & 0.0 & \frac{\boxC \, {\bf{Z}}}{\sin{\gamma}}
+\end{blockarray} \right] 
+\end{equation}
+
+\section{Pixelation of the model box}
+\label{pixel}
+
+\noindent The idea of pixelation, or partitioning, of the model box illustrated in this section is mandatory to deal efficiently with 
+searching for neighbor atoms in large atomic scale models. 
+Indeed the intuitive way to implement the procedure would be to test every pair $i-j$ of atoms in the model: compute the interatomic 
+distance D$_{ij}$ between $i$ ($\alpha$) and $j$ ($\beta$), and then compared this distance to a cutoff radius R$_{cut}(\alpha,\beta)$, 
+that could appropriately be determined when looking at the radial distribution function $g_{\alpha\beta}(r)$. 
+Then if D$_{ij}$ is smaller or equal to R$_{cut}(\alpha,\beta)$ then atoms $i$ and $j$ are first neighbors, otherwise they are not. 
+For a program which purpose is to render the atomic scale model in 3D space, the result of the analysis would be then to draw, or not, a bond between atoms $i$ and $j$. \\
+As intuitive and logical as this approach could seem to be, it requires to perform the testing for every pair of atoms in the model. 
+Which, as long as the size of the system remains within the thousand or few thousands of atoms, could work in a seemingly efficient manner. 
+The time order for the entire analysis is then proportional to $\frac{N \times (N-1)}{2}$, with $N$ the total number of atoms in the model. 
+However as the number of atoms increases, time required to performed the entire analysis increases even more dramatically, 
+soon enough reaching a point where the program will likely seem to be completely frozen. \\
+Therefore a step is required to optimize the procedure for large atomic scale models, and that is 
+to distinguish atom(s) that are of interest for the purpose of the calculation from atom(s) that are not. 
+This is done by dividing, or partitioning, the model box in smaller parts, or pixels. \\
+\begin{figure*}[!h]
+\begin{center}\includegraphics[width=16cm]{img/pixel\_box.eps}\end{center}
+\caption{Pixelation of the model box\label{pixelise}}
+\end{figure*}
+\\ Atomic coordinates will allow to associate an atom to a particular pixel. 
+Then for this particular atom neighbors candidates will only be search for in that same pixel and its immediate surrounding pixel neighbors. 
+The pixel dimension $a$ = R$_{cut}$, with R$_{cut}$ is the cutoff radius used to search for first neighbors atoms. \\ 
+This approach will limit the area of interest to the smallest possible size. 
+Using this methodology the time order for the entire analysis becomes proportional to $N_p \times \frac{N_c \times (N_c - 1)}{2} $, 
+with $N_p$ is the total number of pixels in the grid, and $N_c$ is the average number of atom(s) in the pixel and its 26 surrounding neighbor pixels: $N_c <<< N_p << N$. \\ 
+The idea behind this approach is illustrated in figure~\ref{pixelise}. 
+
+\subsection{Without Periodic Boundary Conditions\label{nopbc}}
+
+The number of pixels on each axis, $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$, are calculated using:
+\begin{equation}
+\label{e_npix}
+n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\textrm{R}_{cut}} \right\rceil 
+\end{equation}
+Where $D_{max}(axis)$ is the maximum interatomic distance separating two atoms on $axis$, and R$_{cut}$ is the cutoff distance that separates neighbor atoms. \\
+Providing a model box, with parameters A, B, and C, encompassing the entire model could prove useful here, allowing the simplifications: 
+\begin{equation}
+\label{e_dmax}
+D_{max}(x) = A,\qquad D_{max}(y) = B\qquad \textrm{and}\qquad D_{max}(z) = C 
+\end{equation}
+Otherwise calculations to determine $D_{max}$ for each axis are needed. 
+It is then required to test each pair of atomic coordinates in the model on $x$, $y$ and $z$. 
+However as long as only subtractions and min/max comparisons are involved calculation time will remain acceptable. \\[0.25cm]
+Then the total number of pixels in the model box, $pixels$, is calculated using: 
+\begin{equation}
+pixels = n_{p}(x) \times n_{p}(y) \times n_{p}(z) 
+\end{equation}
+For an atom $at$ with Cartesian coordinates ($r_x$, $r_y$, $r_z$) in the model, corresponding pixel indices in the pixel grid ($p_x$,~$p_y$,~$p_z$) can be calculated using:
+\begin{equation}
+p_{axis} = \left\lfloor \frac{r_{axis} - min_{axis}}{\textrm{R}_{cut}} \right\rfloor
+\end{equation}
+With:
+\begin{equation}
+\qquad p_{axis} \in [0, n_{p}(axis)-1]
+\end{equation}
+Where $min_{axis}$ in the lowest value for any atomic coordinates in the model on $axis$. \\ 
+The pixel number for $at$, between 0 and $pixels-1$, in entire the pixel grid, $P_{id}$ is calculated using:
+\begin{equation}
+P_{id}(at) = p_{x} + n_{p}(x) \times p_{y} + \left[n_{p}(x) \times n_{p}(y)\right] \times p_{z}
+\end{equation}
+With:
+\begin{equation}
+\qquad P_{id} \in [0, pixels-1]
+\end{equation}
+First neighbors list is calculated as follow:
+\begin{itemize}
+\item[1.] The pixel position ($p_x$,~$p_y$,~$p_z$) for every atom ($r_x$, $r_y$, $r_z$) in the model is to be calculated so that each atom can be assigned a pixel number in the grid.
+\item[2.] Accordingly a list of atom containing pixels is created, the list of atom(s) in each pixel being stored. 
+\item[3.] First neighbor(s) for an atom will then be search for in the pixel this atom belong to and in its surrounding pixel neighbors only, all other pixel(s) being safely ignored. \\ 
+The list of pixel neighbors is constructed using the mathematical relationships between each pixel index in the grid, 
+two cases must considered:
+\newpage
+\begin{itemize}
+\item Pixel inside the pixel grid: \\ 
+\begin{center}
+\includegraphics[width=\pwdi]{img/pixel-27-2.eps}\\
+Self + 26 neighbors\\[0.5cm]
+\end{center}
+\item Pixel on the boundary of the pixel grid :\\
+$p_{axis} = 0$ or $p_{axis} =  n_{p}(axis)-1$ \\
+%\begin{blockarray}{cp{1cm}cp{1cm}c}
+%Face of the pixel grid & & Edge of the pixel grid & & Corner of the pixel grid \\[0.25cm]
+%\includegraphics[width=3cm]{img/pixel-18-2.eps} & &
+%\includegraphics[width=3cm]{img/pixel-12-2.eps} & &
+%\includegraphics[width=2.175cm]{img/pixel-8-2.eps} \\
+%Self + 17 neighbors & & Self + 11 neighbors & & Self + 7 neighbors \\
+%\end{blockarray}
+\begin{center}
+Face of the pixel grid \\[0.25cm]
+\includegraphics[width=\pwdi]{img/pixel-18-2.eps} \\
+Self + 17 neighbors \\[0.5cm]
+Edge of the pixel grid \\[0.25cm]
+\includegraphics[width=\pwdi]{img/pixel-12-2.eps} \\
+Self + 11 neighbors \\[0.5cm]
+Corner of the pixel grid \\[0.25cm]
+\includegraphics[width=\pwdj]{img/pixel-8-2.eps} \\
+Self + 7 neighbors
+\end{center}
+\end{itemize}
+Pixel neighbors are determined as illustrated in figure~\ref{pixelmap}: \\
+\vspace{-1cm}
+\begin{figure*}[!h]
+\begin{center}\includegraphics[width=15cm]{img/pix-map.eps}\end{center}
+\caption{Finding pixel neighbors for pixel P$_{id}$: operation(s) on each axis are illustrated in the appropriate color(s)\label{pixelmap}}
+\end{figure*}
+\end{itemize}
+\vspace{0.5cm}
+Note that this kind of approach only makes sense if the number of pixels in the grid is high enough so that all pixels are not neighbors. 
+
+\newpage
+\subsection{With Periodic Boundary Conditions}
+
+Non-cubic symmetries make it more complicated to offer a general methodology to deal with periodic systems:  
+\begin{itemize}
+\item[1.] Evaluate the number of pixel(s) on each axis, $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$, using equations \ref{e_npix} and \ref{e_dmax}. 
+\item[2.] Convert atomic Cartesian coordinates to fractional coordinates using $\Tf$. \\
+Using the transformation to fractional coordinates is the easiest way to compute the distance between atoms in the model.  
+The problem requires to consider the periodicity of the system, and, in the case of non-cubic symmetry transformations, could be tricky when using Cartesian coordinates. 
+Working with fractional coordinates is much easier since in that case corrections are performed simply adding or subtracting multiples of 1.0 on any fractional direction.
+\begin{itemize}
+\item Convert Cartesian coordinates to fractional coordinates ($f_{x}$, $f_{y}$, $f_{z}$) using Eq.~\ref{c2f}. 
+\item Compute corrected fractional coordinates ($f_{c,x}$, $f_{c,y}$, $f_{c,z}$) inside the model box:
+\begin{equation}
+f_{c,axis} = f_{axis} - \left\lfloor f_{axis} \right\rfloor \qquad \textrm{with}\qquad 0 \le f_{c,axis} < 1
+\end{equation}
+\end{itemize}
+\item[3.] Pixel positions ($p_x$, $p_y$, $p_z$) are determined using the atom's corrected fractional coordinates ($f_{c,x}$, $f_{c,y}$, $f_{c,z}$):
+\begin{equation}
+p_{axis} = \left\lfloor f_{c,axis} \times n_{p}(axis) \right\rfloor \qquad \textrm{with} \qquad p_{axis} \in [0, n_{p}(axis)-1]
+\end{equation}
+\item[4.] Determine each pixel neighbors: 
+\begin{itemize}
+\item Pixel inside the pixel grid:
+\begin{center}\includegraphics[width=4cm]{img/pixel-27-2.eps} \\[0.25cm]
+Self + 26 neighbors, no PBC transformation required. 
+\end{center}
+\clearpage
+\item Pixel on the boundary of the pixel grid :\\
+$p_{axis} = 0$ or $p_{axis} =  n_{p}(axis)-1$ \\ 
+\begin{center}
+Face of the pixel grid: \\[0.25cm] 
+\begin{blockarray}{ccc}\includegraphics[width=\pwdi]{img/pixel-18-2.eps} & \raisebox{\rsv}{+} & \includegraphics[width=\pwdi]{img/pixel-18-9.eps} \end{blockarray} \\
+Self + 17 + 9 neighbors using PBC \\[0.5cm]
+Edge of the pixel grid: \\[0.25cm]
+\begin{blockarray}{ccc}\includegraphics[width=\pwdi]{img/pixel-12-2.eps} & \raisebox{\rsv}{+} & \includegraphics[width=\pwdi]{img/pixel-12-15.eps} \end{blockarray} \\
+Self + 11 + 15 neighbors using PBC \\[0.5cm]
+Corner of the pixel grid: \\[0.25cm]
+\begin{blockarray}{ccc}\includegraphics[width=\pwdj]{img/pixel-8-2.eps} & \raisebox{\rsv}{+} & \includegraphics[width=\pwdi]{img/pixel-8-19.eps} \end{blockarray} \\
+Self + 7 + 19 neighbors using PBC \\[0.5cm]
+\end{center}
+For a pixel with number $p_{id}$ with pixel coordinates ($p_x$, $p_y$, $p_z$) inside the pixel grid, pixel neighbors are determined as illustrated in figure~\ref{pixelmap}. 
+For pixel on the boundary of the grid, then adjustments are required to find the neighbors via PBC. 
+\end{itemize}
+\clearpage
+\item[5.] Compute the interatomic distance $D_{ab}$ between 2 atoms $a$ and $b$ using corrected fractional coordinates:
+\begin{eqnarray}
+f_{c,axis}(ab) & = & f_{c,axis}(a) - f_{c,axis}(b) \\[0.125cm]
+F_{axis}(ab) & = & \lVert f_{c,axis}(ab) \rVert \\[0.125cm]
+Fmin_{axis}(ab) & = & \min\left[F_{axis}(ab),i\ 1.0-F_{axis}(ab)\right] \\[0.125cm]
+f_{axis}(ab) & = & \frac{f_{c,axis(ab)}}{F_{axis}(ab)} \times Fmin_{axis}(ab) \\[0.125cm]
+\vec{r}(ab) & = & \Tc \times \vec{f}(ab) \\[0.125cm]
+\quad {\textrm{with}} \quad \vec{r}(ab) & = & \left( \begin{blockarray}{c}
+r_x(ab) \\
+r_y(ab) \\
+r_z(ab)
+\end{blockarray} \right) \\[0.125cm]
+\quad {\textrm{and}} \quad \vec{f}(ab) & = & \left( \begin{blockarray}{c}
+f_{x}(ab) \\
+f_{y}(ab) \\
+f_{z}(ab)
+\end{blockarray} \right) \\[0.125cm]
+D(ab) & = & \lvert \vec{r}(ab) \rvert
+\end{eqnarray}
+As mentioned in the previous section this approach only makes sense when the number of pixels in the grid is high enough so that all pixels are not neighbors. 
+In the case where PBC are applied this means that the number of pixels on one dimension, $x$, $y$, or $z$ should be higher than 3. 
+\end{itemize}
+Commented codes that illustrate the entire work procedure are provided in: 
+\begin{itemize}
+\item C codes: \ref{c-pc-data} through \ref{c-pc-pixel}.
+\item FORTRAN90 codes: \ref{f-pc-data} through \ref{f-pc-pixel}.
+\item Python codes: \ref{p-pc-data} through \ref{p-pc-pixel}. \\
+Note that this Python code is provided to illustrate the entire implementation in Python, but for that particular programming language
+several Python libraries already exist and can be used as fronted to simplify the complete coding (ex: \href{https://ase-lib.org/}{ASE}, \href{https://thynnine.github.io/pysic/}{Pysic}, \href{https://www.mdanalysis.org/}{MDAnalysis}), 
+however in that case the pixelation approach is rarely coded in pure Python language (\href{https://thynnine.github.io/pysic/}{Pysic} using Fortran, \href{https://www.mdanalysis.org/}{MDAnalysis} using C).
+\end{itemize}
+
+\section{Further optimizations}
+
+The analysis time can be reduced using MPI and/or OpenMP parallel programming. 
+Several scenario, or approaches, can be envisioned depending on the size of the system in number of atoms and/or the number of configuration (MD steps): 
+\begin{itemize}
+\item Single (MPI or OpenMP): atomic coordinates or pixels can be distributed over the CPU and/or CPU cores.
+\item Multiples (MPI or OpenMP): configurations can be distributed over the CPU and/or the CPU cores. 
+\item Multiples (MPI and OpenMP): with hybrid parallelization configurations can be distributed over the CPU, and atomic coordinates or pixels can be distributed over the CPU cores. 
+\end{itemize}
+Ideally the code would provide the option to switch to one or the other approach based on the number of configurations and or atoms in the system. \\ 
+Note that this is the case of the \atomes\ software \cite{CMSatomes} that implements an adaptive OpenMP programming distributing 
+either the atomic coordinates or the MD steps on the CPU cores. 
+
+\section{Conclusion}
+
+The general methodology behind efficient first neighbor(s) analysis in any kind of atomic scale models was described. \\
+It was illustrated that the understanding of lattice mathematics can simplify the evaluation of interatomic bond distances 
+independently of the periodicity of the system, and that the particular idea of the pixelation, or partitioning, of the model box, 
+is a prerequisite to any modern implementation of this analysis. \\
+The methodoly described in this article is the one implemented in the \atomes\ software \cite{CMSatomes}. 
+% Although the methodology presented in this paper is not new per say, it was never properly introduced in any research article to date, or at least not to the author's knowledge. 
+
+\section*{Author Contributions}
+%%%%%%%%%%%%%%%%
+% This section mustt describe the actual contributions of
+% author. Since this is an electronic-only journal, there is
+% no length limit when you describe the authors' contributions,
+% so we recommend describing what they actually did rather than
+% simply categorizing them in a small number of
+% predefined roles as might be done in other journals.
+%
+% See the policies ``Policies on Authorship'' section of https://livecoms.github.io
+% for more information on deciding on authorship and author order.
+%%%%%%%%%%%%%%%%
+
+(Explain the contributions of the different authors here)
+
+% We suggest you preserve this comment:
+For a more detailed description of author contributions,
+see the GitHub issue tracking and changelog at \githubrepository.
+\section*{Potentially Conflicting Interests}
+
+%%%%%%%
+%Declare any potentially competing interests, financial or otherwise
+%%%%%%%
+
+No conflicting interests.
+
+\section*{Author Information}
+\makeorcid
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Biblio %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliography{bonds}
+
+\clearpage
+\appendix
+\onecolumn
+\input{c-code-l}
+
+\input{f-code}
+
+\clearpage
+\input{p-code}
+\twocolumn
+
+\end{document}
