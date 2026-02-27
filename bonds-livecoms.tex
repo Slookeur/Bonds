@@ -502,20 +502,48 @@ is a prerequisite to any modern implementation of this analysis. \\
 The methodoly described in this article is the one implemented in the \atomes\ software \cite{CMSatomes}. 
 % Although the methodology presented in this paper is not new per say, it was never properly introduced in any research article to date, or at least not to the author's knowledge. 
 
-\section*{Author Contributions}
-%%%%%%%%%%%%%%%%
-% This section mustt describe the actual contributions of
-% author. Since this is an electronic-only journal, there is
-% no length limit when you describe the authors' contributions,
-% so we recommend describing what they actually did rather than
-% simply categorizing them in a small number of
-% predefined roles as might be done in other journals.
-%
-% See the policies ``Policies on Authorship'' section of https://livecoms.github.io
-% for more information on deciding on authorship and author order.
-%%%%%%%%%%%%%%%%
+\section*{Checklist}
 
-(Explain the contributions of the different authors here)
+% This does not exist on its own page
+\begin{Checklists*}[h]
+
+\begin{checklist}{Searching for first neighbor atoms}
+\textbf{Non-periodic systems}
+\begin{itemize}
+\item Choose a cutoff radius ${\textrm{R}_{cut}}$ to determine first neighor atoms
+\item Find the maximum distances, $D_{max}(x)$, $D_{max}(y)$ and $D_{max}(z)$ that separate 2 atoms on $x$, $y$ and $z$
+\item Determine the number of pixels, $n_{p}(axis)$, on $x$, $y$ and $z$ using $n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\textrm{R}_{cut}} \right\rceil$
+\item Create a pixel grid for a virtual box with dimensions $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$ on $x$, $y$ and $z$ axis respectively.
+\item Using its Cartesian coordinates, $r_{axis}$, associate each atom $at$ with a pixel position in the grid
+\begin{itemize}
+\item Pixel position on each $axis$: $p_{axis} = \left\lfloor \frac{r_{axis} - min_{axis}}{\textrm{R}_{cut}} \right\rfloor$
+\item Pixel ID number in the grid: $P_{id}(at) = p_{x} + n_{p}(x) \times p_{y} + \left[n_{p}(x) \times n_{p}(y)\right] \times p_{z}$
+\end{itemize}
+\item Associate each pixel with it surrouding neighbors in the grid
+\item Search for bond candidates between the atoms of a pixel as well as the atoms of its surrouding pixel neighbors
+\item Evaluate distances using the atom's Cartesian coordinates
+\end{itemize}
+\textbf{Periodic systems}
+\begin{itemize}
+\item Choose a cutoff radius ${\textrm{R}_{cut}}$ to determine first neighor atoms
+\item Use the lattice parameters as maximum interatomic distances on $x$, $y$ and $z$: $D_{max}(x) = \boxA$, $D_{max}(y) = \boxB$ and $D_{max}(z) = \boxC$
+\item Determine the number of pixels, $n_{p}(axis)$, on $x$, $y$ and $z$ using $n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\textrm{R}_{cut}} \right\rceil$
+\item Create a pixel grid with dimensions $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$ on $x$, $y$ and $z$ axis respectively.
+\item Convert all atom Cartesian coordinates to fractional coordinates $f$
+\item Compute the corrected fractional coordinates $f_c$ to ensure that all are in the unit cell
+\item Using its correct fractional coordinates, $f_{c,axis}$, associate each atom $at$ with a pixel position in the grid
+\begin{itemize}
+\item Pixel position on each $axis$: $p_{axis} = \left\lfloor f_{c,axis} \times n_{p}(axis) \right\rfloor$
+\item Pixel ID number in the grid: $P_{id}(at) = p_{x} + n_{p}(x) \times p_{y} + \left[n_{p}(x) \times n_{p}(y)\right] \times p_{z}$
+\end{itemize}
+\item Associate each pixel with it surrouding neighbors in the grid, if needed apply PBC transformation(s)
+\item Search for bond candidates between the atoms of a pixel as well as the atoms of its surrouding pixel neighbors
+\item Evaluate distances using the atom's corrected fractional coordinates followed by a matrix transformation to Cartesian coordinates
+\end{itemize}
+\end{checklist}
+
+\end{Checklists*}
+
 
 % We suggest you preserve this comment:
 For a more detailed description of author contributions,
