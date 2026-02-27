@@ -59,6 +59,7 @@ float l_params[|\trois|];         // lattice a, b and c
 float cart_to_frac[|\trois|][|\trois|];  // Cartesian to fractional coordinates matrix
 float frac_to_cart[|\trois|][|\trois|];  // fractional to Cartesian coordinates matrix
 \end{lstlisting}
+
 \clearpage
 
 \subsection{C code: set periodic boundary condition pixel shift}
@@ -143,7 +144,9 @@ void set_pbc_shift (pixel_grid * grid, int pixel_coord[|\trois|], int pbc_shift[
   }
 }
 \end{lstlisting}
+
 \clearpage
+
 \subsection{C code: add atom to pixel}
 \label{c-add_atom_pixel}
 \begin{lstlisting}[language=C]
@@ -159,14 +162,15 @@ void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[|\trois|], int atom_i
   }
   the_pixel->pix_atoms = realloc(the_pixel->pix_atoms, (the_pixel−>patoms+|\un|)*sizeof*the_pixel->pix_atoms);
   the_pixel->pix_atoms[patoms].atom_id = atom_id;
-  int |\dbtt{axis}|;
   for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
   {
-    the_pixel->pix_atoms[patoms].coord[ |\dbtt{axis}|] = atom_coord[ |\dbtt{axis}|];
+    the_pixel->pix_atoms[patoms].coord[|\dbtt{axis}|] = atom_coord[|\dbtt{axis}|];
   }
   the_pixel−>patoms ++;
 }
 \end{lstlisting}
+
+\clearpage
 
 \subsection{C code: preparation of the pixel grid}
 \label{c-pc-grid}
@@ -245,8 +249,8 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   return grid;
 }
 \end{lstlisting}
-\clearpage
 
+\clearpage
 
 \subsection{C code: finding pixel neighbors}
 \label{c-find-pn}
@@ -323,6 +327,7 @@ if ( use_pbc )
   the_pix->neighbors = |\bftt{nnp}|;
 }
 \end{lstlisting}
+
 \clearpage
 
 \subsection{C code: inter-atomic distance calculation}
@@ -366,6 +371,7 @@ distance evaluate_distance (bool use_pbc, pixel_atom * at_i, pixel_atom * at_j)
   return dist;
 }
 \end{lstlisting}
+
 \clearpage
 
 \subsection{C code: pixel search for first neighbor atoms}
@@ -379,13 +385,13 @@ void pixel_search_for_neighbors (bool use_pbc)
   int |\vbtt{pix}|, |\rbtt{pjx}|;              // integer pixel ID numbers
   int |\dbtt{aid}|, |\cbtt{bid}|;              // integer loop atom numbers
   int pid;
-  int start, end;            // integer loop modifier
-  pixel * pix_i, * pix_j;    // pointers on pixel data structure
-  pixel_atom * at_i, * at_j; // pointers on pixel_atom data structure
-  distance Dij;              // distance data structure
+  int l_start, l_end;         // integer loop modifier
+  pixel * pix_i, * pix_j;     // pointers on pixel data structure
+  pixel_atom * at_i, * at_j;  // pointers on pixel_atom data structure
+  distance Dij;               // distance data structure
 
   all_pixels = prepare_pixel_grid (use_pbc);
-  // Note that 'all_pixels' must be prepared before the following
+  // Note that the pixel grid 'all_pixels' must be prepared before the following
   // For all pixels in the grid
   for ( |\vbtt{pix}| = |\zero| ; |\vbtt{pix}| < all_pixels->pixels ; |\vbtt{pix}| ++ )
   {
@@ -408,15 +414,15 @@ void pixel_search_for_neighbors (bool use_pbc)
         if ( pix_j->patoms && ! pix_j->tested )
         {
           // If 'pix_i' and 'pix_j' are the same, only test pair of different atoms
-          end = (|\rbtt{pjx}| != |\vbtt{pix}|) ? |\zero| : |\un|
+          l_end = (|\rbtt{pjx}| != |\vbtt{pix}|) ? |\zero| : |\un|
           // For all atom(s) in 'pix'
-          for ( |\dbtt{aid}| = |\zero| ; |\dbtt{aid}| < pix_i->patoms - end ; |\dbtt{aid}| ++ )
+          for ( |\dbtt{aid}| = |\zero| ; |\dbtt{aid}| < pix_i->patoms - l_end ; |\dbtt{aid}| ++ )
           {
             // Set pointer to the first atom to test
             at_i = & pix_i->pix_atom[|\dbtt{aid}|];
-            start = (|\rbtt{pjx}| != |\vbtt{pix}|) ? |\zero| : |\dbtt{aid}| + |\un|
+            lstart = (|\rbtt{pjx}| != |\vbtt{pix}|) ? |\zero| : |\dbtt{aid}| + |\un|
             // For all atom(s) in 'pix_j'
-            for ( |\cbtt{bid}| = start ; |\cbtt{bid}| < pix_j->patoms ; |\cbtt{bid}| ++ )
+            for ( |\cbtt{bid}| = lstart ; |\cbtt{bid}| < pix_j->patoms ; |\cbtt{bid}| ++ )
             {
               // Set pointer to the second atom to test
               at_j = & pix_j->pix_atom[|\cbtt{bid}|];

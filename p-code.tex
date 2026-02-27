@@ -15,9 +15,9 @@ class PixelAtom:
 
 # Pixel data structure
 class Pixel:
-  def __init__(self, pid=|\zero|, p_co=None, tested=False, patoms=|\zero|, pix_atoms=None, neighbors=|\zero|):
+  def __init__(self, pid=|\zero|, p_xyz=None, tested=False, patoms=|\zero|, pix_atoms=None, neighbors=|\zero|):
     self.pid = pid                                               # the pixel number
-    self.p_co = np.zeros(|\trois|) if p_co is None else np.array(p_co)  # the pixel coordinates in the grid
+    self.p_xyz = np.zeros(|\trois|) if p_xyz is None else np.array(p_xyz)  # the pixel coordinates in the grid
     self.tested = tested                                         # was the pixel checked already
     self.patoms = patoms                                         # number of atom(s) in pixel
     self.pix_atoms = [] if pix_atoms is None else pix_atoms      # list of atom(s) in the pixel
@@ -95,67 +95,34 @@ def set_pbc_shift(pixel_grid : PixelGrid, pixel_coord : np.ndarray, pbc_shift : 
       for |\rbtt{y\_pos}| in range(|\trois|):
         pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\deux|] -= pixel_grid.pixels
 \end{lstlisting}
+
 \clearpage
 
-\subsection{Commented Python code: finding pixel neighbors}
-
+\subsection{Commented Python code: add atom to pixel}
+\label{c-add_atom_pixel}
 \begin{lstlisting}[language=Python]
-# Finding neighbor pixels for pixel in the grid
-# - bool use_pbc : flag to set if PBC are used or not
-# - grid * the_grid : pointer to the pixel grid
-# - pixel * the_pix : pointer to the pixel with neighbors to be found
-def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
-  boundary = False                            # is pixel on the boundary of the grid
-  keep_neighbor = True                        # keep or not neighbor during analysis
-  l_start = [|\zero|, |\zero|, |\zero|]                         # loop iterators starting value
-  l_end = [|\trois|, |\trois|, |\trois|]                           # loop iterators ending value
-  pmod = [-|\un|, |\zero|, |\un|]                           # position modifiers
-  pbc_shift = np.zeros((|\trois|, |\trois|, |\trois|), dtype=int)  # shift for pixel neighbor number due to PBC
+def add_atom_to_pixel (the_pixel : Pixel, pixel_coord : , atom_id : int, atom_coord)
 
-  # Check if PBC are used
-  if use_pbc:
-    set_pbc_shift(the_grid, the_pix.p_co, pbc_shift)
-  else:
-    for |\dbtt{axis}| in range(|\trois|):
-      if the_pix.p_co[|\dbtt{axis}|] == |\zero| or the_pix.p_co[|\dbtt{axis}|] == the_grid.n_pix[|\dbtt{axis}|] - |\un|:
-        boundary = True
+  INTEGER                              :: |\dbtt{axis}|       ! loop iterator axis id (1=x , 2=y , 3=z)
 
-  # Adjust the loop start and end based on the grid dimensions
-  for |\dbtt{axis}| in range(|\trois|):
-    if the_grid.n_pix[|\dbtt{axis}|] == |\un|:
-      l_start[|\dbtt{axis}|] = |\un|
-      l_end[|\dbtt{axis}|] = |\deux|
+  if ! the_pixel%patoms
+    do |\dbtt{axis}| = |\un| , |\trois|
+      the_pixel-%p_xyz(|\dbtt{axis}|) = pixel_coord(|\dbtt{axis}|);
+    enddo
 
-  |\bftt{nnp}| = |\zero|  # number of neighbors
-  for |\vbtt{xpos}| in range(l_start[|\zero|], l_end[|\zero|]):
-    for |\rbtt{ypos}| in range(l_start[|\un|], l_end[|\un|]):
-      for |\obtt{zpos}| in range(l_start[|\deux|], l_end[|\deux|]):
-        keep_neighbor = True
+  the_pixel%patoms = the_pixel%patoms + |\un|
+  if (allocated(the_pixel%pix_atoms)) then
+    the_pixel%pix_atoms = realloc(the_pixel%pix_atoms, the_pixel%patoms)
+  else
+    allocate(the_pixel%pix_atoms(1))
+  endif
+  the_pixel%pix_atoms(patoms)%atom_id = atom_id
+  do |\dbtt{axis}| = |\un| , |\trois|
+    the_pixel%pix_atoms(patoms)%coord(|\dbtt{axis}|) = atom_coord(|\dbtt{axis}|)
+  enddo
 
-        if not use_pbc and boundary:
-          if the_pix.p_co[|\zero|] == |\zero| and |\vbtt{xpos}| == |\zero|:
-            keep_neighbor = False
-          elif the_pix.p_co[|\zero|] == the_grid.n_pix[|\zero|] and |\vbtt{xpos}| == |\deux|:
-            keep_neighbor = False
-          elif the_pix.p_co[|\un|] == |\zero| and |\rbtt{ypos}| == |\zero|:
-            keep_neighbor = False
-          elif the_pix.p_co[|\un|] == the_grid.n_pix[|\un|] and |\rbtt{ypos}| == |\deux|:
-            keep_neighbor = False
-          elif the_pix.p_co[|\deux|] == |\zero| and |\obtt{zpos}| == |\zero|:
-            keep_neighbor = False
-          elif the_pix.p_co[|\deux|] == the_grid.n_pix[|\deux|] and |\obtt{zpos}| == |\deux|:
-            keep_neighbor = False
-
-        if keep_neighbor:
-          # Calculate the neighbor id
-          nid = the_pix.pid + pmod[|\vbtt{xpos}|] + pmod[|\rbtt{ypos}|] * the_grid.n_pix[|\zero|] + pmod[|\obtt{zpos}|] * the_grid.n_xy
-          if use_pbc:
-            nid += pbc_shift[|\vbtt{xpos}|][|\rbtt{ypos}|][|\obtt{zpos}|]
-          the_pix.neighbor_list[|\bftt{nnp}|] = nid
-          |\bftt{nnp}| += |\un|
-
-  the_pix.neighbors = |\bftt{nnp}|
 \end{lstlisting}
+
 \clearpage
 
 \subsection{Commented Python code: preparation of the pixel grid}
@@ -216,6 +183,69 @@ def prepare_pixel_grid(use_pbc : bool):
   
   return grid
 \end{lstlisting}
+
+\clearpage
+
+\subsection{Commented Python code: finding pixel neighbors}
+
+\begin{lstlisting}[language=Python]
+# Finding neighbor pixels for pixel in the grid
+# - bool use_pbc : flag to set if PBC are used or not
+# - grid * the_grid : pointer to the pixel grid
+# - pixel * the_pix : pointer to the pixel with neighbors to be found
+def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
+  boundary = False                            # is pixel on the boundary of the grid
+  keep_neighbor = True                        # keep or not neighbor during analysis
+  l_start = [|\zero|, |\zero|, |\zero|]                         # loop iterators starting value
+  l_end = [|\trois|, |\trois|, |\trois|]                           # loop iterators ending value
+  pmod = [-|\un|, |\zero|, |\un|]                           # position modifiers
+  pbc_shift = np.zeros((|\trois|, |\trois|, |\trois|), dtype=int)  # shift for pixel neighbor number due to PBC
+
+  # Check if PBC are used
+  if use_pbc:
+    set_pbc_shift(the_grid, the_pix.p_xyz, pbc_shift)
+  else:
+    for |\dbtt{axis}| in range(|\trois|):
+      if the_pix.p_xyz[|\dbtt{axis}|] == |\zero| or the_pix.p_xyz[|\dbtt{axis}|] == the_grid.n_pix[|\dbtt{axis}|] - |\un|:
+        boundary = True
+
+  # Adjust the loop start and end based on the grid dimensions
+  for |\dbtt{axis}| in range(|\trois|):
+    if the_grid.n_pix[|\dbtt{axis}|] == |\un|:
+      l_start[|\dbtt{axis}|] = |\un|
+      l_end[|\dbtt{axis}|] = |\deux|
+
+  |\bftt{nnp}| = |\zero|  # number of neighbors
+  for |\vbtt{xpos}| in range(l_start[|\zero|], l_end[|\zero|]):
+    for |\rbtt{ypos}| in range(l_start[|\un|], l_end[|\un|]):
+      for |\obtt{zpos}| in range(l_start[|\deux|], l_end[|\deux|]):
+        keep_neighbor = True
+
+        if not use_pbc and boundary:
+          if the_pix.p_xyz[|\zero|] == |\zero| and |\vbtt{xpos}| == |\zero|:
+            keep_neighbor = False
+          elif the_pix.p_xyz[|\zero|] == the_grid.n_pix[|\zero|] and |\vbtt{xpos}| == |\deux|:
+            keep_neighbor = False
+          elif the_pix.p_xyz[|\un|] == |\zero| and |\rbtt{ypos}| == |\zero|:
+            keep_neighbor = False
+          elif the_pix.p_xyz[|\un|] == the_grid.n_pix[|\un|] and |\rbtt{ypos}| == |\deux|:
+            keep_neighbor = False
+          elif the_pix.p_xyz[|\deux|] == |\zero| and |\obtt{zpos}| == |\zero|:
+            keep_neighbor = False
+          elif the_pix.p_xyz[|\deux|] == the_grid.n_pix[|\deux|] and |\obtt{zpos}| == |\deux|:
+            keep_neighbor = False
+
+        if keep_neighbor:
+          # Calculate the neighbor id
+          nid = the_pix.pid + pmod[|\vbtt{xpos}|] + pmod[|\rbtt{ypos}|] * the_grid.n_pix[|\zero|] + pmod[|\obtt{zpos}|] * the_grid.n_xy
+          if use_pbc:
+            nid += pbc_shift[|\vbtt{xpos}|][|\rbtt{ypos}|][|\obtt{zpos}|]
+          the_pix.neighbor_list[|\bftt{nnp}|] = nid
+          |\bftt{nnp}| += |\un|
+
+  the_pix.neighbors = |\bftt{nnp}|
+\end{lstlisting}
+
 \clearpage
 
 \subsection{Commented Python code: inter-atomic distance calculation}
@@ -254,6 +284,7 @@ def evaluate_distance(use_pbc : bool, at_i : PixelAtom, at_j : PixelAtom):
   # - the components of the distance vector on x, y, and z
   return dist
 \end{lstlisting}
+
 \clearpage
 
 \subsection{Commented Python code: pixel search for first neighbor atoms}
