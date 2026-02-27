@@ -39,8 +39,8 @@ To build the PDF file of the manuscript:
 
 > [!WARNING]
 > Issues in version 1.0:
-> - The ` \affil[1]{ ` instruction in `bonds-lievcom.tex` line **136** is always producing an error, and it is required to comment this line to build the PDF.
-> - On page 6 of 25, now way to print all figures in the same column and then continue the discussion, for some reason(s) the third figure ("Corner of the pixel grid") is always inserted on second column.
+> - The ` \affil[1]{ ` instruction, at line **136** in the main TeX file `bonds-lievcoms.tex`, is always producing an error, and it is required to comment this line to build the PDF.
+> - In the PDF file `bonds-lievcoms.pdf`, on page 6 of 25, now way to print all figures in the same column and then continue the discussion, for some reason(s) the third figure ("Corner of the pixel grid") is always inserted on second column.
 
 This manuscript was written by [Dr. Sébastien Le Roux][slr], research engineer for the [CNRS][cnrs]
 
