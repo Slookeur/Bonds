@@ -22,7 +22,7 @@ typedef struct pixel pixel;
 struct pixel
 {
   int pid;                 // the pixel number
-  int p_co[|\trois|];             // the pixel coordinates in the grid
+  int p_xyz[|\trois|];             // the pixel coordinates in the grid
   bool tested;             // was the pixel checked already
   int patoms;              // number of atom(s) in pixel
   pixel_atom * pix_atoms;  // list of atom(s) in the pixel, to be allocated
@@ -64,11 +64,11 @@ float frac_to_cart[|\trois|][|\trois|];  // fractional to Cartesian coordinates 
 \subsection{C code: set periodic boundary condition pixel shift}
 \label{c-set-pshift}
 %// Adjust, if needed, shift to search for pixel neighbor(s) using PBC
-%// - grid pixel_grid            : the pixel grid
+%// - pixel_grid * grid           : the pixel grid
 %// - int pixel_coord[|\trois|]         : the pixel coordinates in the grid
 %// - int pbc_shift[|\trois|][|\trois|][|\trois|]     : the shift, correction, to be calculated
 \begin{lstlisting}[language=C]
-void set_pbc_shift (grid pixel_grid, int pixel_coord[|\trois|], int pbc_shift[|\trois|][|\trois|][|\trois|])
+void set_pbc_shift (pixel_grid * grid, int pixel_coord[|\trois|], int pbc_shift[|\trois|][|\trois|][|\trois|])
 {
   int |\vbtt{x\_pos}|, |\rbtt{y\_pos}|, |\obtt{z\_pos}|; // loop iterators
   for ( |\vbtt{x\_pos}| = |\zero| ; |\vbtt{x\_pos}| < |\trois| ; |\vbtt{x\_pos}| ++ )
@@ -87,17 +87,17 @@ void set_pbc_shift (grid pixel_grid, int pixel_coord[|\trois|], int pbc_shift[|\
     {
       for ( |\obtt{z\_pos}| = |\zero| ; |\obtt{z\_pos}| < |\trois| ; |\obtt{z\_pos}| ++ )
       {
-        pbc_shift[|\zero|][|\rbtt{y\_pos}|][|\obtt{z\_pos}|] = pixel_grid->n_pix[|\zero|];
+        pbc_shift[|\zero|][|\rbtt{y\_pos}|][|\obtt{z\_pos}|] = grid->n_pix[|\zero|];
       }
     }
   }
-  else if ( pixel_coord[|\zero|] == pixel_grid->n_pix[|\zero|] - |\un| ) // pixel position on 'x' is max
+  else if ( pixel_coord[|\zero|] == grid->n_pix[|\zero|] - |\un| ) // pixel position on 'x' is max
   {
     for ( |\rbtt{y\_pos}| = |\zero| ; |\rbtt{y\_pos}| < |\trois| ; |\rbtt{y\_pos}| ++ )
     {
       for ( |\obtt{z\_pos}| = |\zero| ; |\obtt{z\_pos}| < |\trois| ; |\obtt{z\_pos}| ++ )
       {
-        pbc_shift[|\deux|][|\rbtt{y\_pos}|][|\obtt{z\_pos}|] = - pixel_grid->n_pix[|\zero|];
+        pbc_shift[|\deux|][|\rbtt{y\_pos}|][|\obtt{z\_pos}|] = - grid->n_pix[|\zero|];
       }
     }
   }
@@ -107,17 +107,17 @@ void set_pbc_shift (grid pixel_grid, int pixel_coord[|\trois|], int pbc_shift[|\
     {
       for ( |\obtt{z\_pos}| = |\zero| ; |\obtt{z\_pos}| < |\trois| ; |\obtt{z\_pos}| ++ )
       {
-        pbc_shift[|\vbtt{x\_pos}|][|\zero|][|\obtt{z\_pos}|] += pixel_grid->n_xy;
+        pbc_shift[|\vbtt{x\_pos}|][|\zero|][|\obtt{z\_pos}|] += grid->n_xy;
       }
     }
   }
-  else if ( pixel_coord[|\un|] == pixel_grid->n_pix[|\un|] - |\un| ) // pixel position on 'y' is max
+  else if ( pixel_coord[|\un|] == grid->n_pix[|\un|] - |\un| ) // pixel position on 'y' is max
   {
     for ( |\vbtt{x\_pos}| = |\zero| ; |\vbtt{x\_pos}| < |\trois| ; |\vbtt{x\_pos}| ++ )
     {
       for ( |\obtt{z\_pos}| = |\zero| ; |\obtt{z\_pos}| < |\trois| ; |\obtt{z\_pos}| ++ )
       {
-        pbc_shift[|\vbtt{x\_pos}|][|\deux|][|\obtt{z\_pos}|] -= pixel_grid->n_xy;
+        pbc_shift[|\vbtt{x\_pos}|][|\deux|][|\obtt{z\_pos}|] -= grid->n_xy;
       }
     }
   }
@@ -127,100 +127,46 @@ void set_pbc_shift (grid pixel_grid, int pixel_coord[|\trois|], int pbc_shift[|\
     {
       for ( |\rbtt{y\_pos}| = |\zero| ; |\rbtt{y\_pos}| < |\trois| ; |\rbtt{y\_pos}| ++ )
       {
-        pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\zero|] += pixel_grid->pixels;
+        pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\zero|] += grid->pixels;
       }
     }
   }
-  else if ( pixel_coord[|\deux|] == pixel_grid->n_pix[|\deux|] - |\un| ) // pixel position on 'z' is max
+  else if ( pixel_coord[|\deux|] == grid->n_pix[|\deux|] - |\un| ) // pixel position on 'z' is max
   {
     for ( |\vbtt{x\_pos}| = |\zero| ; |\vbtt{x\_pos}| < |\trois| ; |\vbtt{x\_pos}| ++ )
     {
       for ( |\rbtt{y\_pos}| = |\zero| ; |\rbtt{y\_pos}| < |\trois| ; |\rbtt{y\_pos}| ++ )
       {
-        pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\deux|] -= pixel_grid->pixels;
+        pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\deux|] -= grid->pixels;
       }
     }
   }
 }
 \end{lstlisting}
 \clearpage
-
-\subsection{C code: finding pixel neighbors}
-\label{c-find-pn}
+\subsection{C code: add atom to pixel}
+\label{c-add_atom_pixel}
 \begin{lstlisting}[language=C]
-// Finding neighbor pixels for pixel in the grid
-// - bool use_pbc : flag to set if PBC are used or not
-// - grid * the_gird : pointer to the pixel grid
-// - pixel * the_pix : pointer to the pixel with neighbors to be found
-void find_pixel_neighbors (bool use_pbc, grid * the_grid, pixel * the_pix)
+void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[|\trois|], int atom_id, float atom_coord[|\trois|])
 {
-  int |\dbtt{axis}|;                       // |\dbtt{axis}| loop iterator
-  int |\vbtt{xpos}|, |\rbtt{ypos}|, |\obtt{zpos}|;           // neighbor position on x, y and z
-  int l_start[|\trois|] = { |\zero|, |\zero|, |\zero|};    // loop iterators starting value
-  int l_end[|\trois|] = { |\trois|, |\trois|, |\trois|};      // loop iterators ending value
-  int pmod[|\trois|] = {-|\un|, |\zero|, |\un|};       // position modifiers
-  int |\bftt{nnp}|;                        // number of neighbors for pixel
-  int nid;                        // neighbor id for pixel
-  int pbc_shift[|\trois|][|\trois|][|\trois|];         // shift for pixel neighbor number due to PBC
-  bool boundary = FALSE;          // is pixel on the boundary of the grid
-  bool keep_neighbor = TRUE;      // keep or not neighbor during analysis
-
-if ( use_pbc )
-  {
-    set_pbc_shift (the_grid, the_pix->p_co, pbc_shift);
-  }
-  else
+  int |\dbtt{axis}|;
+  if (! the_pixel->patoms)
   {
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
     {
-      if ( the_pix->p_co[|\dbtt{axis}|] == |\zero| |\textbar\textbar| the_pix->p_co[|\dbtt{axis}|] == the_grid->n_pix[|\dbtt{axis}|] - |\un| ) boundary = TRUE;
+      the_pixel->p_xyz[|\dbtt{axis}|] = pixel_coord[|\dbtt{axis}|];
     }
   }
+  the_pixel->pix_atoms = realloc(the_pixel->pix_atoms, (the_pixel−>patoms+|\un|)*sizeof*the_pixel->pix_atoms);
+  the_pixel->pix_atoms[patoms].atom_id = atom_id;
+  int |\dbtt{axis}|;
   for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
   {
-    if ( the_grid->n_pix[|\dbtt{axis}|] == |\un| )
-    {
-      l_start[|\dbtt{axis}|] = |\un|;
-      l_end[|\dbtt{axis}|] = |\deux|;
-    }
+    the_pixel->pix_atoms[patoms].coord[ |\dbtt{axis}|] = atom_coord[ |\dbtt{axis}|];
   }
-  |\bftt{nnp}| = |\zero|;
-  for ( |\vbtt{xpos}| = l_start[|\zero|] ; |\vbtt{xpos}| < l_end[|\zero|] ; |\vbtt{xpos}| ++ )
-  {
-    for ( |\rbtt{ypos}| = l_start[|\un|] ; |\rbtt{ypos}| < l_end[|\un|] ; |\rbtt{ypos}| ++ )
-    {
-      for ( |\obtt{zpos}| = l_start[|\deux|] ; |\obtt{zpos}| < l_end[|\deux|] ; |\obtt{zpos}| ++ )
-      {
-        keep_neighbor = TRUE;
-        if ( ! use_pbc && boundary )
-        {
-          if (( the_pix->p_co[|\zero|] == |\zero| && |\vbtt{xpos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_co[|\zero|] == the_grid->n_pix[|\zero|] && |\vbtt{xpos}| == |\deux| ))
-          {
-            keep_neighbor = FALSE;
-          }
-          else if (( the_pix->p_co[|\un|] == |\zero| && |\rbtt{ypos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_co[|\un|] == the_grid->n_pix[|\un|] && |\rbtt{ypos}| == |\deux| ))
-          {
-            keep_neighbor = FALSE;
-          }
-          else if (( the_pix->p_co[|\deux|] == |\zero| && |\obtt{zpos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_co[|\deux|] == the_grid->n_pix[|\deux|] && |\obtt{zpos}| == |\deux| ))
-          {
-            keep_neighbor = FALSE;
-          }
-        }
-        if ( keep_neighbor )
-        {
-          nid = the_pix->pid + pmod[|\vbtt{xpos}|] + pmod[|\rbtt{ypos}|] * the_grid->n_pix[|\zero|] + pmod[|\obtt{zpos}|] * the_grid->n_xy;
-          if ( use_pbc ) nid += pbc_shift[|\vbtt{xpos}|][|\rbtt{ypos}|][|\obtt{zpos}|];
-          the_pix->pixel_neighbors[|\bftt{nnp}|] = nid;
-          |\bftt{nnp}| ++ ;
-        }
-      }
-    }
-  }
-  the_pix->neighbors = |\bftt{nnp}|;
+  the_pixel−>patoms ++;
 }
 \end{lstlisting}
-\clearpage
 
 \subsection{C code: preparation of the pixel grid}
 \label{c-pc-grid}
@@ -278,10 +224,6 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
         pixel_pos[|\dbtt{axis}|] = (int)((c_coord[|\cbtt{aid}|][|\dbtt{axis}|] - cmin[|\dbtt{axis}|])/cutoff);
       }
       pixel_num = pixel_pos[|\zero|] + pixel_pos[|\un|] * grid->n_pix[|\zero|] + pixel_pos[|\deux|] * grid->n_xy + |\un|;
-      // User defined function to:
-      // - Add atom '|\cbtt{aid}|' with coordinates 'c_coord[|\cbtt{aid}|]' to pixel 'pixel_number'
-      // - Increment the number of atom(s) in pixel 'pixel_number'
-      // - If needed (for the first atom) set pixel coordinates in the grid to 'pixel_pos'
       add_atom_to_pixel (grid, pixel_num, pixel_pos, |\cbtt{aid}|, c_coord[|\cbtt{aid}|]);
     }
   }
@@ -297,10 +239,88 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
         pixel_pos[|\dbtt{axis}|] = (int)((f_coord[|\dbtt{axis}|] * n_pix[|\dbtt{axis}|]);
       }
       pixel_num = pixel_pos[|\zero|] + pixel_pos[|\un|] * grid->n_pix[|\zero|] + pixel_pos[|\deux|] * grid->n_xy + |\un|;
-      add_atom_to_pixel (grid, pixel_num, pixel_pos, |\cbtt{aid}|, f_coord); // User defined function (see above)
+      add_atom_to_pixel (& grid->pixel_list[pixel_num], |\cbtt{aid}|, f_coord);
     }
   }
   return grid;
+}
+\end{lstlisting}
+\clearpage
+
+
+\subsection{C code: finding pixel neighbors}
+\label{c-find-pn}
+\begin{lstlisting}[language=C]
+// Finding neighbor pixels for pixel in the grid
+// - bool use_pbc : flag to set if PBC are used or not
+// - pixel_grid * the_grid : pointer to the pixel grid
+// - pixel * the_pix : pointer to the pixel with neighbors to be found
+void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
+{
+  int |\dbtt{axis}|;                       // |\dbtt{axis}| loop iterator
+  int |\vbtt{xpos}|, |\rbtt{ypos}|, |\obtt{zpos}|;           // neighbor position on x, y and z
+  int l_start[|\trois|] = { |\zero|, |\zero|, |\zero|};    // loop iterators starting value
+  int l_end[|\trois|] = { |\trois|, |\trois|, |\trois|};      // loop iterators ending value
+  int pmod[|\trois|] = {-|\un|, |\zero|, |\un|};       // position modifiers
+  int |\bftt{nnp}|;                        // number of neighbors for pixel
+  int nid;                        // neighbor id for pixel
+  int pbc_shift[|\trois|][|\trois|][|\trois|];         // shift for pixel neighbor number due to PBC
+  bool boundary = FALSE;          // is pixel on the boundary of the grid
+  bool keep_neighbor = TRUE;      // keep or not neighbor during analysis
+
+if ( use_pbc )
+  {
+    set_pbc_shift (the_grid, the_pix->p_xyz, pbc_shift);
+  }
+  else
+  {
+    for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
+    {
+      if ( the_pix->p_xyz[|\dbtt{axis}|] == |\zero| |\textbar\textbar| the_pix->p_xyz[|\dbtt{axis}|] == the_grid->n_pix[|\dbtt{axis}|] - |\un| ) boundary = TRUE;
+    }
+  }
+  for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
+  {
+    if ( the_grid->n_pix[|\dbtt{axis}|] == |\un| )
+    {
+      l_start[|\dbtt{axis}|] = |\un|;
+      l_end[|\dbtt{axis}|] = |\deux|;
+    }
+  }
+  |\bftt{nnp}| = |\zero|;
+  for ( |\vbtt{xpos}| = l_start[|\zero|] ; |\vbtt{xpos}| < l_end[|\zero|] ; |\vbtt{xpos}| ++ )
+  {
+    for ( |\rbtt{ypos}| = l_start[|\un|] ; |\rbtt{ypos}| < l_end[|\un|] ; |\rbtt{ypos}| ++ )
+    {
+      for ( |\obtt{zpos}| = l_start[|\deux|] ; |\obtt{zpos}| < l_end[|\deux|] ; |\obtt{zpos}| ++ )
+      {
+        keep_neighbor = TRUE;
+        if ( ! use_pbc && boundary )
+        {
+          if (( the_pix->p_xyz[|\zero|] == |\zero| && |\vbtt{xpos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_xyz[|\zero|] == the_grid->n_pix[|\zero|] && |\vbtt{xpos}| == |\deux| ))
+          {
+            keep_neighbor = FALSE;
+          }
+          else if (( the_pix->p_xyz[|\un|] == |\zero| && |\rbtt{ypos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_xyz[|\un|] == the_grid->n_pix[|\un|] && |\rbtt{ypos}| == |\deux| ))
+          {
+            keep_neighbor = FALSE;
+          }
+          else if (( the_pix->p_xyz[|\deux|] == |\zero| && |\obtt{zpos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_xyz[|\deux|] == the_grid->n_pix[|\deux|] && |\obtt{zpos}| == |\deux| ))
+          {
+            keep_neighbor = FALSE;
+          }
+        }
+        if ( keep_neighbor )
+        {
+          nid = the_pix->pid + pmod[|\vbtt{xpos}|] + pmod[|\rbtt{ypos}|] * the_grid->n_pix[|\zero|] + pmod[|\obtt{zpos}|] * the_grid->n_xy;
+          if ( use_pbc ) nid += pbc_shift[|\vbtt{xpos}|][|\rbtt{ypos}|][|\obtt{zpos}|];
+          the_pix->pixel_neighbors[|\bftt{nnp}|] = nid;
+          |\bftt{nnp}| ++ ;
+        }
+      }
+    }
+  }
+  the_pix->neighbors = |\bftt{nnp}|;
 }
 \end{lstlisting}
 \clearpage
