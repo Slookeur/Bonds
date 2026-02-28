@@ -54,7 +54,7 @@ frac_to_cart = np.zeros((|\trois|, |\trois|))   # fractional to Cartesian coordi
 \subsection{Python code: set pixel periodic boundary condition shift}
 
 \begin{lstlisting}[language=Python]
-# Adjust, if needed, shift to search for pixel neighbor(s) using PBC
+# adjust, if needed, shift to search for pixel neighbor(s) using PBC
 # - grid pixel_grid          : the pixel grid
 # - int pixel_coord[|\trois|]       : the pixel coordinates in the grid
 # - int pbc_shift[|\trois|][|\trois|][|\trois|]   : the shift, correction, to be calculated
@@ -104,15 +104,18 @@ def set_pbc_shift(pixel_grid : PixelGrid, pixel_coord : np.ndarray, pbc_shift : 
 def add_atom_to_pixel (the_pixel : Pixel, pixel_coord : , atom_id : int, atom_coord)
 
   if ! the_pixel.patoms:
+    # if the pixel do not contains any atom yet, then save its coordinates in the grid
     for |\dbtt{axis}| in range(|\trois|):
       the_pixel.p_xyz[|\dbtt{axis}|] = pixel_coord[|\dbtt{axis}|]
   
   else
+    # otherwise reallocate memory to store the new pixel_atom information
 
   the_pixel.pix_atoms[patoms].atom_id = atom_id
   for |\dbtt{axis}| in range(|\trois|):
     the_pixel.pix_atoms[patoms].coord[|\dbtt{axis}|] = atom_coord[|\dbtt{axis}|]
-
+  
+  # increment the number of atom(s) in the pixel
   the_pixel.patoms += 1
  
 \end{lstlisting}
@@ -122,56 +125,54 @@ def add_atom_to_pixel (the_pixel : Pixel, pixel_coord : , atom_id : int, atom_co
 \subsection{Python code: preparation of the pixel grid}
 
 \begin{lstlisting}[language=Python]
-# Preparation of the pixel grid
+# preparation of the pixel grid
 # - bool use_pbc : flag to set if PBC are used or not
 def prepare_pixel_grid(use_pbc : bool):
-  grid = PixelGrid()                                 # Create a new pixel grid
-  cmin = [float(|\textquotesingle|inf|\textquotesingle|)] * |\trois|                          # Initialize to infinity
-  cmax = [-float(|\textquotesingle|inf|\textquotesingle|)] * |\trois|                         # Initialize to negative infinity
+  grid = PixelGrid()                                 # create a new pixel grid
+  cmin = [float(|\textquotesingle|inf|\textquotesingle|)] * |\trois|                            # initialize to infinity
+  cmax = [-float(|\textquotesingle|inf|\textquotesingle|)] * |\trois|                           # initialize to negative infinity
   pixel_pos = np.zeros(3, dtype=int)
   
-  if not use_pbc:                                    # Without periodic boundary conditions
+  if not use_pbc:                                    # without periodic boundary conditions
     for |\dbtt{axis}| in range(|\trois|):
       cmin[|\dbtt{axis}|] = cmax[|\dbtt{axis}|] = c_coord[|\zero|][|\dbtt{axis}|]
-    for |\cbtt{aid}| in range(|\un|, atoms):                      # For all atoms
-      for |\dbtt{axis}| in range(|\trois|):                          # For x, y and z
+    for |\cbtt{aid}| in range(|\un|, atoms):                      # for all atoms
+      for |\dbtt{axis}| in range(|\trois|):                          # for x, y and z
         cmin[|\dbtt{axis}|] = min(cmin[|\dbtt{axis}|], c_coord[|\cbtt{aid}|][|\dbtt{axis}|])
         cmax[|\dbtt{axis}|] = max(cmax[|\dbtt{axis}|], c_coord[|\cbtt{aid}|][|\dbtt{axis}|])
-    for |\dbtt{axis}| in range(|\trois|):                            # For x, y and z
-      grid.n_pix[|\dbtt{axis}|] = int((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / cutoff) + |\un|  # Number of pixels on axis 'axis'
+    for |\dbtt{axis}| in range(|\trois|):                            # for x, y and z
+      # number of pixels on axis 'axis'
+      grid.n_pix[|\dbtt{axis}|] = int((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / cutoff) + |\un|
   else:                                              # Using periodic boundary conditions
-    for |\dbtt{axis}| in range(|\trois|):                            # For x, y and z
-      grid.n_pix[|\dbtt{axis}|] = int(l_params[|\dbtt{axis}|] / cutoff) + |\un|  # Number of pixels on axis 'axis'
+    for |\dbtt{axis}| in range(|\trois|):                            # for x, y and z
+      # number of pixels on axis 'axis'
+      grid.n_pix[|\dbtt{axis}|] = int(l_params[|\dbtt{axis}|] / cutoff) + |\un|
   
-  for |\dbtt{axis}| in range(|\trois|):                              # For x, y and z
-    # Correction if the number of pixels on '|\dbtt{axis}|' is too small
+  for |\dbtt{axis}| in range(|\trois|):                              # for x, y and z
+    # correction if the number of pixels on '|\dbtt{axis}|' is too small
     grid.n_pix[|\dbtt{axis}|] = |\un| if grid.n_pix][|\dbtt{axis}|] < 4 else grid.n_pix[|\dbtt{axis}|]
   
-  grid.n_xy = grid.p_pix[|\zero|] * grid.n_pix[|\un|] # Number of pixels on the plan 'xy'
-  grid.pixels = grid.n_xy * grid.p_pix[|\deux|]  # Total number of pixels in the grid
+  grid.n_xy = grid.p_pix[|\zero|] * grid.n_pix[|\un|]          # Number of pixels on the plan 'xy'
+  grid.pixels = grid.n_xy * grid.p_pix[|\deux|]            # Total number of pixels in the grid
   
-  # User defined function to allocate the memory to store the pixel information for the grid
+  # user defined function to allocate the memory to store the pixel information for the grid
   grid.pixel_list = allocate_pixel_data(grid.pixels)
   
-  if not use_pbc:                                    # Without periodic boundary conditions
-    for |\cbtt{aid}| in range(atoms):                         # For all atoms
-      for |\dbtt{axis}| in range(|\trois|):                          # For x, y and z
+  if not use_pbc:                                    # without periodic boundary conditions
+    for |\cbtt{aid}| in range(atoms):                         # for all atoms
+      for |\dbtt{axis}| in range(|\trois|):                          # for x, y and z
         pixel_pos[|\dbtt{axis}|] = int((c_coord[|\cbtt{aid}|][|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / cutoff)
       pixel_num = pixel_pos[|\zero|] + pixel_pos[|\un|] * grid.n_pix[|\zero|] + pixel_pos[|\deux|] * grid.n_xy + |\un|
-      # User defined function to:
-      # - Add atom 'aid' with coordinates 'c_coord[aid]' to pixel 'pixel_number'
-      # - Increment the number of atom(s) in pixel 'pixel_number'
-      # - If needed (for the first atom) set pixel coordinates in the grid to 'pixel_pos'
-      add_atom_to_pixel(grid, pixel_num, pixel_pos, |\cbtt{aid}|, c_coord[|\cbtt{aid}|])
-  else:  # Using periodic boundary conditions
-    for |\cbtt{aid}| in range(atoms):                         # For all atoms
+      add_atom_to_pixel(grid.pixel_list[pixel_num], pixel_pos, |\cbtt{aid}|, c_coord[|\cbtt{aid}|])
+  else:                                              # using periodic boundary conditions
+    for |\cbtt{aid}| in range(atoms):                         # for all atoms
       # with 'matrix_multiplication' a user defined function to perform the operation
       f_coord = matrix_multiplication(cart_to_frac, c_coord[|\cbtt{aid}|])
-      for |\dbtt{axis}| in range(|\trois|):                          # For x, y and z
+      for |\dbtt{axis}| in range(|\trois|):                          # for x, y and z
         f_coord[|\dbtt{axis}|] = f_coord[|\dbtt{axis}|] - np.floor(f_coord[|\dbtt{axis}|])
         pixel_pos[|\dbtt{axis}|] = int(f_coord[|\dbtt{axis}|] * grid.n_pix[|\dbtt{axis}|])
       pixel_num = pixel_pos[|\zero|] + pixel_pos[|\un|] * grid.n_pix[|\zero|] + pixel_pos[|\deux|] * grid.n_xy + |\un|
-      add_atom_to_pixel(grid, pixel_num, pixel_pos, |\cbtt{aid}|, f_coord)  # User defined function (see above)
+      add_atom_to_pixel(grid.pixel_list[pixel_num], pixel_pos, |\cbtt{aid}|, f_coord)
   
   return grid
 \end{lstlisting}
@@ -182,7 +183,7 @@ def prepare_pixel_grid(use_pbc : bool):
 
 \begin{lstlisting}[language=Python]
 # Finding neighbor pixels for pixel in the grid
-# - bool use_pbc : flag to set if PBC are used or not
+# - bool use_pbc    : flag to set if PBC are used or not
 # - grid * the_grid : pointer to the pixel grid
 # - pixel * the_pix : pointer to the pixel with neighbors to be found
 def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
@@ -193,7 +194,7 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
   pmod = [-|\un|, |\zero|, |\un|]                           # position modifiers
   pbc_shift = np.zeros((|\trois|, |\trois|, |\trois|), dtype=int)  # shift for pixel neighbor number due to PBC
 
-  # Check if PBC are used
+  # check if PBC are used
   if use_pbc:
     set_pbc_shift(the_grid, the_pix.p_xyz, pbc_shift)
   else:
@@ -201,7 +202,7 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
       if the_pix.p_xyz[|\dbtt{axis}|] == |\zero| or the_pix.p_xyz[|\dbtt{axis}|] == the_grid.n_pix[|\dbtt{axis}|] - |\un|:
         boundary = True
 
-  # Adjust the loop start and end based on the grid dimensions
+  # adjust the loop start and end based on the grid dimensions
   for |\dbtt{axis}| in range(|\trois|):
     if the_grid.n_pix[|\dbtt{axis}|] == |\un|:
       l_start[|\dbtt{axis}|] = |\un|
@@ -228,7 +229,7 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
             keep_neighbor = False
 
         if keep_neighbor:
-          # Calculate the neighbor id
+          # calculate the neighbor id
           nid = the_pix.pid + pmod[|\vbtt{xpos}|] + pmod[|\rbtt{ypos}|] * the_grid.n_pix[|\zero|] + pmod[|\obtt{zpos}|] * the_grid.n_xy
           if use_pbc:
             nid += pbc_shift[|\vbtt{xpos}|][|\rbtt{ypos}|][|\obtt{zpos}|]
@@ -243,35 +244,35 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
 \subsection{Python code: inter-atomic distance calculation}
 
 \begin{lstlisting}[language=Python]
-# Evaluating the interatomic distance between 2 pixel atoms
-# - bool use_pbc : flag to set if PBC are used or not
+# evaluating the interatomic distance between 2 pixel atoms
+# - bool use_pbc      : flag to set if PBC are used or not
 # - pixel_atom * at_i : pointer to first pixel atom
 # - pixel_atom * at_j : pointer to second pixel atom
 def evaluate_distance(use_pbc : bool, at_i : PixelAtom, at_j : PixelAtom):
   dist = Distance()         # Placeholder for the distance data structure
   Rij = np.zeros(|\trois|)  # Initialize the distance vector
-  # Calculating the distance components between atoms
+  # calculating the distance components between atoms
   for |\dbtt{axis}| in range(|\trois|):
     Rij[|\dbtt{axis}|] = at_i.coord[|\dbtt{axis}|] - at_j.coord[|\dbtt{axis}|]
 
   if use_pbc:
-    # Pixel atom's coordinates are in corrected fractional format
+    # then the pixel_atom's coordinates are in corrected fractional format
     for |\dbtt{axis}| in range(|\trois|):
-      # Absolute value in float format
+      # absolute value in float format
       u = abs(Rij[|\dbtt{axis}|])
       v = min(u, |\un|.|\zero| - u)
       # Proper value, with proper sign
       Rij[|\dbtt{axis}|] = (Rij[|\dbtt{axis}|] / u) * v
     
-    # Transform back to Cartesian coordinates
+    # transform back to Cartesian coordinates
     # matrix_multiplication is assumed to be defined elsewhere
     Rij = matrix_multiplication(frac_to_cart, Rij)
 
-  # Calculating the squared distance (no square root for efficiency)
+  # calculating the squared distance (no square root for efficiency)
   dist.length = np.sum(Rij ** |\deux|)
-  dist.Rij = Rij  # Store the distance vector components
+  dist.Rij = Rij  # store the distance vector components
 
-  # Returning the 'distance' data structure that contains:
+  # returning the 'distance' data structure that contains:
   # - the squared value for Dij
   # - the components of the distance vector on x, y, and z
   return dist
@@ -284,50 +285,50 @@ def evaluate_distance(use_pbc : bool, at_i : PixelAtom, at_j : PixelAtom):
 
 \begin{lstlisting}[language=Python]
 def pixel_search_for_neighbors(use_pbc : bool):
-  # Pointer to the pixel grid for analysis
+  # pointer to the pixel grid for analysis
   all_pixels = prepare_pixel_grid(use_pbc)
   
-  # For all pixels in the grid
+  # for all pixels in the grid
   for |\vbtt{pix}| in range(all_pixels.pixels):
-    # Setting pix_i as pointer to pixel number pix
+    # setting pix_i as pointer to pixel number pix
     pix_i = all_pixels.pixel_list[|\vbtt{pix}|]
     
-    # If pixel pix_i contains atom(s)
+    # if pixel pix_i contains atom(s)
     if pix_i.patoms:
-      # Search for neighbor pixels
+      # search for neighbor pixels
       find_pixel_neighbors(use_pbc, all_pixels, pix_i)
       
-      # Testing all pix_i neighbor pixels
+      # testing all pix_i neighbor pixels
       for pid in range(pix_i.neighbors):
         |\rbtt{pjx}| = pix_i.pixel_neighbors[pid]
         # Setting pix_j as pointer to pixel number pjx
         pix_j = all_pixels.pixel_list[|\rbtt{pjx}|]
         
-        # Checking pixel pix_j if it:
+        # checking pixel pix_j if it:
         # - contains atom(s)
         # - was not tested, otherwise the analysis would have been performed already
         if pix_j.patoms and not pix_j.tested:
           # If pix_i and pix_j are the same, only test pair of different atoms
           end = |\zero| if |\rbtt{pjx}| != |\vbtt{pix}| else |\un|
           
-          # For all atom(s) in pix_i
+          # for all atom(s) in pix_i
           for |\dbtt{aid}| in range(pix_i.patoms - end):
             # Set pointer to the first atom to test
             at_i = pix_i.pix_atoms[|\dbtt{aid}|]
             start = |\zero| if |\rbtt{pjx}| != |\vbtt{pix}| else |\dbtt{aid}| + |\un|
             
-            # For all atom(s) in pix_j
+            # for all atom(s) in pix_j
             for |\cbtt{bid}| in range(start, pix_j.patoms):
               # Set pointer to the second atom to test
               at_j = pix_j.pix_atoms[|\cbtt{bid}|]
               
-              # Evaluate interatomic distance
+              # evaluate interatomic distance
               Dij = evaluate_distance(use_pbc, at_i, at_j)
               
               if Dij.length < cutoff_squared:
                 # This is a bond!
                 pass
                 
-      # Store that pixel pix_i was tested
+      # store that pixel pix_i was tested
       pix_i.tested = True
 \end{lstlisting}

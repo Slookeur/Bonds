@@ -69,9 +69,9 @@ float frac_to_cart[|\trois|][|\trois|];  // fractional to Cartesian coordinates 
 \subsection{C code: set periodic boundary condition pixel shift}
 \label{c-set-pshift}
 %// Adjust, if needed, shift to search for pixel neighbor(s) using PBC
-%// - pixel_grid * grid           : the pixel grid
-%// - int pixel_coord[|\trois|]         : the pixel coordinates in the grid
-%// - int pbc_shift[|\trois|][|\trois|][|\trois|]     : the shift, correction, to be calculated
+%// - pixel_grid * grid      : the pixel grid
+%// - int pixel_coord[|\trois|]     : the pixel coordinates in the grid
+%// - int pbc_shift[|\trois|][|\trois|][|\trois|] : the shift, correction, to be calculated
 \begin{lstlisting}[language=C]
 void set_pbc_shift (pixel_grid * grid, int pixel_coord[|\trois|], int pbc_shift[|\trois|][|\trois|][|\trois|])
 {
@@ -199,7 +199,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
 
   grid = malloc(sizeof*grid);
 
-  if ( ! use_pbc )                               // without periodic boundary conditions
+  if ( ! use_pbc )                              // without periodic boundary conditions
   {
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ ) cmin[|\dbtt{axis}|] = cmax[|\dbtt{axis}|] = c_coord[|\zero|][|\dbtt{axis}|];
     for ( |\cbtt{aid}| = |\un| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )      // For all atoms
@@ -237,7 +237,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   {
     for ( |\cbtt{aid}| = |\zero| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )      // for all atoms
     {
-      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )    // for x, y and z
+      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )     // for x, y and z
       {
         pixel_pos[|\dbtt{axis}|] = (int)((c_coord[|\cbtt{aid}|][|\dbtt{axis}|] - cmin[|\dbtt{axis}|])/cutoff);
       }
@@ -245,13 +245,13 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
       add_atom_to_pixel (grid, pixel_num, pixel_pos, |\cbtt{aid}|, c_coord[|\cbtt{aid}|]);
     }
   }
-  else // using periodic boundary conditions
+  else                                          // using periodic boundary conditions
   {
-    for ( |\cbtt{aid}| = |\zero| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )    // for all atoms
+    for ( |\cbtt{aid}| = |\zero| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )      // for all atoms
     {
       // with 'matrix_multiplication' a user defined function to perform the operation
       f_coord = matrix_multiplication (cart_to_frac, c_coord[|\cbtt{aid}|]);
-      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )   // for x, y and z
+      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )     // for x, y and z
       {
         f_coord[|\dbtt{axis}|] = f_coord[|\dbtt{axis}|] - floorf(f_coord[|\dbtt{axis}|]);
         pixel_pos[|\dbtt{axis}|] = (int)((f_coord[|\dbtt{axis}|] * n_pix[|\dbtt{axis}|]);
@@ -270,9 +270,9 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
 \label{c-find-pn}
 \begin{lstlisting}[language=C]
 // finding neighbor pixels for pixel in the grid
-// - bool use_pbc : flag to set if PBC are used or not
+// - bool use_pbc          : flag to set if PBC are used or not
 // - pixel_grid * the_grid : pointer to the pixel grid
-// - pixel * the_pix : pointer to the pixel with neighbors to be found
+// - pixel * the_pix       : pointer to the pixel with neighbors to be found
 void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
 {
   int |\dbtt{axis}|;                       // loop iterator axis id (1=x , 2=y , 3= z)
@@ -347,7 +347,7 @@ void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
 \subsection{C code: inter-atomic distance calculation}
 \begin{lstlisting}[language=C]
 // evaluating the interatomic distance between 2 pixel atoms
-// - bool use_pbc : flag to set if PBC are used or not
+// - bool use_pbc      : flag to set if PBC are used or not
 // - pixel_atom * at_i : pointer to first pixel atom
 // - pixel_atom * at_j : pointer to second pixel atom
 distance evaluate_distance (bool use_pbc, pixel_atom * at_i, pixel_atom * at_j)

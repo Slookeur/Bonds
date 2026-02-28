@@ -96,17 +96,17 @@ SUBROUTINE add_atom_to_pixel (the_pixel, pixel_coord, atom_id, atom_coord)
   REAL, DIMENSION(3), INTENT(IN)     :: atom_coord  ! the atomic coordinates
 
   if (the_pixel%patoms .eq. 0) then
-    // if the pixel do contains any atom yet, then save its coordinates in the grid
+    ! if the pixel do not contains any atom yet, then save its coordinates in the grid
     do axis = 1 , 3
       the_pixel%p_xyz(axis) = pixel_coord(axis)
     enddo
-     // allocate the memory to store the first pixel_atom information
+     ! allocate the memory to store the first pixel_atom information
     allocate(the_pixel%pix_atoms(1))
   else
-    // otherwise reallocate memory to store the new pixel_atom informatio
+    ! otherwise reallocate memory to store the new pixel_atom informatio
     the_pixel%pix_atoms = realloc(the_pixel%pix_atoms, the_pixel%patoms+1)
   endif
-  // increment the number of atom(s) in the pixel
+  ! increment the number of atom(s) in the pixel
   the_pixel%patoms = the_pixel%patoms + 1
   the_pixel%pix_atoms(patoms)%atom_id = atom_id
   do axis = 1 , 3
@@ -126,7 +126,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   LOGICAL, INTENT(IN)              :: use_pbc          ! flag to set if PBC are used or not
   TYPE (pixel_grid), INTENT(INOUT) :: grid             ! the pixel grid to prepare
   INTEGER                          :: axis             ! loop iterator axis id (1=x, 2=y, 3=z)
-  INTEGER                          :: aid              ! loop iterator atom number (1, |\rbtt{atoms}|)
+  INTEGER                          :: aid              ! loop iterator atom number (1, atoms)
   INTEGER                          :: pixel_num        ! pixel number in the grid
   INTEGER, DIMENSION(3)            :: pixel_pos        ! pixel coordinates in the grid
   REAL, DIMENSION(3)               :: cmin, cmax       ! real precision coordinates min, max

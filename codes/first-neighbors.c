@@ -60,9 +60,9 @@ float frac_to_cart[3][3];  // fractional to Cartesian coordinates matrix
 
 
 // Adjust, if needed, shift to search for pixel neighbor(s) using PBC
-// - pixel_grid * grid           : the pixel grid
-// - int pixel_coord[3]         : the pixel coordinates in the grid
-// - int pbc_shift[3][3][3]     : the shift, correction, to be calculated
+// - pixel_grid * grid      : the pixel grid
+// - int pixel_coord[3]     : the pixel coordinates in the grid
+// - int pbc_shift[3][3][3] : the shift, correction, to be calculated
 void set_pbc_shift (pixel_grid * grid, int pixel_coord[3], int pbc_shift[3][3][3])
 {
   int x_pos, y_pos, z_pos; // loop iterators
@@ -72,7 +72,7 @@ void set_pbc_shift (pixel_grid * grid, int pixel_coord[3], int pbc_shift[3][3][3
     {
       for ( z_pos = 0 ; z_pos < 3 ; z_pos ++ )
       {
-        pbc_shift[x_pos][y_pos][z_pos] = 0;           // initialization without any shift
+        pbc_shift[x_pos][y_pos][z_pos] = 0;             // initialization without any shift
       }
     }
   }
@@ -144,7 +144,7 @@ void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[3], int atom_id, floa
   int axis;
   if (! the_pixel->patoms) 
   {
-    // if the pixel do contains any atom yet, then save its coordinates in the grid
+    // if the pixel do not contains any atom yet, then save its coordinates in the grid
     for ( axis = 0 ; axis < 3 ; axis ++ )
     {
       the_pixel->p_xyz[axis] = pixel_coord[axis];
@@ -171,7 +171,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
 {
   pixel_grid * grid;        // pointer to the pixel grid to create
   int axis;                 // loop iterator axis id (0=x, 1=y, 2=z)
-  int aid;                  // loop iterator atom number (0, atoms-1)
+  int aid;                  // loop iterator atom number (0, atoms--1)
   int pixel_num;            // pixel number in the grid
   int pixel_pos[3];         // pixel coordinates in the grid
   float cmin[3], cmax[3];   // float coordinates min, max values
@@ -179,30 +179,32 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
 
   grid = malloc(sizeof*grid);
 
-  if ( ! use_pbc ) // without periodic boundary conditions
+  if ( ! use_pbc )                              // without periodic boundary conditions
   {
     for ( axis = 0 ; axis < 3 ; axis ++ ) cmin[axis] = cmax[axis] = c_coord[0][axis];
-    for ( aid = 1 ; aid < atoms ; aid ++ )    // For all atoms
+    for ( aid = 1 ; aid < atoms ; aid ++ )      // For all atoms
     {
-      for ( axis = 0 ; axis < 3 ; axis ++ )   // For x, y and z
+      for ( axis = 0 ; axis < 3 ; axis ++ )     // For x, y and z
       {
         cmin[axis] = min(cmin[axis], c_coord[aid][axis]);
         cmax[axis] = max(cmax[axis], c_coord[aid][axis]);
       }
     }
-    for ( axis = 0 ; axis < 3 ; axis ++ )     // For x, y and z
+    for ( axis = 0 ; axis < 3 ; axis ++ )       // For x, y and z
     {
-      grid->n_pix[axis] = (int)((cmax[axis] - cmin[axis]) / cutoff) + 1; // Number of pixel(s) on axis 'axis'
+      // Number of pixel(s) on axis 'axis'
+      grid->n_pix[axis] = (int)((cmax[axis] - cmin[axis]) / cutoff) + 1;
     }
   }
   else  // using periodic boundary conditions
   {
-    for ( axis = 0 ; axis < 3 ; axis ++ )     // For x, y and z
+    for ( axis = 0 ; axis < 3 ; axis ++ )       // For x, y and z
     {
-      grid->n_pix[axis] = (int)(l_params[axis] / cutoff) + 1; // Number of pixel(s) on axis 'axis'
+      // Number of pixel(s) on axis 'axis'
+      grid->n_pix[axis] = (int)(l_params[axis] / cutoff) + 1;
     }
   }
-  for ( axis = 0 ; axis < 3 ; axis ++ )       // For x, y and z
+  for ( axis = 0 ; axis < 3 ; axis ++ )         // For x, y and z
   {
     // correction if the number of pixel(s) on 'axis' is too small
     grid->n_pix[axis] = (grid->n_pix[axis] < 4) ? 1 : grid->n_pix[axis];
@@ -211,11 +213,11 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   grid->pixels = grid->n_xy * grid->n_pix[2];   // Total number of pixels in the grid
   grid->pixel_list = malloc (grid->pixels*sizeof*grid->pixel_list);
 
-  if ( ! use_pbc ) // without periodic boundary conditions
+  if ( ! use_pbc )                              // without periodic boundary conditions
   {
-    for ( aid = 0 ; aid < atoms ; aid ++ )  // for all atoms
+    for ( aid = 0 ; aid < atoms ; aid ++ )      // for all atoms
     {
-      for ( axis = 0 ; axis < 3 ; axis ++ )    // for x, y and z
+      for ( axis = 0 ; axis < 3 ; axis ++ )     // for x, y and z
       {
         pixel_pos[axis] = (int)((c_coord[aid][axis] - cmin[axis])/cutoff);
       }
@@ -223,13 +225,13 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
       add_atom_to_pixel (grid, pixel_num, pixel_pos, aid, c_coord[aid]);
     }
   }
-  else // using periodic boundary conditions
+  else                                          // using periodic boundary conditions
   {
-    for ( aid = 0 ; aid < atoms ; aid ++ )  // for all atoms
+    for ( aid = 0 ; aid < atoms ; aid ++ )      // for all atoms
     {
       // with 'matrix_multiplication' a user defined function to perform the operation
       f_coord = matrix_multiplication (cart_to_frac, c_coord[aid]);
-      for ( axis = 0 ; axis < 3 ; axis ++ )    // for x, y and z
+      for ( axis = 0 ; axis < 3 ; axis ++ )     // for x, y and z
       {
         f_coord[axis] = f_coord[axis] - floorf(f_coord[axis]);
         pixel_pos[axis] = (int)((f_coord[axis] * n_pix[axis]);
@@ -243,9 +245,9 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
 
 
 // finding neighbor pixels for pixel in the grid
-// - bool use_pbc : flag to set if PBC are used or not
+// - bool use_pbc          : flag to set if PBC are used or not
 // - pixel_grid * the_grid : pointer to the pixel grid
-// - pixel * the_pix : pointer to the pixel with neighbors to be found
+// - pixel * the_pix       : pointer to the pixel with neighbors to be found
 void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
 {
   int axis;                       // loop iterator axis id (1=x , 2=y , 3= z)
@@ -316,7 +318,7 @@ void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
 
 
 // evaluating the interatomic distance between 2 pixel atoms
-// - bool use_pbc : flag to set if PBC are used or not
+// - bool use_pbc      : flag to set if PBC are used or not
 // - pixel_atom * at_i : pointer to first pixel atom
 // - pixel_atom * at_j : pointer to second pixel atom
 distance evaluate_distance (bool use_pbc, pixel_atom * at_i, pixel_atom * at_j)
