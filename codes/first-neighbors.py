@@ -2,13 +2,13 @@
 
 import numpy as np
 
-# Atom in pixel data structure
+# atom in pixel data structure
 class PixelAtom:
   def __init__(self, atom_id=0, coord=None):
     self.atom_id = atom_id                                                    # the atom ID
     self.coord = np.zeros(3) if coord is None else np.array(coord)            # the atom coordinates on x, y and z
 
-# Pixel data structure
+# pixel data structure
 class Pixel:
   def __init__(self, pid=0, p_xyz=None, tested=False, patoms=0, pix_atoms=None, neighbors=0):
     self.pid = pid                                                            # the pixel number
@@ -19,7 +19,7 @@ class Pixel:
     self.neighbors = neighbors                                                # number of neighbors for pixel
     self.pixel_neighbors = np.zeros(27, dtype=int)                            # the list of neighbor pixels, maximum 27
 
-# Pixel grid data structure
+# pixel grid data structure
 class PixelGrid:
   def __init__(self, pixels=0, n_pix=None, n_xy=0, pixel_list=None):
     self.pixels = pixels                                                      # total number of pixels in the grid
@@ -27,19 +27,23 @@ class PixelGrid:
     self.n_xy = n_xy                                                          # number of pixels in the plan xy
     self.pixel_list = [] if pixel_list is None else pixel_list                # pointer to the pixels, to be allocated
 
-# Bond distance data structure
+# bond distance data structure
 class Distance:
   def __init__(self, length=0.0, Rij=None):
     self.length = length                                                      # the distance in |\AA| squared
     self.Rij = np.zeros(3) if Rij is None else np.array(Rij)                  # vector components of x, y and z
 
-# Model description
+#
+# the following are considered to be provided by the user 
+#
+
+# model description
 atoms = 0                                                                     # the total number of atom(s)
 c_coord = None                                                                # list of Cartesian coordinates: c_coord[atoms][3]
 cutoff = 0.0                                                                  # the cutoff to define atomic bond(s)
 cutoff_squared = 0.0                                                          # squared value for the cutoff
 
-# Model box description
+# model box description
 l_params = np.zeros(3)                                                        # lattice a, b and c
 cart_to_frac = np.zeros((3, 3))                                               # Cartesian to fractional coordinates matrix
 frac_to_cart = np.zeros((3, 3))                                               # fractional to Cartesian coordinates matrix

@@ -191,14 +191,14 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     }
     for ( axis = 0 ; axis < 3 ; axis ++ )       // For x, y and z
     {
-      grid->n_pix[axis] = (int)((cmax[axis] - cmin[axis]) / cutoff) + 1; // Number of pixel(s) on axis 'axis'
+      grid->n_pix[axis] = (int)((cmax[axis] - cmin[axis]) / cutoff) + 1; // number of pixel(s) on axis 'axis'
     }
   }
   else  // using periodic boundary conditions
   {
     for ( axis = 0 ; axis < 3 ; axis ++ )       // For x, y and z
     {
-      grid->n_pix[axis] = (int)(l_params[axis] / cutoff) + 1; // Number of pixel(s) on axis 'axis'
+      grid->n_pix[axis] = (int)(l_params[axis] / cutoff) + 1; // number of pixel(s) on axis 'axis'
     }
   }
   for ( axis = 0 ; axis < 3 ; axis ++ )         // For x, y and z
@@ -206,8 +206,8 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     // correction if the number of pixel(s) on 'axis' is too small
     grid->n_pix[axis] = (grid->n_pix[axis] < 4) ? 1 : grid->n_pix[axis];
   }
-  grid->n_xy = grid->n_pix[0] * grid->n_pix[1]; // Number of pixels on the plan 'xy'
-  grid->pixels = grid->n_xy * grid->n_pix[2];   // Total number of pixels in the grid
+  grid->n_xy = grid->n_pix[0] * grid->n_pix[1]; // number of pixels on the plan 'xy'
+  grid->pixels = grid->n_xy * grid->n_pix[2];   // total number of pixels in the grid
   grid->pixel_list = malloc (grid->pixels*sizeof*grid->pixel_list);
   for ( pixel_num = 0 ; pixel_num < grid->pixels ; pixel_num ++ )
   {

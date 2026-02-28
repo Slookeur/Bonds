@@ -5,33 +5,33 @@ MODULE parameters
   
   ! atom in pixel data structure
   TYPE pixel_atom
-    INTEGER                                 :: atom_id            ! the atom ID
-    REAL, DIMENSION(3)                      :: coord              ! the atom coordinates on x, y and z
+    INTEGER                                         :: atom_id            ! the atom ID
+    REAL, DIMENSION(3)                              :: coord              ! the atom coordinates on x, y and z
   END TYPE pixel_atom
   
   ! pixel data structure
   TYPE pixel
-    INTEGER                                 :: pid                ! the pixel number
-    INTEGER, DIMENSION(3)                   :: p_xyz              ! the pixel coordinates in the grid
-    LOGICAL                                 :: tested             ! was the pixel checked already
-    INTEGER                                 :: patoms             ! number of atom(s) in pixel
-    TYPE(pixel_atom), DIMENSION(:), ALLOCATABLE   :: pix_atoms    ! list of atom(s) in pixel, to be allocated
-    INTEGER                                 :: neighbors          ! number of neighbors for pixel
-    INTEGER, DIMENSION(27)                  :: pixel_neighbors    ! the list of neighbor pixels, maximum 27
+    INTEGER                                         :: pid                ! the pixel number
+    INTEGER, DIMENSION(3)                           :: p_xyz              ! the pixel coordinates in the grid
+    LOGICAL                                         :: tested             ! was the pixel checked already
+    INTEGER                                         :: patoms             ! number of atom(s) in pixel
+    TYPE(pixel_atom), DIMENSION(:), ALLOCATABLE     :: pix_atoms          ! list of atom(s) in pixel, to be allocated
+    INTEGER                                         :: neighbors          ! number of neighbors for pixel
+    INTEGER, DIMENSION(27)                          :: pixel_neighbors    ! the list of neighbor pixels, maximum 27
   END TYPE pixel
   
   ! pixel grid data structure
   TYPE pixel_grid
-    INTEGER                                 :: pixels             ! total number of pixels in the grid
-    INTEGER, DIMENSION(3)                   :: n_pix              ! number of pixel(s) on each axis
-    INTEGER                                 :: n_xy               ! number of pixels in the plan xy
-    TYPE (pixel), DIMENSION(:), ALLOCATABLE, TARGET :: pixel_list ! pointer to the pixels, to be allocated
+    INTEGER                                         :: pixels             ! total number of pixels in the grid
+    INTEGER, DIMENSION(3)                           :: n_pix              ! number of pixel(s) on each axis
+    INTEGER                                         :: n_xy               ! number of pixels in the plan xy
+    TYPE (pixel), DIMENSION(:), ALLOCATABLE, TARGET :: pixel_list         ! pointer to the pixels, to be allocated
   END TYPE pixel_grid
   
   ! distance data structure
   TYPE distance
-    REAL                                    :: length             ! the distance in Angstrom squared
-    REAL, DIMENSION(3)                      :: Rij                ! vector components of x, y and z
+    REAL                                            :: length             ! the distance in Angstrom squared
+    REAL, DIMENSION(3)                              :: Rij                ! vector components of x, y and z
   END TYPE distance
   
   !
@@ -39,15 +39,15 @@ MODULE parameters
   !
 
   ! model description
-  INTEGER                                   :: atoms              ! the total number of atom(s)
-  REAL, DIMENSION(atoms,3)                  :: c_coord            ! list of Cartesian coordinates
-  REAL                                      :: cutoff             ! the cutoff to define first neighbors
-  REAL                                      :: cutoff_squared     ! squared value of the cutoff to define first neighbors
+  INTEGER                                           :: atoms              ! the total number of atom(s)
+  REAL, DIMENSION(atoms,3)                          :: c_coord            ! list of Cartesian coordinates
+  REAL                                              :: cutoff             ! the cutoff to define first neighbors
+  REAL                                              :: cutoff_squared     ! squared value of the cutoff to define first neighbors
   
   ! model box description
-  REAL, DIMENSION(3)                        :: l_params           ! lattice a, b and c
-  REAL, DIMENSION(3,3)                      :: cart_to_frac       ! Cartesian to fractional coordinates matrix
-  REAL, DIMENSION(3,3)                      :: frac_to_cart       ! fractional to Cartesian coordinates matrix
+  REAL, DIMENSION(3)                                :: l_params           ! lattice a, b and c
+  REAL, DIMENSION(3,3)                              :: cart_to_frac       ! Cartesian to fractional coordinates matrix
+  REAL, DIMENSION(3,3)                              :: frac_to_cart       ! fractional to Cartesian coordinates matrix
 
 END MODULE parameters
 
@@ -117,7 +117,7 @@ END SUBROUTINE
 
 
 
-! Preparation of the pixel grid
+! preparation of the pixel grid
 SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   
   USE parameters
@@ -144,12 +144,12 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
       enddo
     enddo
     do axis = 1 , 3                                    ! for x, y and z
-      ! Number of pixel(s) on axis 'axis'
+      ! number of pixel(s) on axis 'axis'
       grid%n_pix(axis) = INT((cmax(axis) - cmin(axis)) / cutoff) + 1
     enddo
   else                                                 ! using periodic boundary conditions
     do axis = 1 , 3                                    ! for x, y and z
-      ! Number of pixel(s) on axis 'axis'
+      ! number of pixel(s) on axis 'axis'
       grid%n_pix(axis) = INT(l_params(axis) / cutoff) + 1
     enddo
   endif
@@ -160,8 +160,8 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
     endif
   enddo
   
-  grid%n_xy = grid%n_pix(1) * grid%n_pix(2)            ! Number of pixels on the plan 'xy'
-  grid%pixels = grid%n_xy * grid%n_pix(3)              ! Total number of pixels in the grid
+  grid%n_xy = grid%n_pix(1) * grid%n_pix(2)            ! number of pixels on the plan 'xy'
+  grid%pixels = grid%n_xy * grid%n_pix(3)              ! total number of pixels in the grid
 
   allocate (grid%pixel_list(grid%pixels))
   do pixel_num = 1 , grid%pixels

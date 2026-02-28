@@ -211,14 +211,14 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     }
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )       // For x, y and z
     {
-      grid->n_pix[|\dbtt{axis}|] = (int)((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / cutoff) + |\un|; // Number of pixel(s) on axis '|\dbtt{axis}|'
+      grid->n_pix[|\dbtt{axis}|] = (int)((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / cutoff) + |\un|; // number of pixel(s) on axis '|\dbtt{axis}|'
     }
   }
   else  // using periodic boundary conditions
   {
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )       // For x, y and z
     {
-      grid->n_pix[|\dbtt{axis}|] = (int)(l_params[|\dbtt{axis}|] / cutoff) + |\un|; // Number of pixel(s) on axis '|\dbtt{axis}|'
+      grid->n_pix[|\dbtt{axis}|] = (int)(l_params[|\dbtt{axis}|] / cutoff) + |\un|; // number of pixel(s) on axis '|\dbtt{axis}|'
     }
   }
   for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )         // For x, y and z
@@ -226,8 +226,8 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     // correction if the number of pixel(s) on '|\dbtt{axis}|' is too small
     grid->n_pix[|\dbtt{axis}|] = (grid->n_pix[|\dbtt{axis}|] < 4) ? |\un| : grid->n_pix[|\dbtt{axis}|];
   }
-  grid->n_xy = grid->n_pix[|\zero|] * grid->n_pix[|\un|]; // Number of pixels on the plan 'xy'
-  grid->pixels = grid->n_xy * grid->n_pix[|\deux|];   // Total number of pixels in the grid
+  grid->n_xy = grid->n_pix[|\zero|] * grid->n_pix[|\un|]; // number of pixels on the plan 'xy'
+  grid->pixels = grid->n_xy * grid->n_pix[|\deux|];   // total number of pixels in the grid
   grid->pixel_list = malloc (grid->pixels*sizeof*grid->pixel_list);
   for ( pixel_num = |\zero| ; pixel_num < grid->pixels ; pixel_num ++ )
   {
