@@ -105,10 +105,10 @@ SUBROUTINE add_atom_to_pixel (the_pixel, pixel_coord, atom_id, atom_coord)
   IMPLICIT NONE
 
   TYPE (pixel), INTENT(INOUT) :: the_pixel           ! pointer to the pixel
-  INTEGER, DIMENSION(|\trois|), INTENT(IN) :: pixel_coord     ! the pixel coordinates in the grid
+  INTEGER, DIMENSION(|\trois|), INTENT(IN) :: pixel_coord  ! the pixel coordinates in the grid
   INTEGER, INTENT(IN)                :: atom_id      ! the atom ID number
-  INTEGER                            :: |\dbtt{axis}|        ! loop iterator axis id (1=x , 2=y , 3=z)
-  REAL, DIMENSION(|\trois|), INTENT(IN)     :: atom_coord     ! the atomic coordinates
+  INTEGER                            :: |\dbtt{axis}|         ! loop iterator axis id (1=x , 2=y , 3=z)
+  REAL, DIMENSION(|\trois|), INTENT(IN)     :: atom_coord  ! the atomic coordinates
 
   if (the_pixel%patoms .eq. |\zero|) then
     do |\dbtt{axis}| = |\un| , |\trois|
