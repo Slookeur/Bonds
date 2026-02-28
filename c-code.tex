@@ -78,7 +78,7 @@ void set_pbc_shift (pixel_grid * grid, int pixel_coord[|\trois|], int pbc_shift[
     {
       for ( |\obtt{z\_pos}| = |\zero| ; |\obtt{z\_pos}| < |\trois| ; |\obtt{z\_pos}| ++ )
       {
-        pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\obtt{z\_pos}|] = |\zero|; // at first there is no shift
+        pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\obtt{z\_pos}|] = |\zero|; // initialization without any shift
       }
     }
   }
@@ -194,7 +194,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   if ( ! use_pbc ) // Without periodic boundary conditions
   {
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ ) cmin[|\dbtt{axis}|] = cmax[|\dbtt{axis}|] = c_coord[|\zero|][|\dbtt{axis}|];
-    for ( |\cbtt{aid}| = |\un| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ ) // For all atoms
+    for ( |\cbtt{aid}| = |\un| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )    // For all atoms
     {
       for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )   // For x, y and z
       {
@@ -223,7 +223,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   grid->pixels = grid->n_xy * grid->n_pix[|\deux|];   // Total number of pixels in the grid
   grid->pixel_list = malloc (grid->pixels*sizeof*grid->pixel_list);
 
-if ( ! use_pbc ) // Without periodic boundary conditions
+  if ( ! use_pbc ) // Without periodic boundary conditions
   {
     for ( |\cbtt{aid}| = |\zero| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )  // For all atoms
     {
@@ -276,7 +276,7 @@ void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
   bool boundary = FALSE;          // is pixel on the boundary of the grid
   bool keep_neighbor = TRUE;      // keep or not neighbor during analysis
 
-if ( use_pbc )
+  if ( use_pbc )
   {
     set_pbc_shift (the_grid, the_pix->p_xyz, pbc_shift);
   }
@@ -404,7 +404,7 @@ void pixel_search_for_neighbors (bool use_pbc)
     // If pixel 'pix_i' contains atom(s)
     if ( pix_i->patoms )
     {
-      // Search for neighbbor pixels
+      // Search for neighbbor pixels of 'pix_i'
       find_pixel_neighbors ( use_pbc, all_pixels, pix_i );
       // Testing all 'pix_i' neighbor pixels
       for ( pid = |\zero| ; pid < pix_i->neighbors ; pid ++ )

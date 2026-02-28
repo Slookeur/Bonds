@@ -1,0 +1,14 @@
+void set_pbc_shift (pixel_grid * grid, int pixel_coord[|\trois|], int pbc_shift[|\trois|][|\trois|][|\trois|])
+{
+  int |\vbtt{x\_pos}|, |\rbtt{y\_pos}|, |\obtt{z\_pos}|; // loop iterators
+  for ( |\vbtt{x\_pos}| = |\zero| ; |\vbtt{x\_pos}| < |\trois| ; |\vbtt{x\_pos}| ++ )
+  {
+    for ( |\rbtt{y\_pos}| = |\zero| ; |\rbtt{y\_pos}| < |\trois| ; |\rbtt{y\_pos}| ++ )
+    {
+      for ( |\obtt{z\_pos}| = |\zero| ; |\obtt{z\_pos}| < |\trois| ; |\obtt{z\_pos}| ++ )
+      {
+        pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\obtt{z\_pos}|] = |\zero|; // at first there is no shift
+      }
+    }
+  }
+

@@ -72,7 +72,7 @@ SUBROUTINE set_pbc_shift (grid, pixel_coord, pbc_shift)
   INTEGER, DIMENSION(|\trois|), INTENT(IN)        :: pixel_coord         ! the pixel coordinates in the grid
   INTEGER, DIMENSION(|\trois|,|\trois|,|\trois|), INTENT(INOUT) :: pbc_shift           ! the shift, correction, to be calculated
   
-  pbc_shift(:,:,:) = |\zero|                                            ! at first there is no shift
+  pbc_shift(:,:,:) = |\zero|                                            ! initialization without any shift
 
   if ( pixel_coord(|\un|) .eq. |\un| ) then                               ! pixel position on 'x' is min
     pbc_shift(|\un|,:,:) = grid%n_pix(|\un|)
@@ -131,9 +131,8 @@ END SUBROUTINE
 \clearpage
 
 \subsection{FORTRAN90 code: preparation of the pixel grid}
-\newcommand{\faidloop}{\ffor{\red{aid}\equal\un}{\rbtt{atoms}}}
-\newcommand{\fcidloop}{\ffor{\dgreen{cid}\equal\un}{\trois}}
 \label{f-pc-grid}
+
 \begin{lstlisting}[language={[90]FORTRAN}]
 ! Preparation of the pixel grid
 SUBROUTINE prepare_pixel_grid (use_pbc, grid)

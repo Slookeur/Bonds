@@ -63,7 +63,7 @@ def set_pbc_shift(pixel_grid : PixelGrid, pixel_coord : np.ndarray, pbc_shift : 
   for |\vbtt{x\_pos}| in range(|\trois|):
     for |\rbtt{y\_pos}| in range(|\trois|):
       for |\obtt{z\_pos}| in range(|\trois|):
-        pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\obtt{z\_pos}|] = |\zero|        # at first there is no shift
+        pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\obtt{z\_pos}|] = |\zero|        # initialization without any shift
 
   if pixel_coord[|\zero|] == |\zero|:                         # pixel position on 'x' is min
     for |\rbtt{y\_pos}| in range(|\trois|):
