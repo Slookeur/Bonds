@@ -3,13 +3,13 @@
 
 MODULE parameters
   
-  ! Atom in pixel data structure
+  ! atom in pixel data structure
   TYPE pixel_atom
     INTEGER                                 :: atom_id            ! the atom ID
     REAL, DIMENSION(3)                      :: coord              ! the atom coordinates on x, y and z
   END TYPE pixel_atom
   
-  ! Pixel data structure
+  ! pixel data structure
   TYPE pixel
     INTEGER                                 :: pid                ! the pixel number
     INTEGER, DIMENSION(3)                   :: p_xyz              ! the pixel coordinates in the grid
@@ -20,7 +20,7 @@ MODULE parameters
     INTEGER, DIMENSION(27)                  :: pixel_neighbors    ! the list of neighbor pixels, maximum 27
   END TYPE pixel
   
-  ! Pixel grid data structure
+  ! pixel grid data structure
   TYPE pixel_grid
     INTEGER                                 :: pixels             ! total number of pixels in the grid
     INTEGER, DIMENSION(3)                   :: n_pix              ! number of pixel(s) on each axis
@@ -28,23 +28,23 @@ MODULE parameters
     TYPE (pixel), DIMENSION(:), ALLOCATABLE, TARGET :: pixel_list ! pointer to the pixels, to be allocated
   END TYPE pixel_grid
   
-  ! Distance data structure
+  ! distance data structure
   TYPE distance
     REAL                                    :: length             ! the distance in |\blue{\AA}| squared
     REAL, DIMENSION(3)                      :: Rij                ! vector components of x, y and z
   END TYPE distance
   
   !
-  ! The following are considered to be provided by the user
+  ! the following are considered to be provided by the user
   !
 
-  ! Model description
+  ! model description
   INTEGER                                   :: atoms              ! the total number of atom(s)
   REAL, DIMENSION(atoms,3)                  :: c_coord            ! list of Cartesian coordinates
   REAL                                      :: cutoff             ! the cutoff to define first neighbors
   REAL                                      :: cutoff_squared     ! squared value of the cutoff to define first neighbors
   
-  ! Model box description
+  ! model box description
   REAL, DIMENSION(3)                        :: l_params           ! lattice a, b and c
   REAL, DIMENSION(3,3)                      :: cart_to_frac       ! Cartesian to fractional coordinates matrix
   REAL, DIMENSION(3,3)                      :: frac_to_cart       ! fractional to Cartesian coordinates matrix
@@ -96,13 +96,17 @@ SUBROUTINE add_atom_to_pixel (the_pixel, pixel_coord, atom_id, atom_coord)
   REAL, DIMENSION(3), INTENT(IN)     :: atom_coord  ! the atomic coordinates
 
   if (the_pixel%patoms .eq. 0) then
+    // if the pixel do contains any atom yet, then save its coordinates in the grid
     do axis = 1 , 3
       the_pixel%p_xyz(axis) = pixel_coord(axis)
     enddo
+     // allocate the memory to store the first pixel_atom information
     allocate(the_pixel%pix_atoms(1))
   else
+    // otherwise reallocate memory to store the new pixel_atom informatio
     the_pixel%pix_atoms = realloc(the_pixel%pix_atoms, the_pixel%patoms+1)
   endif
+  // increment the number of atom(s) in the pixel
   the_pixel%patoms = the_pixel%patoms + 1
   the_pixel%pix_atoms(patoms)%atom_id = atom_id
   do axis = 1 , 3
@@ -123,34 +127,34 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   TYPE (pixel_grid), INTENT(INOUT) :: grid             ! the pixel grid to prepare
   INTEGER                          :: axis             ! loop iterator axis id (1=x, 2=y, 3=z)
   INTEGER                          :: aid              ! loop iterator atom number (1, |\rbtt{atoms}|)
-  INTEGER                          :: pixel_num        ! pixe number in the grid
+  INTEGER                          :: pixel_num        ! pixel number in the grid
   INTEGER, DIMENSION(3)            :: pixel_pos        ! pixel coordinates in the grid
   REAL, DIMENSION(3)               :: cmin, cmax       ! real precision coordinates min, max
   REAL, DIMENSION(3)               :: f_coord          ! real precision fractional coordinates
   
-  if ( .not. use_pbc ) then                            ! Without periodic boundary conditions
+  if ( .not. use_pbc ) then                            ! without periodic boundary conditions
     do axis = 1 , 3
       cmin(axis) = c_coord(1,axis)
       cmax(axis) = c_coord(1,axis)
     enddo
-    do aid = 2 , atoms                                 ! For all atoms
-      do axis = 1 , 3                                  ! For x, y and z
+    do aid = 2 , atoms                                 ! for all atoms
+      do axis = 1 , 3                                  ! for x, y and z
         cmin(axis) = min(cmin(axis), c_coord(aid,axis))
         cmax(axis) = max(cmax(axis), c_coord(aid,axis))
       enddo
     enddo
-    do axis = 1 , 3                                    ! For x, y and z
+    do axis = 1 , 3                                    ! for x, y and z
       ! Number of pixel(s) on axis 'axis'
       grid%n_pix(axis) = INT((cmax(axis) - cmin(axis)) / cutoff) + 1
     enddo
-  else                                                 ! Using periodic boundary conditions
-    do axis = 1 , 3                                    ! For x, y and z
+  else                                                 ! using periodic boundary conditions
+    do axis = 1 , 3                                    ! for x, y and z
       ! Number of pixel(s) on axis 'axis'
       grid%n_pix(axis) = INT(l_params(axis) / cutoff) + 1
     enddo
   endif
-  do axis = 1 , 3                                      ! For x, y and z
-    ! Correction if the number of pixel(s) on 'axis' is too small
+  do axis = 1 , 3                                      ! for x, y and z
+    ! correction if the number of pixel(s) on 'axis' is too small
     if ( grid%n_pix(axis) .lt. 4 ) then
       grid%n_pix(axis) = 1
     endif
@@ -161,18 +165,18 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
 
   allocate (grid%pixel_list(grid%pixels))
   
-  if ( .not. use_pbc ) then                            ! Without periodic boundary conditions
-    do aid = 1 , atoms                                 ! For all atoms
-      do axis = 1 , 3                                  ! For x, y and z
+  if ( .not. use_pbc ) then                            ! without periodic boundary conditions
+    do aid = 1 , atoms                                 ! for all atoms
+      do axis = 1 , 3                                  ! for x, y and z
         pixel_pos(axis) = INT( (c_coord(aid,axis) - cmin(axis) )/ cutoff)
       enddo
       pixel_num = pixel_pos(1) + pixel_pos(2) * grid%n_pix(1) + pixel_pos(3) * grid%n_xy + 1
       call add_atom_to_pixel (grid%pixel_list(pixel_num), pixel_pos, aid, c_coord(aid,:))
     enddo
-  else                                                 ! Using periodic boundary conditions
-    do aid = 1 , atoms                                 ! For all atoms
+  else                                                 ! using periodic boundary conditions
+    do aid = 1 , atoms                                 ! for all atoms
      f_coord = MATMUL ( c_coord(aid), cart_to_frac )
-     do axis = 1 , 3                                   ! For x, y and z
+     do axis = 1 , 3                                   ! for x, y and z
        f_coord(axis) = f_coord(axis) - floor(f_coord(axis))
        pixel_pos(axis) = INT(f_coord(axis) * n_pix(axis))
      enddo
@@ -239,10 +243,10 @@ SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
           endif
         endif
         if ( keep_neighbor ) then
-          ! Evaluating neighbor pixel number in the grid
+          ! evaluating neighbor pixel number in the grid
           nid = the_pix%pid + pmod(xpos) + pmod(ypos) * the_grid%n_pix(1) + pmod(zpos) * the_grid%n_xy
           if ( use_pbc ) then
-            ! Correcting the value if PBC are used
+            ! correcting the value if PBC are used
             nid = nid + pbc_shift(xpos, ypos, zpos)
           endif
           the_pix%pixel_neighbors(nnp) = nid
@@ -257,7 +261,7 @@ END SUBROUTINE find_pixel_neighbors
 
 
 
-! Evaluating the interatomic distance between 2 pixel atoms
+! evaluating the interatomic distance between 2 pixel atoms
 SUBROUTINE evaluate_distance (use_pbc, at_i, at_j, dist)
   
   USE parameters
@@ -267,17 +271,17 @@ SUBROUTINE evaluate_distance (use_pbc, at_i, at_j, dist)
   TYPE (pixel_atom), POINTER, INTENT(IN) :: at_i      ! first pixel atom
   TYPE (pixel_atom), POINTER, INTENT(IN) :: at_j      ! second pixel atom
   TYPE (distance), INTENT(INOUT)         :: dist      ! calculation results
-  INTEGER                                :: axis    ! loop iterator axis id (1=x, 2=y, 3=z)
+  INTEGER                                :: axis      ! loop iterator axis id (1=x, 2=y, 3=z)
   
   do axis = 1 , 3
     dist%Rij(axis) = at_i%coord(axis) - at_j%coord(axis)
   enddo
   if ( use_pbc ) then
-    ! Pixel atom's coordinates are in corrected fractional format
+    ! then the pixel_atom's coordinates are in corrected fractional format
     do axis = 1 , 3
       dist%Rij(axis) = dist%Rij(axis) - AnINT(dist%Rij(axis))
     enddo
-    ! Transform back to Cartesian coordinates
+    ! transform back to Cartesian coordinates
     dist%Rij = MATMUL( dist%Rij, frac_to_cart )
   endif
   
@@ -285,7 +289,7 @@ SUBROUTINE evaluate_distance (use_pbc, at_i, at_j, dist)
   do axis = 1 , 3
     dist%length = dist%length + dist%Rij(axis) * dist%Rij(axis)
   enddo
-  ! Returning the 'distance' data structure that contains:
+  ! returning the 'distance' data structure that contains:
   ! - the squared value for Dij: no time consuming square root calculation !
   ! - the components of the distance vector on x, y and z
 END SUBROUTINE evaluate_distance
@@ -308,23 +312,23 @@ SUBROUTINE pixel_search_for_neighbors (use_pbc)
   TYPE (distance)       :: Dij                          ! distance data structure
   
   call prepare_pixel_grid (use_pbc, all_pixels)
-  ! Note that the pixel grid 'all_pixels' must be prepared before the following
-  ! For all pixels in the grid
+  ! note that the pixel grid 'all_pixels' must be prepared before the following
+  ! for all pixels in the grid
   do pix = 1 , all_pixels%pixels
-    ! Setting 'pix_i' as pointer to pixel number 'pix'
+    ! setting 'pix_i' as pointer to pixel number 'pix'
     pix_i => all_pixels%pixel_list(pix)
-    ! If pixel 'pix_i' contains atom(s)
+    ! if pixel 'pix_i' contains atom(s)
     if ( pix_i%patoms .gt. 0 ) then
 
-      ! Search for neighbbor pixels
+      ! search for pixel neighbbors of 'pix_'
       call find_pixel_neighbors (use_pbc, all_pixels, pix_i)
 
-      ! Testing all 'pix_i' neighbor pixels
+      ! testing all 'pix_i' neighbor pixels
       do pid = 1 , pix_i%neighbors
         pjx = pix_i%pixel_neighbors(pid)
-        ! Setting 'pix_j' as pointer to pixel number 'pjx'
+        ! setting 'pix_j' as pointer to pixel number 'pjx'
         pix_j => all_pixels%pixel_list(pjx)
-        ! Checking pixel 'pix_j' if it:
+        ! checking pixel 'pix_j' if it:
         ! - contains atom(s)
         ! - was not tested, otherwise the analysis would have been performed already
         if ( pix_j%patoms .gt. 0 .and. .not. pix_j%tested ) then
@@ -334,29 +338,29 @@ SUBROUTINE pixel_search_for_neighbors (use_pbc)
           else
             l_end = 0
           endif
-          ! For all atom(s) in 'pix_i'
+          ! for all atom(s) in 'pix_i'
           do aid = 1 , pix_i%patoms - l_end
-            ! Set pointers to the first atom to test
+            ! set pointers to the first atom to test
             at_i => pix_i%pix_atoms(aid)
             if ( pjx .eq. pix ) then
               l_start = aid + 1
             else
               l_start = 1
             endif
-            ! For all atom(s) in 'pix_j'
+            ! for all atom(s) in 'pix_j'
             do bid = l_start , pix_j%patoms
-              ! Set pointers to the second atom to test
+              ! set pointers to the second atom to test
               at_j => pix_j%pix_atoms(bid)
-              ! Evaluate interatomic distance
+              ! evaluate interatomic distance
               call evaluate_distance (use_pbc, at_i, at_j, Dij)
               if ( Dij%length .lt. cutoff_squared ) then
-                ! This is a bond !
+                ! this is a first neighbor bond !
               endif
             enddo
           enddo
         endif
       enddo
-      ! Store that pixel 'pix_i' was tested
+      ! store that pixel 'pix_i' was tested
       pix_i%tested = .true.
     endif
   enddo

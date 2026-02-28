@@ -4,12 +4,12 @@
 \label{c-pc-data}
 
 \begin{lstlisting}[language=C]
-// Global data structures and variables used in the next code sections
+// global data structures and variables used in the next code sections
 
 #define TRUE |\un|
 #define FALSE |\zero|
 
-// Atom in pixel data structure
+// atom in pixel data structure
 typedef struct pixel_atom pixel_atom;
 struct pixel_atom
 {
@@ -17,7 +17,7 @@ struct pixel_atom
   float coord[|\trois|];          // the atom coordinates on x, y and z
 };
 
-// Pixel data structure
+// pixel data structure
 typedef struct pixel pixel;
 struct pixel
 {
@@ -30,7 +30,7 @@ struct pixel
   int pixel_neighbors[|\mbtt{27}|]; // the list of neighbor pixels, maximum |\mbtt{27}|
 };
 
-// Pixel grid data structure
+// pixel grid data structure
 typedef struct pixel_grid pixel_grid;
 struct pixel_grid
 {
@@ -40,7 +40,7 @@ struct pixel_grid
   pixel * pixel_list;      // pointer to the pixels, to be allocated
 };
 
-// Bond distance data structure
+// bond distance data structure
 typedef struct distance distance;
 struct distance
 {
@@ -48,13 +48,17 @@ struct distance
   float Rij[|\trois|];            // vector components of x, y and z
 };
 
-// Model description
+/*
+  the following are considered to be provided by the user
+*/
+
+// model description
 int atoms;                 // the total number of atom(s)
 float ** c_coord;          // list of Cartesian coordinates: c_coord[atoms][|\trois|]
 float cutoff;              // the cutoff to define atomic bond(s)
 float cutoff_squared;      // squared value for the cutoff
 
-// Model box description
+// model box description
 float l_params[|\trois|];         // lattice a, b and c
 float cart_to_frac[|\trois|][|\trois|];  // Cartesian to fractional coordinates matrix
 float frac_to_cart[|\trois|][|\trois|];  // fractional to Cartesian coordinates matrix
@@ -78,7 +82,7 @@ void set_pbc_shift (pixel_grid * grid, int pixel_coord[|\trois|], int pbc_shift[
     {
       for ( |\obtt{z\_pos}| = |\zero| ; |\obtt{z\_pos}| < |\trois| ; |\obtt{z\_pos}| ++ )
       {
-        pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\obtt{z\_pos}|] = |\zero|; // initialization without any shift
+        pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\obtt{z\_pos}|] = |\zero|;           // initialization without any shift
       }
     }
   }
@@ -92,7 +96,7 @@ void set_pbc_shift (pixel_grid * grid, int pixel_coord[|\trois|], int pbc_shift[
       }
     }
   }
-  else if ( pixel_coord[|\zero|] == grid->n_pix[|\zero|] - |\un| ) // pixel position on 'x' is max
+  else if ( pixel_coord[|\zero|] == grid->n_pix[|\zero|] - |\un| )      // pixel position on 'x' is max
   {
     for ( |\rbtt{y\_pos}| = |\zero| ; |\rbtt{y\_pos}| < |\trois| ; |\rbtt{y\_pos}| ++ )
     {
@@ -112,7 +116,7 @@ void set_pbc_shift (pixel_grid * grid, int pixel_coord[|\trois|], int pbc_shift[
       }
     }
   }
-  else if ( pixel_coord[|\un|] == grid->n_pix[|\un|] - |\un| ) // pixel position on 'y' is max
+  else if ( pixel_coord[|\un|] == grid->n_pix[|\un|] - |\un| )      // pixel position on 'y' is max
   {
     for ( |\vbtt{x\_pos}| = |\zero| ; |\vbtt{x\_pos}| < |\trois| ; |\vbtt{x\_pos}| ++ )
     {
@@ -132,7 +136,7 @@ void set_pbc_shift (pixel_grid * grid, int pixel_coord[|\trois|], int pbc_shift[
       }
     }
   }
-  else if ( pixel_coord[|\deux|] == grid->n_pix[|\deux|] - |\un| ) // pixel position on 'z' is max
+  else if ( pixel_coord[|\deux|] == grid->n_pix[|\deux|] - |\un| )      // pixel position on 'z' is max
   {
     for ( |\vbtt{x\_pos}| = |\zero| ; |\vbtt{x\_pos}| < |\trois| ; |\vbtt{x\_pos}| ++ )
     {
@@ -153,16 +157,19 @@ void set_pbc_shift (pixel_grid * grid, int pixel_coord[|\trois|], int pbc_shift[
 void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[|\trois|], int atom_id, float atom_coord[|\trois|])
 {
   int |\dbtt{axis}|;
-  if (! the_pixel->patoms)
+  if (! the_pixel->patoms) 
   {
+    // if the pixel do contains any atom yet, then save its coordinates in the grid
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
     {
       the_pixel->p_xyz[|\dbtt{axis}|] = pixel_coord[|\dbtt{axis}|];
     }
+    // allocate the memory to store the first pixel_atom information
     the_pixel->pix_atoms = malloc(sizeof*the_pixel->pix_atoms);
   }
   else
   {
+    // otherwise reallocate memory to store the new pixel_atom information
     the_pixel->pix_atoms = realloc(the_pixel->pix_atoms, (the_pixel->patoms+|\un|)*sizeof*the_pixel->pix_atoms);
   }
   the_pixel->pix_atoms[patoms].atom_id = atom_id;
@@ -170,6 +177,7 @@ void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[|\trois|], int atom_i
   {
     the_pixel->pix_atoms[patoms].coord[|\dbtt{axis}|] = atom_coord[|\dbtt{axis}|];
   }
+  // increment the number of atom(s) in the pixel
   the_pixel->patoms ++;
 }
 \end{lstlisting}
@@ -182,8 +190,8 @@ void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[|\trois|], int atom_i
 pixel_grid * prepare_pixel_grid (bool use_pbc)
 {
   pixel_grid * grid;        // pointer to the pixel grid to create
-  int |\dbtt{axis}|;                 // integer loop |\dbtt{axis}| id (|\zero|=x, |\un|=y, |\deux|=z)
-  int |\cbtt{aid}|;                  // integer loop atom number (|\zero|, atoms-|\un|)
+  int |\dbtt{axis}|;                 // loop iterator |\dbtt{axis}| id (|\zero|=x, |\un|=y, |\deux|=z)
+  int |\cbtt{aid}|;                  // loop iterator atom number (|\zero|, atoms-|\un|)
   int pixel_num;            // pixel number in the grid
   int pixel_pos[|\trois|];         // pixel coordinates in the grid
   float cmin[|\trois|], cmax[|\trois|];   // float coordinates min, max values
@@ -191,7 +199,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
 
   grid = malloc(sizeof*grid);
 
-  if ( ! use_pbc ) // Without periodic boundary conditions
+  if ( ! use_pbc ) // without periodic boundary conditions
   {
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ ) cmin[|\dbtt{axis}|] = cmax[|\dbtt{axis}|] = c_coord[|\zero|][|\dbtt{axis}|];
     for ( |\cbtt{aid}| = |\un| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )    // For all atoms
@@ -204,30 +212,30 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     }
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )     // For x, y and z
     {
-      grid->n_pix[|\dbtt{axis}|] = (int)((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / cutoff) + |\un|; // Number of pixel(s) on |\dbtt{axis}| '|\dbtt{axis}|'
+      grid->n_pix[|\dbtt{axis}|] = (int)((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / cutoff) + |\un|; // Number of pixel(s) on axis '|\dbtt{axis}|'
     }
   }
-  else  // Using periodic boundary conditions
+  else  // using periodic boundary conditions
   {
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )     // For x, y and z
     {
-      grid->n_pix[|\dbtt{axis}|] = (int)(l_params[|\dbtt{axis}|] / cutoff) + |\un|; // Number of pixel(s) on |\dbtt{axis}| '|\dbtt{axis}|'
+      grid->n_pix[|\dbtt{axis}|] = (int)(l_params[|\dbtt{axis}|] / cutoff) + |\un|; // Number of pixel(s) on axis '|\dbtt{axis}|'
     }
   }
   for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )       // For x, y and z
   {
-    // Correction if the number of pixel(s) on '|\dbtt{axis}|' is too small
+    // correction if the number of pixel(s) on '|\dbtt{axis}|' is too small
     grid->n_pix[|\dbtt{axis}|] = (grid->n_pix[|\dbtt{axis}|] < 4) ? |\un| : grid->n_pix[|\dbtt{axis}|];
   }
   grid->n_xy = grid->n_pix[|\zero|] * grid->n_pix[|\un|]; // Number of pixels on the plan 'xy'
   grid->pixels = grid->n_xy * grid->n_pix[|\deux|];   // Total number of pixels in the grid
   grid->pixel_list = malloc (grid->pixels*sizeof*grid->pixel_list);
 
-  if ( ! use_pbc ) // Without periodic boundary conditions
+  if ( ! use_pbc ) // without periodic boundary conditions
   {
-    for ( |\cbtt{aid}| = |\zero| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )  // For all atoms
+    for ( |\cbtt{aid}| = |\zero| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )  // for all atoms
     {
-      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )    // For x, y and z
+      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )    // for x, y and z
       {
         pixel_pos[|\dbtt{axis}|] = (int)((c_coord[|\cbtt{aid}|][|\dbtt{axis}|] - cmin[|\dbtt{axis}|])/cutoff);
       }
@@ -235,13 +243,13 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
       add_atom_to_pixel (grid, pixel_num, pixel_pos, |\cbtt{aid}|, c_coord[|\cbtt{aid}|]);
     }
   }
-  else // Using periodic boundary conditions
+  else // using periodic boundary conditions
   {
-    for ( |\cbtt{aid}| = |\zero| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )  // For all atoms
+    for ( |\cbtt{aid}| = |\zero| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )  // for all atoms
     {
       // with 'matrix_multiplication' a user defined function to perform the operation
       f_coord = matrix_multiplication (cart_to_frac, c_coord[|\cbtt{aid}|]);
-      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )    // For x, y and z
+      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )    // for x, y and z
       {
         f_coord[|\dbtt{axis}|] = f_coord[|\dbtt{axis}|] - floorf(f_coord[|\dbtt{axis}|]);
         pixel_pos[|\dbtt{axis}|] = (int)((f_coord[|\dbtt{axis}|] * n_pix[|\dbtt{axis}|]);
@@ -259,13 +267,13 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
 \subsection{C code: finding pixel neighbors}
 \label{c-find-pn}
 \begin{lstlisting}[language=C]
-// Finding neighbor pixels for pixel in the grid
+// finding neighbor pixels for pixel in the grid
 // - bool use_pbc : flag to set if PBC are used or not
 // - pixel_grid * the_grid : pointer to the pixel grid
 // - pixel * the_pix : pointer to the pixel with neighbors to be found
 void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
 {
-  int |\dbtt{axis}|;                       // |\dbtt{axis}| loop iterator
+  int |\dbtt{axis}|;                       // loop iterator axis id (1=x , 2=y , 3= z)
   int |\vbtt{xpos}|, |\rbtt{ypos}|, |\obtt{zpos}|;           // neighbor position on x, y and z
   int l_start[|\trois|] = { |\zero|, |\zero|, |\zero|};    // loop iterators starting value
   int l_end[|\trois|] = { |\trois|, |\trois|, |\trois|};      // loop iterators ending value
@@ -336,13 +344,13 @@ void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
 
 \subsection{C code: inter-atomic distance calculation}
 \begin{lstlisting}[language=C]
-// Evaluating the interatomic distance between 2 pixel atoms
+// evaluating the interatomic distance between 2 pixel atoms
 // - bool use_pbc : flag to set if PBC are used or not
 // - pixel_atom * at_i : pointer to first pixel atom
 // - pixel_atom * at_j : pointer to second pixel atom
 distance evaluate_distance (bool use_pbc, pixel_atom * at_i, pixel_atom * at_j)
 {
-  int |\dbtt{axis}|;          // integer parameter loop iterator
+  int |\dbtt{axis}|;          // axis loop iterator
   float u, v;        // float parameters
   distance dist;     // distance data to store calculation results
   for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
@@ -351,16 +359,16 @@ distance evaluate_distance (bool use_pbc, pixel_atom * at_i, pixel_atom * at_j)
   }
   if ( use_pbc )
   {
-    // Pixel atom's coordinates are in corrected fractional format
+    // then the pixel_atom's coordinates are in corrected fractional format
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
     {
-      // Absolute value in float format
+      // absolute value in float format
       u = fabs (dist.Rij[|\dbtt{axis}|]);
       v = min (u, |\un|.|\zero| - u);
-      // Proper value, with proper sign
+      // proper value, with proper sign
       dist.Rij[|\dbtt{axis}|] = (dist.Rij[|\dbtt{axis}|] / u) * v;
     }
-    // Transform back to Cartesian coordinates
+    // transform back to Cartesian coordinates
     // with 'matrix_multiplication' a user defined function to perform the operation
     dist.Rij = matrix_multiplication (frac_to_cart, dist.Rij);
   }
@@ -369,7 +377,7 @@ distance evaluate_distance (bool use_pbc, pixel_atom * at_i, pixel_atom * at_j)
   {
     dist.length += dist.Rij[|\dbtt{axis}|] * dist.Rij[|\dbtt{axis}|];
   }
-  // Returning the 'distance' data structure that contains:
+  // returning the 'distance' data structure that contains:
   // - the squared value for Dij: no time consuming square root calculation !
   // - the components of the distance vector on x, y and z
   return dist;
@@ -381,7 +389,7 @@ distance evaluate_distance (bool use_pbc, pixel_atom * at_i, pixel_atom * at_j)
 \subsection{C code: pixel search for first neighbor atoms}
 \label{c-pc-pixel}
 \begin{lstlisting}[language=C]
-// Searching for first neighbor atoms using the grid pixelation/partitioning method
+// searching for first neighbor atoms using the grid pixelation/partitioning method
 // - bool use_pbc : flag to set if PBC are used or not
 void pixel_search_for_neighbors (bool use_pbc)
 {
@@ -395,52 +403,52 @@ void pixel_search_for_neighbors (bool use_pbc)
   distance Dij;               // distance data structure
 
   all_pixels = prepare_pixel_grid (use_pbc);
-  // Note that the pixel grid 'all_pixels' must be prepared before the following
-  // For all pixels in the grid
+  // note that the pixel grid 'all_pixels' must be prepared before the following
+  // for all pixels in the grid
   for ( |\vbtt{pix}| = |\zero| ; |\vbtt{pix}| < all_pixels->pixels ; |\vbtt{pix}| ++ )
   {
-    // Setting 'pix_i' as pointer to pixel number 'pix'
+    // setting 'pix_i' as pointer to pixel number 'pix'
     pix_i = & all_pixels->pixel_list[|\vbtt{pix}|];
-    // If pixel 'pix_i' contains atom(s)
+    // if pixel 'pix_i' contains atom(s)
     if ( pix_i->patoms )
     {
-      // Search for neighbbor pixels of 'pix_i'
+      // search for neighbbor pixels of 'pix_i'
       find_pixel_neighbors ( use_pbc, all_pixels, pix_i );
-      // Testing all 'pix_i' neighbor pixels
+      // testing all 'pix_i' neighbor pixels
       for ( pid = |\zero| ; pid < pix_i->neighbors ; pid ++ )
       {
         |\rbtt{pjx}| = pix_i->pixel_neighbors[pid];
-        // Setting 'pix_j' as pointer to pixel number 'pjx'
+        // setting 'pix_j' as pointer to pixel number 'pjx'
         pix_j = & all_grid->pixel_list[|\rbtt{pjx}|];
-        // Checking pixel 'pix_j' if it:
+        // checking pixel 'pix_j' if it:
         // - contains atom(s)
         // - was not tested, otherwise the analysis would have been performed already
         if ( pix_j->patoms && ! pix_j->tested )
         {
-          // If 'pix_i' and 'pix_j' are the same, only test pair of different atoms
+          // if 'pix_i' and 'pix_j' are the same, only test pair of different atoms
           l_end = (|\rbtt{pjx}| != |\vbtt{pix}|) ? |\zero| : |\un|
-          // For all atom(s) in 'pix'
+          // for all atom(s) in 'pix'
           for ( |\dbtt{aid}| = |\zero| ; |\dbtt{aid}| < pix_i->patoms - l_end ; |\dbtt{aid}| ++ )
           {
-            // Set pointer to the first atom to test
+            // set pointer to the first atom to test
             at_i = & pix_i->pix_atom[|\dbtt{aid}|];
             lstart = (|\rbtt{pjx}| != |\vbtt{pix}|) ? |\zero| : |\dbtt{aid}| + |\un|
-            // For all atom(s) in 'pix_j'
+            // for all atom(s) in 'pix_j'
             for ( |\cbtt{bid}| = lstart ; |\cbtt{bid}| < pix_j->patoms ; |\cbtt{bid}| ++ )
             {
-              // Set pointer to the second atom to test
+              // set pointer to the second atom to test
               at_j = & pix_j->pix_atom[|\cbtt{bid}|];
-              // Evaluate interatomic distance
+              // evaluate interatomic distance
               Dij = evaluate_distance (use_pbc, at_i, at_j);
               if ( Dij.length < cutoff_squared )
               {
-                // This is a bond !
+                // this is a first neighbor bond !
               }
             }
           }
         }
       }
-      // Store that pixel 'pix' was tested
+      // store that pixel 'pix' was tested
       pix_i->tested = TRUE;
     }
   }
