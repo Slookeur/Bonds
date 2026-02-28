@@ -112,7 +112,7 @@ SUBROUTINE add_atom_to_pixel (the_pixel, pixel_coord, atom_id, atom_coord)
   REAL, DIMENSION(|\trois|), INTENT(IN)     :: atom_coord  ! the atomic coordinates
 
   if (the_pixel%patoms .eq. |\zero|) then
-    // if the pixel do contains any atom yet, then save its coordinates in the grid
+    // if the pixel do not contains any atom yet, then save its coordinates in the grid
     do |\dbtt{axis}| = |\un| , |\trois|
       the_pixel%p_xyz(|\dbtt{axis}|) = pixel_coord(|\dbtt{axis}|)
     enddo

@@ -82,7 +82,7 @@ void set_pbc_shift (pixel_grid * grid, int pixel_coord[|\trois|], int pbc_shift[
     {
       for ( |\obtt{z\_pos}| = |\zero| ; |\obtt{z\_pos}| < |\trois| ; |\obtt{z\_pos}| ++ )
       {
-        pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\obtt{z\_pos}|] = |\zero|;           // initialization without any shift
+        pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\obtt{z\_pos}|] = |\zero|;             // initialization without any shift
       }
     }
   }
@@ -159,7 +159,7 @@ void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[|\trois|], int atom_i
   int |\dbtt{axis}|;
   if (! the_pixel->patoms) 
   {
-    // if the pixel do contains any atom yet, then save its coordinates in the grid
+    // if the pixel do not contains any atom yet, then save its coordinates in the grid
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
     {
       the_pixel->p_xyz[|\dbtt{axis}|] = pixel_coord[|\dbtt{axis}|];
@@ -233,11 +233,11 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   grid->pixels = grid->n_xy * grid->n_pix[|\deux|];   // Total number of pixels in the grid
   grid->pixel_list = malloc (grid->pixels*sizeof*grid->pixel_list);
 
-  if ( ! use_pbc )                         // without periodic boundary conditions
+  if ( ! use_pbc )                              // without periodic boundary conditions
   {
-    for ( |\cbtt{aid}| = |\zero| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )    // for all atoms
+    for ( |\cbtt{aid}| = |\zero| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )      // for all atoms
     {
-      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )      // for x, y and z
+      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )    // for x, y and z
       {
         pixel_pos[|\dbtt{axis}|] = (int)((c_coord[|\cbtt{aid}|][|\dbtt{axis}|] - cmin[|\dbtt{axis}|])/cutoff);
       }
@@ -251,7 +251,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     {
       // with 'matrix_multiplication' a user defined function to perform the operation
       f_coord = matrix_multiplication (cart_to_frac, c_coord[|\cbtt{aid}|]);
-      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )      // for x, y and z
+      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )   // for x, y and z
       {
         f_coord[|\dbtt{axis}|] = f_coord[|\dbtt{axis}|] - floorf(f_coord[|\dbtt{axis}|]);
         pixel_pos[|\dbtt{axis}|] = (int)((f_coord[|\dbtt{axis}|] * n_pix[|\dbtt{axis}|]);
