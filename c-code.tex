@@ -189,8 +189,8 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   float cmin[|\trois|], cmax[|\trois|];   // float coordinates min, max values
   float f_coord[|\trois|];         // float fractional coordinates
 
-  // User defined function to allocate the memory to store the pixel grid data
-  grid = allocate_grid_data ();
+  grid = malloc(sizeof*grid);
+
   if ( ! use_pbc ) // Without periodic boundary conditions
   {
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ ) cmin[|\dbtt{axis}|] = cmax[|\dbtt{axis}|] = c_coord[|\zero|][|\dbtt{axis}|];
@@ -221,9 +221,9 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   }
   grid->n_xy = grid->n_pix[|\zero|] * grid->n_pix[|\un|]; // Number of pixels on the plan 'xy'
   grid->pixels = grid->n_xy * grid->n_pix[|\deux|];   // Total number of pixels in the grid
-  // User defined function to allocate the memory to store the pixel information for the grid
-  grid->pixel_list = allocate_pixel_data (grid->pixels);
-  if ( ! use_pbc ) // Without periodic boundary conditions
+  grid->pixel_list = malloc (grid->pixels*sizeof*grid->pixel_list);
+
+if ( ! use_pbc ) // Without periodic boundary conditions
   {
     for ( |\cbtt{aid}| = |\zero| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )  // For all atoms
     {

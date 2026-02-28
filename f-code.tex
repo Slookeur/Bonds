@@ -47,6 +47,7 @@ MODULE parameters
   ! Model description
   INTEGER                                   :: atoms              ! the total number of atom(s)
   REAL, DIMENSION(atoms,|\trois|)                  :: c_coord            ! list of Cartesian coordinates
+  REAL                                      :: cutoff             ! the cutoff to define first neighbors
   REAL                                      :: cutoff_squared     ! squared value of the cutoff to define first neighbors
   
   ! Model box description
@@ -107,21 +108,18 @@ SUBROUTINE add_atom_to_pixel (the_pixel, pixel_coord, atom_id, atom_coord)
   TYPE (pixel), INTENT(INOUT) :: the_pixel          ! pointer to the pixel
   INTEGER, DIMENSION(|\trois|), INTENT(IN) :: pixel_coord  ! the pixel coordinates in the grid
   INTEGER, INTENT(IN)                :: atom_id     ! the atom ID number
-  INTEGER                            :: |\dbtt{axis}|        ! loop iterator axis id (1=x , 2=y , 3=z)
+  INTEGER                            :: |\dbtt{axis}|        ! loop iterator axis id (1=x, 2=y, 3=z)
   REAL, DIMENSION(|\trois|), INTENT(IN)     :: atom_coord  ! the atomic coordinates
 
   if (the_pixel%patoms .eq. |\zero|) then
     do |\dbtt{axis}| = |\un| , |\trois|
-      the_pixel-%p_xyz(|\dbtt{axis}|) = pixel_coord(|\dbtt{axis}|);
+      the_pixel%p_xyz(|\dbtt{axis}|) = pixel_coord(|\dbtt{axis}|)
     enddo
-  endif
-
-  the_pixel%patoms = the_pixel%patoms + |\un|
-  if (allocated(the_pixel%pix_atoms)) then
-    the_pixel%pix_atoms = realloc(the_pixel%pix_atoms, the_pixel%patoms)
-  else
     allocate(the_pixel%pix_atoms(1))
+  else
+    the_pixel%pix_atoms = realloc(the_pixel%pix_atoms, the_pixel%patoms+1)
   endif
+  the_pixel%patoms = the_pixel%patoms + |\un|
   the_pixel%pix_atoms(patoms)%atom_id = atom_id
   do |\dbtt{axis}| = |\un| , |\trois|
     the_pixel%pix_atoms(patoms)%coord(|\dbtt{axis}|) = atom_coord(|\dbtt{axis}|)
@@ -183,7 +181,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   grid%n_xy = grid%n_pix(|\un|) * grid%n_pix(|\deux|)            ! Number of pixels on the plan 'xy'
   grid%pixels = grid%n_xy * grid%n_pix(|\trois|)              ! Total number of pixels in the grid
 
-  allocate (grid%pixel_list(grid%pixels));
+  allocate (grid%pixel_list(grid%pixels))
   
   if ( .not. use_pbc ) then                            ! Without periodic boundary conditions
     do |\cbtt{aid}| = |\un| , atoms                                 ! For all atoms
@@ -200,7 +198,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
        f_coord(|\dbtt{axis}|) = f_coord(|\dbtt{axis}|) - floor(f_coord(|\dbtt{axis}|))
        pixel_pos(|\dbtt{axis}|) = INT(f_coord(|\dbtt{axis}|) * n_pix(|\dbtt{axis}|))
      enddo
-     pixel_num = pixel_pos(|\un|) + pixel_pos(|\un|) * grid%n_pix(|\deux|) + pixel_pos(|\trois|) * grid%n_xy + |\un|
+     pixel_num = pixel_pos(|\un|) + pixel_pos(|\deux|) * grid%n_pix(|\un|) + pixel_pos(|\trois|) * grid%n_xy + |\un|
      call add_atom_to_pixel (grid%pixel_list(pixel_num), pixel_pos, |\cbtt{aid}|, f_coord)
     enddo
   endif
@@ -221,7 +219,7 @@ SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
   LOGICAL, INTENT(IN)                  :: use_pbc                 ! flag to set if PBC are used or not
   TYPE (pixel_grid), INTENT(INOUT)     :: the_grid                ! pointer to the pixel grid
   TYPE (pixel), POINTER, INTENT(INOUT) :: the_pix                 ! pointer to the pixel
-  INTEGER                              :: |\dbtt{axis}|                    ! loop iterator axis id (1=x , 2=y , 3=z)
+  INTEGER                              :: |\dbtt{axis}|                    ! loop iterator axis id (1=x, 2=y, 3=z)
   INTEGER                              :: |\vbtt{xpos}|, |\rbtt{ypos}|, |\obtt{zpos}|        ! neighbor position on x, y and z
   INTEGER, DIMENSION(|\trois|)                :: l_start = (\|\un|, |\un|, |\un|\)   ! loop iterators starting value
   INTEGER, DIMENSION(|\trois|)                :: l_end = (\|\trois|, |\trois|, |\trois|\)     ! loop iterators ending value
@@ -296,11 +294,11 @@ SUBROUTINE evaluate_distance (use_pbc, at_i, at_j, dist)
   USE parameters
   IMPLICIT NONE
   
-  LOGICAL, INTENT(IN)              :: use_pbc         ! flag to set if PBC are used or not
+  LOGICAL, INTENT(IN)                    :: use_pbc   ! flag to set if PBC are used or not
   TYPE (pixel_atom), POINTER, INTENT(IN) :: at_i      ! first pixel atom
   TYPE (pixel_atom), POINTER, INTENT(IN) :: at_j      ! second pixel atom
-  TYPE (distance), INTENT(INOUT)   :: dist            ! calculation results
-  INTEGER                          :: |\dbtt{axis}|            ! loop iterator axis id (1=x , 2=y , 3=z)
+  TYPE (distance), INTENT(INOUT)         :: dist      ! calculation results
+  INTEGER                                :: |\dbtt{axis}|    ! loop iterator axis id (1=x, 2=y, 3=z)
   
   do |\dbtt{axis}| = |\un| , |\trois|
     dist%Rij(|\dbtt{axis}|) = at_i%coord(|\dbtt{axis}|) - at_j%coord(|\dbtt{axis}|)
@@ -339,9 +337,9 @@ SUBROUTINE pixel_search_for_neighbors (use_pbc)
   TYPE (pixel_grid)     :: all_pixels                   ! the pixel grid to analyze
   INTEGER               :: |\vbtt{pix}|, |\rbtt{pjx}|                     ! integer pixel ID numbers
   INTEGER               :: |\dbtt{aid}|, |\cbtt{bid}|                     ! integer loop atom numbers
-  INTEGER               :: l_start, l_en                ! integer loop modifier
+  INTEGER               :: l_start, l_end               ! integer loop modifier
   INTEGER               :: pid
-  TYPE (pixel), POINTER :: pix_i, pix_j                 ! pointers of pixel data structure
+  TYPE (pixel_atom), POINTER :: pix_i, pix_j            ! pointers on pixel data structure
   TYPE (atom), POINTER  :: at_i, at_j                   ! pointers on pixel_atom data structure
   TYPE (distance)       :: Dij                          ! distance data structure
   
