@@ -11,45 +11,45 @@ MODULE parameters
   
   ! Atom in pixel data structure
   TYPE pixel_atom
-    INTEGER                                 :: atom_id         ! the atom ID
-    REAL, DIMENSION(|\trois|)                      :: coord           ! the atom coordinates on x, y and z
+    INTEGER                                 :: atom_id            ! the atom ID
+    REAL, DIMENSION(|\trois|)                      :: coord             ! the atom coordinates on x, y and z
   END TYPE pixel_atom
   
   ! Pixel data structure
   TYPE pixel
-    INTEGER                                 :: pid             ! the pixel number
-    INTEGER, DIMENSION(|\trois|)                   :: p_xyz           ! the pixel coordinates in the grid
-    LOGICAL                                 :: tested          ! was the pixel checked already
-    INTEGER                                 :: patoms          ! number of atom(s) in pixel
-    TYPE(pixel_atom), DIMENSION(:), ALLOCATABLE   :: pix_atoms ! list of atom(s) in pixel, to be allocated
-    INTEGER                                 :: neighbors       ! number of neighbors for pixel
+    INTEGER                                 :: pid                ! the pixel number
+    INTEGER, DIMENSION(|\trois|)                   :: p_xyz             ! the pixel coordinates in the grid
+    LOGICAL                                 :: tested             ! was the pixel checked already
+    INTEGER                                 :: patoms             ! number of atom(s) in pixel
+    TYPE(pixel_atom), DIMENSION(:), ALLOCATABLE   :: pix_atoms    ! list of atom(s) in pixel, to be allocated
+    INTEGER                                 :: neighbors          ! number of neighbors for pixel
     INTEGER, DIMENSION(|\mbtt{27}|)                  :: pixel_neighbors ! the list of neighbor pixels, maximum 27
   END TYPE pixel
   
   ! Pixel grid data structure
   TYPE pixel_grid
-    INTEGER                                 :: pixels          ! total number of pixels in the grid
-    INTEGER, DIMENSION(|\trois|)                   :: n_pix           ! number of pixel(s) on each axis
-    INTEGER                                 :: n_xy            ! number of pixels in the plan xy
-    TYPE (pixel), DIMENSION(:), ALLOCATABLE, TARGET :: pixel_list      ! pointer to the pixels, to be allocated
+    INTEGER                                 :: pixels             ! total number of pixels in the grid
+    INTEGER, DIMENSION(|\trois|)                   :: n_pix              ! number of pixel(s) on each axis
+    INTEGER                                 :: n_xy               ! number of pixels in the plan xy
+    TYPE (pixel), DIMENSION(:), ALLOCATABLE, TARGET :: pixel_list ! pointer to the pixels, to be allocated
   END TYPE pixel_grid
   
   ! Distance data structure
   TYPE distance
-    REAL                                    :: length          ! the distance in |\blue{\AA}| squared
-    REAL, DIMENSION(|\trois|)                      :: Rij             ! vector components of x, y and z
+    REAL                                    :: length             ! the distance in |\blue{\AA}| squared
+    REAL, DIMENSION(|\trois|)                      :: Rij               ! vector components of x, y and z
   END TYPE distance
   
   ! Model description
-  INTEGER                                   :: atoms           ! the total number of atom(s)
-  REAL, DIMENSION(atoms,|\trois|)                  :: c_coord         ! list of Cartesian coordinates
-  REAL                                      :: cutoff          ! the cutoff to define atomic bond(s)
-  REAL                                      :: cutoff_squared  ! squared value for the cutoff
+  INTEGER                                   :: atoms              ! the total number of atom(s)
+  REAL, DIMENSION(atoms,|\trois|)                  :: c_coord            ! list of Cartesian coordinates
+  REAL                                      :: cutoff             ! the cutoff to define atomic bond(s)
+  REAL                                      :: cutoff_squared     ! squared value for the cutoff
   
   ! Model box description
-  REAL, DIMENSION(|\trois|)                        :: l_params        ! lattice a, b and c
-  REAL, DIMENSION(|\trois|,|\trois|)                      :: cart_to_frac    ! Cartesian to fractional coordinates matrix
-  REAL, DIMENSION(|\trois|,|\trois|)                      :: frac_to_cart    ! fractional to Cartesian coordinates matrix
+  REAL, DIMENSION(|\trois|)                        :: l_params           ! lattice a, b and c
+  REAL, DIMENSION(|\trois|,|\trois|)                      :: cart_to_frac       ! Cartesian to fractional coordinates matrix
+  REAL, DIMENSION(|\trois|,|\trois|)                      :: frac_to_cart       ! fractional to Cartesian coordinates matrix
 
 END MODULE parameters
 \end{lstlisting}
