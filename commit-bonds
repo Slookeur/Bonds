@@ -1,0 +1,29 @@
+#!/bin/bash
+
+function main {
+  cd Bonds
+  # To init a git repository:
+  #git init
+
+  # To add/create a branch:
+  #git branch -M main
+
+  # To link it to a github repo: 
+  #git remote add origin git@github.com:Slookeur/Atomes-doc
+
+  git config user.name "Slookeur"
+  git config user.email "sebastien.leroux@ipcms.unistra.fr"
+  git config pull.rebase false
+  git fetch || printf "fetch did not work\n"
+  # Basculement sur la branche "main"
+  git checkout -b main || git checkout main
+  git add .
+  now=`date`
+  git commit -m "Bonds sources: $now"
+  #git push origin main --force
+  git push origin main
+
+  cd ..
+}
+
+main
