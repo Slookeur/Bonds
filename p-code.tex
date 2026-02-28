@@ -1,6 +1,6 @@
 \section{Commented Python code}
 
-\subsection{Commented Python code: data structures and global variables}
+\subsection{Python code: data structures and global variables}
 \label{p-pc-data}
 
 \begin{lstlisting}[language=Python]
@@ -16,27 +16,27 @@ class PixelAtom:
 # Pixel data structure
 class Pixel:
   def __init__(self, pid=|\zero|, p_xyz=None, tested=False, patoms=|\zero|, pix_atoms=None, neighbors=|\zero|):
-    self.pid = pid                                               # the pixel number
+    self.pid = pid                                                  # the pixel number
     self.p_xyz = np.zeros(|\trois|) if p_xyz is None else np.array(p_xyz)  # the pixel coordinates in the grid
-    self.tested = tested                                         # was the pixel checked already
-    self.patoms = patoms                                         # number of atom(s) in pixel
-    self.pix_atoms = [] if pix_atoms is None else pix_atoms      # list of atom(s) in the pixel
-    self.neighbors = neighbors                                   # number of neighbors for pixel
-    self.pixel_neighbors = np.zeros(|\mbtt{27}|, dtype=int)               # the list of neighbor pixels, maximum 27
+    self.tested = tested                                            # was the pixel checked already
+    self.patoms = patoms                                            # number of atom(s) in pixel
+    self.pix_atoms = [] if pix_atoms is None else pix_atoms         # list of atom(s) in the pixel
+    self.neighbors = neighbors                                      # number of neighbors for pixel
+    self.pixel_neighbors = np.zeros(|\mbtt{27}|, dtype=int)                  # the list of neighbor pixels, maximum 27
 
 # Pixel grid data structure
 class PixelGrid:
   def __init__(self, pixels=|\zero|, n_pix=None, n_xy=|\zero|, pixel_list=None):
-    self.pixels = pixels                                         # total number of pixels in the grid
-    self.n_pix = np.zeros(|\trois|, dtype=int) if n_pix is None else np.array(n_pix)   # pixel(s) on each axis
-    self.n_xy = n_xy                                             # number of pixels in the plan xy
-    self.pixel_list = [] if pixel_list is None else pixel_list   # pointer to the pixels, to be allocated
+    self.pixels = pixels                                            # total number of pixels in the grid
+    self.n_pix = np.zeros(|\trois|, dtype=int) if n_pix is None else np.array(n_pix) # pixel(s) on each axis
+    self.n_xy = n_xy                                                # number of pixels in the plan xy
+    self.pixel_list = [] if pixel_list is None else pixel_list      # pointer to the pixels, to be allocated
 
 # Bond distance data structure
 class Distance:
   def __init__(self, length=|\zero|.|\zero|, Rij=None):
-    self.length = length                                         # the distance in |\AA| squared
-    self.Rij = np.zeros(|\trois|) if Rij is None else np.array(Rij)     # vector components of x, y and z
+    self.length = length                                            # the distance in |\AA| squared
+    self.Rij = np.zeros(|\trois|) if Rij is None else np.array(Rij)        # vector components of x, y and z
 
 # Model description
 atoms = |\zero|                         # the total number of atom(s)
@@ -51,7 +51,7 @@ frac_to_cart = np.zeros((|\trois|, |\trois|))   # fractional to Cartesian coordi
 \end{lstlisting}
 \clearpage
 
-\subsection{Commented Python code: set pixel periodic boundary condition shift}
+\subsection{Python code: set pixel periodic boundary condition shift}
 
 \begin{lstlisting}[language=Python]
 # Adjust, if needed, shift to search for pixel neighbor(s) using PBC
@@ -98,34 +98,28 @@ def set_pbc_shift(pixel_grid : PixelGrid, pixel_coord : np.ndarray, pbc_shift : 
 
 \clearpage
 
-\subsection{Commented Python code: add atom to pixel}
+\subsection{Python code: add atom to pixel}
 \label{c-add_atom_pixel}
 \begin{lstlisting}[language=Python]
 def add_atom_to_pixel (the_pixel : Pixel, pixel_coord : , atom_id : int, atom_coord)
 
-  INTEGER                              :: |\dbtt{axis}|       ! loop iterator axis id (1=x , 2=y , 3=z)
-
-  if ! the_pixel%patoms
-    do |\dbtt{axis}| = |\un| , |\trois|
-      the_pixel-%p_xyz(|\dbtt{axis}|) = pixel_coord(|\dbtt{axis}|);
-    enddo
-
-  the_pixel%patoms = the_pixel%patoms + |\un|
-  if (allocated(the_pixel%pix_atoms)) then
-    the_pixel%pix_atoms = realloc(the_pixel%pix_atoms, the_pixel%patoms)
+  if ! the_pixel.patoms:
+    for |\dbtt{axis}| in range(|\trois|):
+      the_pixel.p_xyz[|\dbtt{axis}|] = pixel_coord[|\dbtt{axis}|]
+  
   else
-    allocate(the_pixel%pix_atoms(1))
-  endif
-  the_pixel%pix_atoms(patoms)%atom_id = atom_id
-  do |\dbtt{axis}| = |\un| , |\trois|
-    the_pixel%pix_atoms(patoms)%coord(|\dbtt{axis}|) = atom_coord(|\dbtt{axis}|)
-  enddo
 
+  the_pixel.pix_atoms[patoms].atom_id = atom_id
+  for |\dbtt{axis}| in range(|\trois|):
+    the_pixel.pix_atoms[patoms].coord[|\dbtt{axis}|] = atom_coord[|\dbtt{axis}|]
+
+  the_pixel.patoms += 1
+ 
 \end{lstlisting}
 
 \clearpage
 
-\subsection{Commented Python code: preparation of the pixel grid}
+\subsection{Python code: preparation of the pixel grid}
 
 \begin{lstlisting}[language=Python]
 # Preparation of the pixel grid
@@ -135,8 +129,6 @@ def prepare_pixel_grid(use_pbc : bool):
   cmin = [float(|\textquotesingle|inf|\textquotesingle|)] * |\trois|                          # Initialize to infinity
   cmax = [-float(|\textquotesingle|inf|\textquotesingle|)] * |\trois|                         # Initialize to negative infinity
   pixel_pos = np.zeros(3, dtype=int)
-# User defined function to allocate the memory to store the pixel grid data
-  grid = allocate_grid_data()
   
   if not use_pbc:                                    # Without periodic boundary conditions
     for |\dbtt{axis}| in range(|\trois|):
@@ -186,7 +178,7 @@ def prepare_pixel_grid(use_pbc : bool):
 
 \clearpage
 
-\subsection{Commented Python code: finding pixel neighbors}
+\subsection{Python code: finding pixel neighbors}
 
 \begin{lstlisting}[language=Python]
 # Finding neighbor pixels for pixel in the grid
@@ -248,7 +240,7 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
 
 \clearpage
 
-\subsection{Commented Python code: inter-atomic distance calculation}
+\subsection{Python code: inter-atomic distance calculation}
 
 \begin{lstlisting}[language=Python]
 # Evaluating the interatomic distance between 2 pixel atoms
@@ -287,7 +279,7 @@ def evaluate_distance(use_pbc : bool, at_i : PixelAtom, at_j : PixelAtom):
 
 \clearpage
 
-\subsection{Commented Python code: pixel search for first neighbor atoms}
+\subsection{Python code: pixel search for first neighbor atoms}
 \label{p-pc-pixel}
 
 \begin{lstlisting}[language=Python]
