@@ -30,7 +30,7 @@ class PixelGrid:
 # Bond distance data structure
 class Distance:
   def __init__(self, length=0.0, Rij=None):
-    self.length = length                                            # the distance in |\AA| squared
+    self.length = length                                            # the distance in Angstrom squared
     self.Rij = np.zeros(3) if Rij is None else np.array(Rij)        # vector components of x, y and z
 
 # Model description
@@ -111,8 +111,8 @@ def add_atom_to_pixel (the_pixel : Pixel, pixel_coord : , atom_id : int, atom_co
 # - bool use_pbc : flag to set if PBC are used or not
 def prepare_pixel_grid(use_pbc : bool):
   grid = PixelGrid()                                 # create a new pixel grid
-  cmin = [float(inf)] * 3                            # initialize to infinity
-  cmax = [-float(inf)] * 3                           # initialize to negative infinity
+  cmin = [float('inf')] * 3                          # initialize to infinity
+  cmax = [-float('inf')] * 3                         # initialize to negative infinity
   pixel_pos = np.zeros(3, dtype=int)
   
   if not use_pbc:                                    # without periodic boundary conditions

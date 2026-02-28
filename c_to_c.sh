@@ -30,10 +30,11 @@ function clean {
   sed 's/|\\rbtt{ypos}|/ypos/g' tmp_a > tmp_b
   sed 's/|\\obtt{zpos}|/zpos/g' tmp_b > tmp_a
   sed 's/%\/\//\/\//g' tmp_a > tmp_b
-  sed 's/|\\textquotesingle|//g' tmp_b > tmp_a
+  sed 's/|\\textquotesingle|/'"'"'/g' tmp_b > tmp_a
+  sed 's/|\\AA|/Angstrom/g' tmp_a > tmp_b
 
-  rm -f tmp_b
-  mv tmp_a codes/$out
+  rm -f tmp_a
+  mv tmp_b codes/$out
 }
 
 
