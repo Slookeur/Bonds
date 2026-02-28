@@ -22,7 +22,7 @@ typedef struct pixel pixel;
 struct pixel
 {
   int pid;                 // the pixel number
-  int p_xyz[|\trois|];             // the pixel coordinates in the grid
+  int p_xyz[|\trois|];            // the pixel coordinates in the grid
   bool tested;             // was the pixel checked already
   int patoms;              // number of atom(s) in pixel
   pixel_atom * pix_atoms;  // list of atom(s) in the pixel, to be allocated
@@ -159,8 +159,12 @@ void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[|\trois|], int atom_i
     {
       the_pixel->p_xyz[|\dbtt{axis}|] = pixel_coord[|\dbtt{axis}|];
     }
+    the_pixel->pix_atoms = malloc(sizeof*the_pixel->pix_atoms);
   }
-  the_pixel->pix_atoms = realloc(the_pixel->pix_atoms, (the_pixel->patoms+|\un|)*sizeof*the_pixel->pix_atoms);
+  else
+  {
+    the_pixel->pix_atoms = realloc(the_pixel->pix_atoms, (the_pixel->patoms+|\un|)*sizeof*the_pixel->pix_atoms);
+  }
   the_pixel->pix_atoms[patoms].atom_id = atom_id;
   for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
   {
