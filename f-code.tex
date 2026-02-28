@@ -12,18 +12,18 @@ MODULE parameters
   ! Atom in pixel data structure
   TYPE pixel_atom
     INTEGER                                 :: atom_id            ! the atom ID
-    REAL, DIMENSION(|\trois|)                      :: coord             ! the atom coordinates on x, y and z
+    REAL, DIMENSION(|\trois|)                      :: coord              ! the atom coordinates on x, y and z
   END TYPE pixel_atom
   
   ! Pixel data structure
   TYPE pixel
     INTEGER                                 :: pid                ! the pixel number
-    INTEGER, DIMENSION(|\trois|)                   :: p_xyz             ! the pixel coordinates in the grid
+    INTEGER, DIMENSION(|\trois|)                   :: p_xyz              ! the pixel coordinates in the grid
     LOGICAL                                 :: tested             ! was the pixel checked already
     INTEGER                                 :: patoms             ! number of atom(s) in pixel
     TYPE(pixel_atom), DIMENSION(:), ALLOCATABLE   :: pix_atoms    ! list of atom(s) in pixel, to be allocated
     INTEGER                                 :: neighbors          ! number of neighbors for pixel
-    INTEGER, DIMENSION(|\mbtt{27}|)                  :: pixel_neighbors ! the list of neighbor pixels, maximum 27
+    INTEGER, DIMENSION(|\mbtt{27}|)                  :: pixel_neighbors    ! the list of neighbor pixels, maximum 27
   END TYPE pixel
   
   ! Pixel grid data structure
@@ -37,14 +37,17 @@ MODULE parameters
   ! Distance data structure
   TYPE distance
     REAL                                    :: length             ! the distance in |\blue{\AA}| squared
-    REAL, DIMENSION(|\trois|)                      :: Rij               ! vector components of x, y and z
+    REAL, DIMENSION(|\trois|)                      :: Rij                ! vector components of x, y and z
   END TYPE distance
   
+  !
+  ! The following are considered to be provided by the user
+  !
+
   ! Model description
   INTEGER                                   :: atoms              ! the total number of atom(s)
   REAL, DIMENSION(atoms,|\trois|)                  :: c_coord            ! list of Cartesian coordinates
-  REAL                                      :: cutoff             ! the cutoff to define atomic bond(s)
-  REAL                                      :: cutoff_squared     ! squared value for the cutoff
+  REAL                                      :: cutoff_squared     ! squared value of the cutoff to define first neighbors
   
   ! Model box description
   REAL, DIMENSION(|\trois|)                        :: l_params           ! lattice a, b and c
@@ -56,7 +59,7 @@ END MODULE parameters
 
 \clearpage
 
-\subsection{Commented FORTRAN90 code: set pixel periodic boundary condition shift}
+\subsection{FORTRAN90 code: set pixel periodic boundary condition shift}
 \label{f-set-pshift}
 \begin{lstlisting}[language={[90]FORTRAN}]
 SUBROUTINE set_pbc_shift (grid, pixel_coord, pbc_shift)
@@ -103,9 +106,9 @@ SUBROUTINE add_atom_to_pixel (the_pixel, pixel_coord, atom_id, atom_coord)
 
   TYPE (pixel), INTENT(INOUT) :: the_pixel           ! pointer to the pixel
   INTEGER, DIMENSION(|\trois|), INTENT(IN) :: pixel_coord            ! the pixel coordinates in the grid
-  INTEGER, INTENT(IN)                  :: atom_id             ! the atom ID number
-  INTEGER                              :: |\dbtt{axis}|       ! loop iterator axis id (1=x , 2=y , 3=z)
-  REAL, DIMENSION(|\trois|), INTENT(IN) :: atom_coord               ! the atomic coordinates
+  INTEGER, INTENT(IN)                :: atom_id             ! the atom ID number
+  INTEGER                            :: |\dbtt{axis}|            ! loop iterator axis id (1=x , 2=y , 3=z)
+  REAL, DIMENSION(|\trois|), INTENT(IN)     :: atom_coord               ! the atomic coordinates
 
   if (the_pixel%patoms .eq. |\zero|) then
     do |\dbtt{axis}| = |\un| , |\trois|
@@ -129,7 +132,7 @@ END SUBROUTINE
 
 \clearpage
 
-\subsection{Commented FORTRAN90 code: preparation of the pixel grid}
+\subsection{FORTRAN90 code: preparation of the pixel grid}
 \newcommand{\faidloop}{\ffor{\red{aid}\equal\un}{\rbtt{atoms}}}
 \newcommand{\fcidloop}{\ffor{\dgreen{cid}\equal\un}{\trois}}
 \label{f-pc-grid}
@@ -140,14 +143,14 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   USE parameters
   IMPLICIT NONE
   
-  LOGICAL, INTENT(IN)        :: use_pbc                ! flag to set if PBC are used or not
+  LOGICAL, INTENT(IN)              :: use_pbc          ! flag to set if PBC are used or not
   TYPE (pixel_grid), INTENT(INOUT) :: grid             ! the pixel grid to prepare
-  INTEGER                    :: |\dbtt{axis}|                   ! loop iterator axis id (1=x, 2=y, 3=z)
-  INTEGER                    :: |\cbtt{aid}|                    ! loop iterator atom number (1, |\rbtt{atoms}|)
-  INTEGER                    :: pixel_num              ! pixe number in the grid
-  INTEGER, DIMENSION(|\trois|)      :: pixel_pos              ! pixel coordinates in the grid
-  REAL, DIMENSION(|\trois|)         :: cmin, cmax             ! real precision coordinates min, max
-  REAL, DIMENSION(|\trois|)         :: f_coord                ! real precision fractional coordinates
+  INTEGER                          :: |\dbtt{axis}|             ! loop iterator axis id (1=x, 2=y, 3=z)
+  INTEGER                          :: |\cbtt{aid}|              ! loop iterator atom number (1, |\rbtt{atoms}|)
+  INTEGER                          :: pixel_num        ! pixe number in the grid
+  INTEGER, DIMENSION(|\trois|)            :: pixel_pos        ! pixel coordinates in the grid
+  REAL, DIMENSION(|\trois|)               :: cmin, cmax       ! real precision coordinates min, max
+  REAL, DIMENSION(|\trois|)               :: f_coord          ! real precision fractional coordinates
   
   if ( .not. use_pbc ) then                            ! Without periodic boundary conditions
     do |\dbtt{axis}| = |\un| , |\trois|
@@ -179,8 +182,8 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   
   grid%n_xy = grid%n_pix(|\un|) * grid%n_pix(|\deux|)            ! Number of pixels on the plan 'xy'
   grid%pixels = grid%n_xy * grid%n_pix(|\trois|)              ! Total number of pixels in the grid
-  ! User defined function to allocate the memory to store the pixel information for the grid
-  grid%pixel_list = allocate_pixel_data (grid%pixels);
+
+  allocate (grid%pixel_list(grid%pixels));
   
   if ( .not. use_pbc ) then                            ! Without periodic boundary conditions
     do |\cbtt{aid}| = |\un| , atoms                                 ! For all atoms
@@ -207,7 +210,7 @@ END SUBROUTINE prepare_pixel_grid
 
 \clearpage
 
-\subsection{Commented FORTRAN90 code: finding pixel neighbors}
+\subsection{FORTRAN90 code: finding pixel neighbors}
 \label{f-find-pn}
 \begin{lstlisting}[language={[90]FORTRAN}]
 SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
@@ -217,17 +220,17 @@ SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
   
   LOGICAL, INTENT(IN)               :: use_pbc             ! flag to set if PBC are used or no
   TYPE (pixel_grid), INTENT(INOUT)  :: the_grid            ! pointer to the pixel grid
-  TYPE (pixel), POINTER, INTENT(INOUT) :: the_pix             ! pointer to the pixel
-  INTEGER                           :: |\dbtt{axis}|                        ! loop iterator axis id (1=x , 2=y , 3=z)
-  INTEGER                     :: |\vbtt{xpos}|, |\rbtt{ypos}|, |\obtt{zpos}|            ! neighbor position on x, y and z
-  INTEGER, DIMENSION(|\trois|)       :: l_start = (\|\un|, |\un|, |\un|\)       ! loop iterators starting value
-  INTEGER, DIMENSION(|\trois|)       :: l_end = (\|\trois|, |\trois|, |\trois|\)         ! loop iterators ending value
-  INTEGER, DIMENSION(|\trois|)       :: pmod = (\-|\un|, |\zero|, |\un|\)         ! position modifiers
-  INTEGER                     :: |\bftt{nnp}|                         ! number of neighbors for pixel
-  INTEGER                     :: nid                         ! neighbor id for pixel
-  INTEGER, DIMENSION(|\trois|,|\trois|,|\trois|)   :: pbc_shift                   ! shift, correction, due to PBC
-  LOGICAL                     :: boundary=.false.            ! is pixel on the boundary of the grid
-  LOGICAL                     :: keep_neighbor = .true.      ! keep or not neighbor during analysis
+  TYPE (pixel), POINTER, INTENT(INOUT) :: the_pix          ! pointer to the pixel
+  INTEGER                              :: |\dbtt{axis}|                ! loop iterator axis id (1=x , 2=y , 3=z)
+  INTEGER                          :: |\vbtt{xpos}|, |\rbtt{ypos}|, |\obtt{zpos}|            ! neighbor position on x, y and z
+  INTEGER, DIMENSION(|\trois|)            :: l_start = (\|\un|, |\un|, |\un|\)       ! loop iterators starting value
+  INTEGER, DIMENSION(|\trois|)            :: l_end = (\|\trois|, |\trois|, |\trois|\)         ! loop iterators ending value
+  INTEGER, DIMENSION(|\trois|)            :: pmod = (\-|\un|, |\zero|, |\un|\)         ! position modifiers
+  INTEGER                          :: |\bftt{nnp}|                         ! number of neighbors for pixel
+  INTEGER                          :: nid                         ! neighbor id for pixel
+  INTEGER, DIMENSION(|\trois|,|\trois|,|\trois|)        :: pbc_shift                   ! shift, correction, due to PBC
+  LOGICAL                          :: boundary=.false.            ! is pixel on the boundary of the grid
+  LOGICAL                          :: keep_neighbor = .true.      ! keep or not neighbor during analysis
   
   if ( use_pbc ) then
     call set_pbc_shift (the_grid, the_pix%p_xyz, pbc_shift)
@@ -284,7 +287,7 @@ END SUBROUTINE find_pixel_neighbors
 
 \clearpage
 
-\subsection{Commented FORTRAN90 code: inter-atomic distance calculation}
+\subsection{FORTRAN90 code: inter-atomic distance calculation}
 
 \begin{lstlisting}[language={[90]FORTRAN}]
 ! Evaluating the interatomic distance between 2 pixel atoms
@@ -294,8 +297,8 @@ SUBROUTINE evaluate_distance (use_pbc, at_i, at_j, dist)
   IMPLICIT NONE
   
   LOGICAL, INTENT(IN)              :: use_pbc         ! flag to set if PBC are used or not
-  TYPE (atom), POINTER, INTENT(IN) :: at_i            ! first pixel atom
-  TYPE (atom), POINTER, INTENT(IN) :: at_j            ! second pixel atom
+  TYPE (pixel_atom), POINTER, INTENT(IN) :: at_i      ! first pixel atom
+  TYPE (pixel_atom), POINTER, INTENT(IN) :: at_j      ! second pixel atom
   TYPE (distance), INTENT(INOUT)   :: dist            ! calculation results
   INTEGER                          :: |\dbtt{axis}|            ! loop iterator axis id (1=x , 2=y , 3=z)
   
@@ -323,7 +326,7 @@ END SUBROUTINE evaluate_distance
 
 \clearpage
 
-\subsection{Commented FORTRAN90 code: pixel search for first neighbor atoms}
+\subsection{FORTRAN90 code: pixel search for first neighbor atoms}
 \label{f-pc-pixel}
 
 \begin{lstlisting}[language={[90]FORTRAN}]
@@ -350,7 +353,7 @@ SUBROUTINE pixel_search_for_neighbors (use_pbc)
     pix_i => all_pixels%pixel_list(|\vbtt{pix}|)
     ! If pixel 'pix_i' contains atom(s)
     if ( pix_i%patoms .gt. |\zero| ) then
-      // Search for neighbbor pixels
+      ! Search for neighbbor pixels
       call find_pixel_neighbors (use_pbc, all_pixels, pix_i)
       ! Testing all 'pix_i' neighbor pixels
       do pid = |\un| , pix_i%neighbors
