@@ -451,9 +451,7 @@ For pixel on the boundary of the grid, then adjustments are required to find the
 \item[5.] Compute the interatomic distance $D_{ab}$ between 2 atoms $a$ and $b$ using corrected fractional coordinates:
 \begin{eqnarray}
 f_{c,axis}(ab) & = & f_{c,axis}(a) - f_{c,axis}(b) \\[0.125cm]
-F_{axis}(ab) & = & \lVert f_{c,axis}(ab) \rVert \\[0.125cm]
-Fmin_{axis}(ab) & = & \min\left[F_{axis}(ab),i\ 1.0-F_{axis}(ab)\right] \\[0.125cm]
-f_{axis}(ab) & = & \frac{f_{c,axis(ab)}}{F_{axis}(ab)} \times Fmin_{axis}(ab) \\[0.125cm]
+f_{axis}(ab) & = & f_{c,axis(ab)} - \operatorname{round}{f_{c,axis(ab)}} \\[0.125cm]
 \vec{r}(ab) & = & \Tc \times \vec{f}(ab) \\[0.125cm]
 \quad {\textrm{with}} \quad \vec{r}(ab) & = & \left( \begin{blockarray}{c}
 r_x(ab) \\
