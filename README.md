@@ -42,6 +42,10 @@ To build the PDF file of the manuscript:
 > - The ` \affil[1]{ ` instruction, at line **136** in the main TeX file `bonds-lievcoms.tex`, is always producing an error, and it is required to comment this line to build the PDF.
 > - In the PDF file `bonds-lievcoms.pdf`, on page 6 of 25, now way to print all figures in the same column and then continue the discussion, for some reason(s) the third figure ("Corner of the pixel grid") is always inserted on second column.
 
+## Sample codes
+
+ Sample code in C, FORTRAN90 and Python are provided in the folder [`codes`][codes]
+
 This manuscript was written by [Dr. Sébastien Le Roux][slr], research engineer for the [CNRS][cnrs]
 
 <p align="center">
@@ -62,6 +66,7 @@ This manuscript was written by [Dr. Sébastien Le Roux][slr], research engineer 
 [mactex]:http://www.tug.org/mactex/
 [miktex]:http://miktex.org/
 [bonds]:bonds-livecoms.pdf
+[codes]:codes/
 [slr]:https://www.ipcms.fr/sebastien-le-roux/
 [cnrs]:https://www.cnrs.fr/
 [ipcms]:https://www.ipcms.fr/
