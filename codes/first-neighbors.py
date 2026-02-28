@@ -87,23 +87,18 @@ def set_pbc_shift(pixel_grid : PixelGrid, pixel_coord : np.ndarray, pbc_shift : 
         pbc_shift[x_pos][y_pos][2] -= pixel_grid.pixels
 
 
-def add_atom_to_pixel (the_pixel : Pixel, pixel_coord : , atom_id : int, atom_coord)
-
-  if ! the_pixel.patoms:
+def add_atom_to_pixel(the_pixel: Pixel, pixel_coord: np.ndarray, atom_id: int, atom_coord: np.ndarray):
+  if not the_pixel.patoms:
     # if the pixel do not contains any atom yet, then save its coordinates in the grid
     for axis in range(3):
       the_pixel.p_xyz[axis] = pixel_coord[axis]
-  
-  else
-    # otherwise reallocate memory to store the new pixel_atom information
-
-  the_pixel.pix_atoms[patoms].atom_id = atom_id
-  for axis in range(3):
-    the_pixel.pix_atoms[patoms].coord[axis] = atom_coord[axis]
+ 
+  new_atom = PixelAtom(atom_id, atom_coord)
+  the_pixel.pix_atoms.append(new_atom)
   
   # increment the number of atom(s) in the pixel
   the_pixel.patoms += 1
- 
+
 
 
 
@@ -132,19 +127,18 @@ def prepare_pixel_grid(use_pbc : bool):
   
   for axis in range(3):                              # for x, y and z
     # correction if the number of pixels on 'axis' is too small
-    grid.n_pix[axis] = 1 if grid.n_pix][axis] < 4 else grid.n_pix[axis]
+    grid.n_pix[axis] = 1 if grid.n_pix[axis] < 4 else grid.n_pix[axis]
   
-  grid.n_xy = grid.p_pix[0] * grid.n_pix[1]          # Number of pixels on the plan 'xy'
-  grid.pixels = grid.n_xy * grid.p_pix[2]            # Total number of pixels in the grid
+  grid.n_xy = grid.n_pix[0] * grid.n_pix[1]          # number of pixels on the plan 'xy'
+  grid.pixels = grid.n_xy * grid.n_pix[2]            # total number of pixels in the grid
   
-  # user defined function to allocate the memory to store the pixel information for the grid
-  grid.pixel_list = allocate_pixel_data(grid.pixels)
-  
+  grid.pixel_list = [Pixel(pid=i) for i in range(grid.pixels)]
+
   if not use_pbc:                                    # without periodic boundary conditions
     for aid in range(atoms):                         # for all atoms
       for axis in range(3):                          # for x, y and z
         pixel_pos[axis] = int((c_coord[aid][axis] - cmin[axis]) / cutoff)
-      pixel_num = pixel_pos[0] + pixel_pos[1] * grid.n_pix[0] + pixel_pos[2] * grid.n_xy + 1
+      pixel_num = pixel_pos[0] + pixel_pos[1] * grid.n_pix[0] + pixel_pos[2] * grid.n_xy
       add_atom_to_pixel(grid.pixel_list[pixel_num], pixel_pos, aid, c_coord[aid])
   else:                                              # using periodic boundary conditions
     for aid in range(atoms):                         # for all atoms
@@ -153,7 +147,7 @@ def prepare_pixel_grid(use_pbc : bool):
       for axis in range(3):                          # for x, y and z
         f_coord[axis] = f_coord[axis] - np.floor(f_coord[axis])
         pixel_pos[axis] = int(f_coord[axis] * grid.n_pix[axis])
-      pixel_num = pixel_pos[0] + pixel_pos[1] * grid.n_pix[0] + pixel_pos[2] * grid.n_xy + 1
+      pixel_num = pixel_pos[0] + pixel_pos[1] * grid.n_pix[0] + pixel_pos[2] * grid.n_xy
       add_atom_to_pixel(grid.pixel_list[pixel_num], pixel_pos, aid, f_coord)
   
   return grid
@@ -211,7 +205,7 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
           nid = the_pix.pid + pmod[xpos] + pmod[ypos] * the_grid.n_pix[0] + pmod[zpos] * the_grid.n_xy
           if use_pbc:
             nid += pbc_shift[xpos][ypos][zpos]
-          the_pix.neighbor_list[nnp] = nid
+          the_pix.pixel_neighbors[nnp] = nid
           nnp += 1
 
   the_pix.neighbors = nnp
@@ -232,11 +226,7 @@ def evaluate_distance(use_pbc : bool, at_i : PixelAtom, at_j : PixelAtom):
   if use_pbc:
     # then the pixel_atom's coordinates are in corrected fractional format
     for axis in range(3):
-      # absolute value in float format
-      u = abs(Rij[axis])
-      v = min(u, 1.0 - u)
-      # Proper value, with proper sign
-      Rij[axis] = (Rij[axis] / u) * v
+      Rij[axis] = Rij[axis] - round(Rij[axis])
     
     # transform back to Cartesian coordinates
     # matrix_multiplication is assumed to be defined elsewhere

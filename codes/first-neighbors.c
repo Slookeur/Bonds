@@ -157,10 +157,10 @@ void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[3], int atom_id, floa
     // otherwise reallocate memory to store the new pixel_atom information
     the_pixel->pix_atoms = realloc(the_pixel->pix_atoms, (the_pixel->patoms+1)*sizeof*the_pixel->pix_atoms);
   }
-  the_pixel->pix_atoms[patoms].atom_id = atom_id;
+  the_pixel->pix_atoms[the_pixel->patoms].atom_id = atom_id;
   for ( axis = 0 ; axis < 3 ; axis ++ )
   {
-    the_pixel->pix_atoms[patoms].coord[axis] = atom_coord[axis];
+    the_pixel->pix_atoms[the_pixel->patoms].coord[axis] = atom_coord[axis];
   }
   // increment the number of atom(s) in the pixel
   the_pixel->patoms ++;
@@ -212,7 +212,12 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   grid->n_xy = grid->n_pix[0] * grid->n_pix[1]; // Number of pixels on the plan 'xy'
   grid->pixels = grid->n_xy * grid->n_pix[2];   // Total number of pixels in the grid
   grid->pixel_list = malloc (grid->pixels*sizeof*grid->pixel_list);
-
+  for ( pixel_num = 0 ; pixel_num < grid->pixels ; pixel_num ++ )
+  {
+    grid->pixel_list[pixel_num].pid = pixel_num;
+    grid->pixel_list[pixel_num].patoms = 0;
+    grid->pixel_list[pixel_num].tested = FALSE;
+  }
   if ( ! use_pbc )                              // without periodic boundary conditions
   {
     for ( aid = 0 ; aid < atoms ; aid ++ )      // for all atoms
@@ -221,7 +226,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
       {
         pixel_pos[axis] = (int)((c_coord[aid][axis] - cmin[axis])/cutoff);
       }
-      pixel_num = pixel_pos[0] + pixel_pos[1] * grid->n_pix[0] + pixel_pos[2] * grid->n_xy + 1;
+      pixel_num = pixel_pos[0] + pixel_pos[1] * grid->n_pix[0] + pixel_pos[2] * grid->n_xy;
       add_atom_to_pixel (grid, pixel_num, pixel_pos, aid, c_coord[aid]);
     }
   }
@@ -234,9 +239,9 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
       for ( axis = 0 ; axis < 3 ; axis ++ )     // for x, y and z
       {
         f_coord[axis] = f_coord[axis] - floorf(f_coord[axis]);
-        pixel_pos[axis] = (int)((f_coord[axis] * n_pix[axis]);
+        pixel_pos[axis] = (int)((f_coord[axis] * grid->n_pix[axis]);
       }
-      pixel_num = pixel_pos[0] + pixel_pos[1] * grid->n_pix[0] + pixel_pos[2] * grid->n_xy + 1;
+      pixel_num = pixel_pos[0] + pixel_pos[1] * grid->n_pix[0] + pixel_pos[2] * grid->n_xy;
       add_atom_to_pixel (& grid->pixel_list[pixel_num], aid, f_coord);
     }
   }
@@ -335,11 +340,7 @@ distance evaluate_distance (bool use_pbc, pixel_atom * at_i, pixel_atom * at_j)
     // then the pixel_atom's coordinates are in corrected fractional format
     for ( axis = 0 ; axis < 3 ; axis ++ )
     {
-      // absolute value in float format
-      u = fabs (dist.Rij[axis]);
-      v = min (u, 1.0 - u);
-      // proper value, with proper sign
-      dist.Rij[axis] = (dist.Rij[axis] / u) * v;
+      dist.Rij[axis] = dist.Rij[axis] - roundf(dist.Rij[axis]);
     }
     // transform back to Cartesian coordinates
     // with 'matrix_multiplication' a user defined function to perform the operation
@@ -387,25 +388,25 @@ void pixel_search_for_neighbors (bool use_pbc)
       {
         pjx = pix_i->pixel_neighbors[pid];
         // setting 'pix_j' as pointer to pixel number 'pjx'
-        pix_j = & all_grid->pixel_list[pjx];
+        pix_j = & all_pixels->pixel_list[pjx];
         // checking pixel 'pix_j' if it:
         // - contains atom(s)
         // - was not tested, otherwise the analysis would have been performed already
         if ( pix_j->patoms && ! pix_j->tested )
         {
           // if 'pix_i' and 'pix_j' are the same, only test pair of different atoms
-          l_end = (pjx != pix) ? 0 : 1
+          l_end = (pjx != pix) ? 0 : 1;
           // for all atom(s) in 'pix'
           for ( aid = 0 ; aid < pix_i->patoms - l_end ; aid ++ )
           {
             // set pointer to the first atom to test
-            at_i = & pix_i->pix_atom[aid];
-            lstart = (pjx != pix) ? 0 : aid + 1
+            at_i = & pix_i->pix_atoms[aid];
+            lstart = (pjx != pix) ? 0 : aid + 1;
             // for all atom(s) in 'pix_j'
-            for ( bid = lstart ; bid < pix_j->patoms ; bid ++ )
+            for ( bid = l_start ; bid < pix_j->patoms ; bid ++ )
             {
               // set pointer to the second atom to test
-              at_j = & pix_j->pix_atom[bid];
+              at_j = & pix_j->pix_atoms[bid];
               // evaluate interatomic distance
               Dij = evaluate_distance (use_pbc, at_i, at_j);
               if ( Dij.length < cutoff_squared )

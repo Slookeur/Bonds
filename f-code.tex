@@ -124,9 +124,9 @@ SUBROUTINE add_atom_to_pixel (the_pixel, pixel_coord, atom_id, atom_coord)
   endif
   ! increment the number of atom(s) in the pixel
   the_pixel%patoms = the_pixel%patoms + |\un|
-  the_pixel%pix_atoms(patoms)%atom_id = atom_id
+  the_pixel%pix_atoms(the_pixel%patoms)%atom_id = atom_id
   do |\dbtt{axis}| = |\un| , |\trois|
-    the_pixel%pix_atoms(patoms)%coord(|\dbtt{axis}|) = atom_coord(|\dbtt{axis}|)
+    the_pixel%pix_atoms(the_pixel%patoms)%coord(|\dbtt{axis}|) = atom_coord(|\dbtt{axis}|)
   enddo
 
 END SUBROUTINE
@@ -185,7 +185,11 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   grid%pixels = grid%n_xy * grid%n_pix(|\trois|)              ! Total number of pixels in the grid
 
   allocate (grid%pixel_list(grid%pixels))
-  
+  do pixel_num = 1 , grid%pixels
+    grid%pixel_list(pixel_num)%pid = pixel_num
+    grid%pixel_list(pixel_num)%patoms = 0
+    grid%pixel_list(pixel_num)%tested = .false.
+  enddo
   if ( .not. use_pbc ) then                            ! without periodic boundary conditions
     do |\cbtt{aid}| = |\un| , atoms                                 ! for all atoms
       do |\dbtt{axis}| = |\un| , |\trois|                                  ! for x, y and z
@@ -199,7 +203,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
      f_coord = MATMUL ( c_coord(|\cbtt{aid}|), cart_to_frac )
      do |\dbtt{axis}| = |\un| , |\trois|                                   ! for x, y and z
        f_coord(|\dbtt{axis}|) = f_coord(|\dbtt{axis}|) - floor(f_coord(|\dbtt{axis}|))
-       pixel_pos(|\dbtt{axis}|) = INT(f_coord(|\dbtt{axis}|) * n_pix(|\dbtt{axis}|))
+       pixel_pos(|\dbtt{axis}|) = INT(f_coord(|\dbtt{axis}|) * grid%n_pix(|\dbtt{axis}|))
      enddo
      pixel_num = pixel_pos(|\un|) + pixel_pos(|\deux|) * grid%n_pix(|\un|) + pixel_pos(|\trois|) * grid%n_xy + |\un|
      call add_atom_to_pixel (grid%pixel_list(pixel_num), pixel_pos, |\cbtt{aid}|, f_coord)
