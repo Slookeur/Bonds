@@ -112,17 +112,17 @@ SUBROUTINE add_atom_to_pixel (the_pixel, pixel_coord, atom_id, atom_coord)
   REAL, DIMENSION(|\trois|), INTENT(IN)     :: atom_coord  ! the atomic coordinates
 
   if (the_pixel%patoms .eq. |\zero|) then
-    // if the pixel do not contains any atom yet, then save its coordinates in the grid
+    ! if the pixel do not contains any atom yet, then save its coordinates in the grid
     do |\dbtt{axis}| = |\un| , |\trois|
       the_pixel%p_xyz(|\dbtt{axis}|) = pixel_coord(|\dbtt{axis}|)
     enddo
-     // allocate the memory to store the first pixel_atom information
+     ! allocate the memory to store the first pixel_atom information
     allocate(the_pixel%pix_atoms(1))
   else
-    // otherwise reallocate memory to store the new pixel_atom informatio
+    ! otherwise reallocate memory to store the new pixel_atom informatio
     the_pixel%pix_atoms = realloc(the_pixel%pix_atoms, the_pixel%patoms+1)
   endif
-  // increment the number of atom(s) in the pixel
+  ! increment the number of atom(s) in the pixel
   the_pixel%patoms = the_pixel%patoms + |\un|
   the_pixel%pix_atoms(patoms)%atom_id = atom_id
   do |\dbtt{axis}| = |\un| , |\trois|
