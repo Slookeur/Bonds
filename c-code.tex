@@ -27,7 +27,7 @@ struct pixel
   int patoms;              // number of atom(s) in pixel
   pixel_atom * pix_atoms;  // list of atom(s) in the pixel, to be allocated
   int neighbors;           // number of neighbors for pixel
-  int pixel_neighbors[|\mbtt{27}|]; // the list of neighbor pixels, maximum |\mbtt{27}|
+  int pixel_neighbors[|\mbtt{27}|]; // the list of neighbor pixels, maximum 27
 };
 
 // pixel grid data structure
@@ -54,7 +54,7 @@ struct distance
 
 // model description
 int atoms;                 // the total number of atom(s)
-float ** c_coord;          // list of Cartesian coordinates: c_coord[atoms][|\trois|]
+float ** c_coord;          // list of Cartesian coordinates: c_coord[atoms][3]
 float cutoff;              // the cutoff to define atomic bond(s)
 float cutoff_squared;      // squared value for the cutoff
 
@@ -190,8 +190,8 @@ void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[|\trois|], int atom_i
 pixel_grid * prepare_pixel_grid (bool use_pbc)
 {
   pixel_grid * grid;        // pointer to the pixel grid to create
-  int |\dbtt{axis}|;                 // loop iterator |\dbtt{axis}| id (|\zero|=x, |\un|=y, |\deux|=z)
-  int |\cbtt{aid}|;                  // loop iterator atom number (|\zero|, atoms-|\un|)
+  int |\dbtt{axis}|;                 // loop iterator axis id (0=x, 1=y, 2=z)
+  int |\cbtt{aid}|;                  // loop iterator atom number (0, atoms--1)
   int pixel_num;            // pixel number in the grid
   int pixel_pos[|\trois|];         // pixel coordinates in the grid
   float cmin[|\trois|], cmax[|\trois|];   // float coordinates min, max values
@@ -199,30 +199,32 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
 
   grid = malloc(sizeof*grid);
 
-  if ( ! use_pbc ) // without periodic boundary conditions
+  if ( ! use_pbc )                               // without periodic boundary conditions
   {
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ ) cmin[|\dbtt{axis}|] = cmax[|\dbtt{axis}|] = c_coord[|\zero|][|\dbtt{axis}|];
-    for ( |\cbtt{aid}| = |\un| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )    // For all atoms
+    for ( |\cbtt{aid}| = |\un| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )      // For all atoms
     {
-      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )   // For x, y and z
+      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )     // For x, y and z
       {
         cmin[|\dbtt{axis}|] = min(cmin[|\dbtt{axis}|], c_coord[|\cbtt{aid}|][|\dbtt{axis}|]);
         cmax[|\dbtt{axis}|] = max(cmax[|\dbtt{axis}|], c_coord[|\cbtt{aid}|][|\dbtt{axis}|]);
       }
     }
-    for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )     // For x, y and z
+    for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )       // For x, y and z
     {
-      grid->n_pix[|\dbtt{axis}|] = (int)((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / cutoff) + |\un|; // Number of pixel(s) on axis '|\dbtt{axis}|'
+      // Number of pixel(s) on axis '|\dbtt{axis}|'
+      grid->n_pix[|\dbtt{axis}|] = (int)((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / cutoff) + |\un|;
     }
   }
   else  // using periodic boundary conditions
   {
-    for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )     // For x, y and z
+    for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )       // For x, y and z
     {
-      grid->n_pix[|\dbtt{axis}|] = (int)(l_params[|\dbtt{axis}|] / cutoff) + |\un|; // Number of pixel(s) on axis '|\dbtt{axis}|'
+      // Number of pixel(s) on axis '|\dbtt{axis}|'
+      grid->n_pix[|\dbtt{axis}|] = (int)(l_params[|\dbtt{axis}|] / cutoff) + |\un|;
     }
   }
-  for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )       // For x, y and z
+  for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )         // For x, y and z
   {
     // correction if the number of pixel(s) on '|\dbtt{axis}|' is too small
     grid->n_pix[|\dbtt{axis}|] = (grid->n_pix[|\dbtt{axis}|] < 4) ? |\un| : grid->n_pix[|\dbtt{axis}|];
@@ -231,11 +233,11 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   grid->pixels = grid->n_xy * grid->n_pix[|\deux|];   // Total number of pixels in the grid
   grid->pixel_list = malloc (grid->pixels*sizeof*grid->pixel_list);
 
-  if ( ! use_pbc ) // without periodic boundary conditions
+  if ( ! use_pbc )                         // without periodic boundary conditions
   {
-    for ( |\cbtt{aid}| = |\zero| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )  // for all atoms
+    for ( |\cbtt{aid}| = |\zero| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )    // for all atoms
     {
-      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )    // for x, y and z
+      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )      // for x, y and z
       {
         pixel_pos[|\dbtt{axis}|] = (int)((c_coord[|\cbtt{aid}|][|\dbtt{axis}|] - cmin[|\dbtt{axis}|])/cutoff);
       }
@@ -245,11 +247,11 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   }
   else // using periodic boundary conditions
   {
-    for ( |\cbtt{aid}| = |\zero| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )  // for all atoms
+    for ( |\cbtt{aid}| = |\zero| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )    // for all atoms
     {
       // with 'matrix_multiplication' a user defined function to perform the operation
       f_coord = matrix_multiplication (cart_to_frac, c_coord[|\cbtt{aid}|]);
-      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )    // for x, y and z
+      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )      // for x, y and z
       {
         f_coord[|\dbtt{axis}|] = f_coord[|\dbtt{axis}|] - floorf(f_coord[|\dbtt{axis}|]);
         pixel_pos[|\dbtt{axis}|] = (int)((f_coord[|\dbtt{axis}|] * n_pix[|\dbtt{axis}|]);

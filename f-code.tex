@@ -147,7 +147,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   LOGICAL, INTENT(IN)              :: use_pbc          ! flag to set if PBC are used or not
   TYPE (pixel_grid), INTENT(INOUT) :: grid             ! the pixel grid to prepare
   INTEGER                          :: |\dbtt{axis}|             ! loop iterator axis id (1=x, 2=y, 3=z)
-  INTEGER                          :: |\cbtt{aid}|              ! loop iterator atom number (1, |\rbtt{atoms}|)
+  INTEGER                          :: |\cbtt{aid}|              ! loop iterator atom number (1, atoms)
   INTEGER                          :: pixel_num        ! pixel number in the grid
   INTEGER, DIMENSION(|\trois|)            :: pixel_pos        ! pixel coordinates in the grid
   REAL, DIMENSION(|\trois|)               :: cmin, cmax       ! real precision coordinates min, max
