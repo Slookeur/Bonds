@@ -30,7 +30,7 @@ MODULE parameters
   
   ! distance data structure
   TYPE distance
-    REAL                                    :: length             ! the distance in |\blue{\AA}| squared
+    REAL                                    :: length             ! the distance in Angstrom squared
     REAL, DIMENSION(3)                      :: Rij                ! vector components of x, y and z
   END TYPE distance
   

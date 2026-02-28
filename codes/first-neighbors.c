@@ -39,7 +39,7 @@ struct pixel_grid
 typedef struct distance distance;
 struct distance
 {
-  float length;            // the distance in \AA\ squared
+  float length;            // the distance in Angstrom squared
   float Rij[3];            // vector components of x, y and z
 };
 
@@ -178,7 +178,6 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   float f_coord[3];         // float fractional coordinates
 
   grid = malloc(sizeof*grid);
-
   if ( ! use_pbc )                              // without periodic boundary conditions
   {
     for ( axis = 0 ; axis < 3 ; axis ++ ) cmin[axis] = cmax[axis] = c_coord[0][axis];
@@ -192,16 +191,14 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     }
     for ( axis = 0 ; axis < 3 ; axis ++ )       // For x, y and z
     {
-      // Number of pixel(s) on axis 'axis'
-      grid->n_pix[axis] = (int)((cmax[axis] - cmin[axis]) / cutoff) + 1;
+      grid->n_pix[axis] = (int)((cmax[axis] - cmin[axis]) / cutoff) + 1; // Number of pixel(s) on axis 'axis'
     }
   }
   else  // using periodic boundary conditions
   {
     for ( axis = 0 ; axis < 3 ; axis ++ )       // For x, y and z
     {
-      // Number of pixel(s) on axis 'axis'
-      grid->n_pix[axis] = (int)(l_params[axis] / cutoff) + 1;
+      grid->n_pix[axis] = (int)(l_params[axis] / cutoff) + 1; // Number of pixel(s) on axis 'axis'
     }
   }
   for ( axis = 0 ; axis < 3 ; axis ++ )         // For x, y and z

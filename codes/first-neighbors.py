@@ -5,44 +5,44 @@ import numpy as np
 # Atom in pixel data structure
 class PixelAtom:
   def __init__(self, atom_id=0, coord=None):
-    self.atom_id = atom_id                                           # the atom ID
-    self.coord = np.zeros(3) if coord is None else np.array(coord)   # the atom coordinates on x, y and z
+    self.atom_id = atom_id                                                    # the atom ID
+    self.coord = np.zeros(3) if coord is None else np.array(coord)            # the atom coordinates on x, y and z
 
 # Pixel data structure
 class Pixel:
   def __init__(self, pid=0, p_xyz=None, tested=False, patoms=0, pix_atoms=None, neighbors=0):
-    self.pid = pid                                                  # the pixel number
-    self.p_xyz = np.zeros(3) if p_xyz is None else np.array(p_xyz)  # the pixel coordinates in the grid
-    self.tested = tested                                            # was the pixel checked already
-    self.patoms = patoms                                            # number of atom(s) in pixel
-    self.pix_atoms = [] if pix_atoms is None else pix_atoms         # list of atom(s) in the pixel
-    self.neighbors = neighbors                                      # number of neighbors for pixel
-    self.pixel_neighbors = np.zeros(27, dtype=int)                  # the list of neighbor pixels, maximum 27
+    self.pid = pid                                                            # the pixel number
+    self.p_xyz = np.zeros(3) if p_xyz is None else np.array(p_xyz)            # the pixel coordinates in the grid
+    self.tested = tested                                                      # was the pixel checked already
+    self.patoms = patoms                                                      # number of atom(s) in pixel
+    self.pix_atoms = [] if pix_atoms is None else pix_atoms                   # list of atom(s) in the pixel
+    self.neighbors = neighbors                                                # number of neighbors for pixel
+    self.pixel_neighbors = np.zeros(27, dtype=int)                            # the list of neighbor pixels, maximum 27
 
 # Pixel grid data structure
 class PixelGrid:
   def __init__(self, pixels=0, n_pix=None, n_xy=0, pixel_list=None):
-    self.pixels = pixels                                            # total number of pixels in the grid
+    self.pixels = pixels                                                      # total number of pixels in the grid
     self.n_pix = np.zeros(3, dtype=int) if n_pix is None else np.array(n_pix) # pixel(s) on each axis
-    self.n_xy = n_xy                                                # number of pixels in the plan xy
-    self.pixel_list = [] if pixel_list is None else pixel_list      # pointer to the pixels, to be allocated
+    self.n_xy = n_xy                                                          # number of pixels in the plan xy
+    self.pixel_list = [] if pixel_list is None else pixel_list                # pointer to the pixels, to be allocated
 
 # Bond distance data structure
 class Distance:
   def __init__(self, length=0.0, Rij=None):
-    self.length = length                                            # the distance in Angstrom squared
-    self.Rij = np.zeros(3) if Rij is None else np.array(Rij)        # vector components of x, y and z
+    self.length = length                                                      # the distance in |\AA| squared
+    self.Rij = np.zeros(3) if Rij is None else np.array(Rij)                  # vector components of x, y and z
 
 # Model description
-atoms = 0                         # the total number of atom(s)
-c_coord = None                    # list of Cartesian coordinates: c_coord[atoms][3]
-cutoff = 0.0                      # the cutoff to define atomic bond(s)
-cutoff_squared = 0.0              # squared value for the cutoff
+atoms = 0                                                                     # the total number of atom(s)
+c_coord = None                                                                # list of Cartesian coordinates: c_coord[atoms][3]
+cutoff = 0.0                                                                  # the cutoff to define atomic bond(s)
+cutoff_squared = 0.0                                                          # squared value for the cutoff
 
 # Model box description
-l_params = np.zeros(3)            # lattice a, b and c
-cart_to_frac = np.zeros((3, 3))   # Cartesian to fractional coordinates matrix
-frac_to_cart = np.zeros((3, 3))   # fractional to Cartesian coordinates matrix
+l_params = np.zeros(3)                                                        # lattice a, b and c
+cart_to_frac = np.zeros((3, 3))                                               # Cartesian to fractional coordinates matrix
+frac_to_cart = np.zeros((3, 3))                                               # fractional to Cartesian coordinates matrix
 
 
 # adjust, if needed, shift to search for pixel neighbor(s) using PBC
@@ -217,8 +217,8 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
 # - pixel_atom * at_i : pointer to first pixel atom
 # - pixel_atom * at_j : pointer to second pixel atom
 def evaluate_distance(use_pbc : bool, at_i : PixelAtom, at_j : PixelAtom):
-  dist = Distance()         # Placeholder for the distance data structure
-  Rij = np.zeros(3)  # Initialize the distance vector
+  dist = Distance()   # placeholder for the distance data structure
+  Rij = np.zeros(3)  # initialize the distance vector
   # calculating the distance components between atoms
   for axis in range(3):
     Rij[axis] = at_i.coord[axis] - at_j.coord[axis]
