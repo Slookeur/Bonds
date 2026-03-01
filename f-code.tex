@@ -62,6 +62,7 @@ END MODULE parameters
 
 \subsection{FORTRAN90 code: set pixel periodic boundary condition shift}
 \label{f-set-pshift}
+
 \begin{lstlisting}[language={[90]FORTRAN}]
 SUBROUTINE set_pbc_shift (grid, pixel_coord, pbc_shift)
   
@@ -98,7 +99,8 @@ END SUBROUTINE set_pbc_shift
 \clearpage
 
 \subsection{FORTRAN90 code: add atom to pixel}
-\label{c-add_atom_pixel}
+\label{c-add-atom-pixel}
+
 \begin{lstlisting}[language={[90]FORTRAN}]
 SUBROUTINE add_atom_to_pixel (the_pixel, pixel_coord, atom_id, atom_coord)
 
@@ -217,6 +219,7 @@ END SUBROUTINE prepare_pixel_grid
 
 \subsection{FORTRAN90 code: finding pixel neighbors}
 \label{f-find-pn}
+
 \begin{lstlisting}[language={[90]FORTRAN}]
 SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
   

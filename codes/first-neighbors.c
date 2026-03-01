@@ -139,6 +139,7 @@ void set_pbc_shift (pixel_grid * grid, int pixel_coord[3], int pbc_shift[3][3][3
 }
 
 
+
 void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[3], int atom_id, float atom_coord[3])
 {
   int axis;
@@ -165,6 +166,7 @@ void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[3], int atom_id, floa
   // increment the number of atom(s) in the pixel
   the_pixel->patoms ++;
 }
+
 
 
 pixel_grid * prepare_pixel_grid (bool use_pbc)
@@ -244,6 +246,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   }
   return grid;
 }
+
 
 
 // finding neighbor pixels for pixel in the grid
@@ -353,6 +356,7 @@ distance evaluate_distance (bool use_pbc, pixel_atom * at_i, pixel_atom * at_j)
   // - the components of the distance vector on x, y and z
   return dist;
 }
+
 
 
 // searching for first neighbor atoms using the grid pixelation/partitioning method

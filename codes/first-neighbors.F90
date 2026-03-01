@@ -52,6 +52,7 @@ MODULE parameters
 END MODULE parameters
 
 
+
 SUBROUTINE set_pbc_shift (grid, pixel_coord, pbc_shift)
   
   USE parameters
@@ -82,6 +83,7 @@ SUBROUTINE set_pbc_shift (grid, pixel_coord, pbc_shift)
   endif
   
 END SUBROUTINE set_pbc_shift
+
 
 
 SUBROUTINE add_atom_to_pixel (the_pixel, pixel_coord, atom_id, atom_coord)
@@ -190,6 +192,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   endif
 
 END SUBROUTINE prepare_pixel_grid
+
 
 
 SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)

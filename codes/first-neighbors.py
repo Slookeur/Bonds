@@ -91,6 +91,7 @@ def set_pbc_shift(pixel_grid : PixelGrid, pixel_coord : np.ndarray, pbc_shift : 
         pbc_shift[x_pos][y_pos][2] -= pixel_grid.pixels
 
 
+
 def add_atom_to_pixel(the_pixel: Pixel, pixel_coord: np.ndarray, atom_id: int, atom_coord: np.ndarray):
   if not the_pixel.patoms:
     # if the pixel do not contains any atom yet, then save its coordinates in the grid

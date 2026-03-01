@@ -152,7 +152,8 @@ void set_pbc_shift (pixel_grid * grid, int pixel_coord[|\trois|], int pbc_shift[
 \clearpage
 
 \subsection{C code: add atom to pixel}
-\label{c-add_atom_pixel}
+\label{c-add-atom-pixel}
+
 \begin{lstlisting}[language=C]
 void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[|\trois|], int atom_id, float atom_coord[|\trois|])
 {
@@ -186,6 +187,7 @@ void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[|\trois|], int atom_i
 
 \subsection{C code: preparation of the pixel grid}
 \label{c-pc-grid}
+
 \begin{lstlisting}[language=C]
 pixel_grid * prepare_pixel_grid (bool use_pbc)
 {
@@ -270,6 +272,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
 
 \subsection{C code: finding pixel neighbors}
 \label{c-find-pn}
+
 \begin{lstlisting}[language=C]
 // finding neighbor pixels for pixel in the grid
 // - bool use_pbc          : flag to set if PBC are used or not
@@ -388,6 +391,7 @@ distance evaluate_distance (bool use_pbc, pixel_atom * at_i, pixel_atom * at_j)
 
 \subsection{C code: pixel search for first neighbor atoms}
 \label{c-pc-pixel}
+
 \begin{lstlisting}[language=C]
 // searching for first neighbor atoms using the grid pixelation/partitioning method
 // - bool use_pbc : flag to set if PBC are used or not
