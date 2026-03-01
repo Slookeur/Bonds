@@ -87,7 +87,8 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
 
 \begin{algorithm}
 \begin{algorithmic}[1]
-\Procedure{shift}{{\footnotesize{\xdir, \ydir, \zdir, \xydir, \xyzdir, pixel[3], shift[3][3][3]}}}
+\Procedure{shift}{\xdir, \ydir, \zdir, \xydir, \xyzdir, pixel[\trois], shift[\trois][\trois][\trois]}
+%\Procedure{shift}{{\footnotesize{\xdir, \ydir, \zdir, \xydir, \xyzdir, pixel[\trois], shift[\trois][\trois][\trois]}}}
   \For{\vbtt{x} = \un, $\dots$, \trois}
     \For{\rbtt{y} = \un, $\dots$, \trois}
       \For{\obtt{z} = \un, $\dots$, \trois}
