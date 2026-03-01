@@ -206,7 +206,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   for ( axis = 0 ; axis < 3 ; axis ++ )         // For x, y and z
   {
     // correction if the number of pixel(s) on 'axis' is too small
-    grid->n_pix[axis] = (grid->n_pix[axis] < 4) ? 1 : grid->n_pix[axis];
+    grid->n_pix[axis] = (grid->n_pix[axis] < |\quatre|) ? 1 : grid->n_pix[axis];
   }
   grid->n_xy = grid->n_pix[0] * grid->n_pix[1]; // number of pixels on the plan 'xy'
   grid->pixels = grid->n_xy * grid->n_pix[2];   // total number of pixels in the grid
@@ -256,7 +256,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
 void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
 {
   int axis;                       // loop iterator axis id (1=x , 2=y , 3= z)
-  int xpos, ypos, zpos;           // neighbor position on x, y and z
+  int |\vbtt{x_pos}|, |\rbtt{y_pos}|, |\obtt{z_pos}|;        // neighbor position on x, y and z
   int l_start[3] = { 0, 0, 0};    // loop iterators starting value
   int l_end[3] = { 3, 3, 3};      // loop iterators ending value
   int pmod[3] = {-1, 0, 1};       // position modifiers
@@ -286,32 +286,32 @@ void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
     }
   }
   nnp = 0;
-  for ( xpos = l_start[0] ; xpos < l_end[0] ; xpos ++ )
+  for ( |\vbtt{x_pos}| = l_start[0] ; |\vbtt{x_pos}| < l_end[0] ; |\vbtt{x_pos}| ++ )
   {
-    for ( ypos = l_start[1] ; ypos < l_end[1] ; ypos ++ )
+    for ( |\rbtt{y_pos}| = l_start[1] ; |\rbtt{y_pos}| < l_end[1] ; |\rbtt{y_pos}| ++ )
     {
-      for ( zpos = l_start[2] ; zpos < l_end[2] ; zpos ++ )
+      for ( |\obtt{z_pos}| = l_start[2] ; |\obtt{z_pos}| < l_end[2] ; |\obtt{z_pos}| ++ )
       {
         keep_neighbor = TRUE;
         if ( ! use_pbc && boundary )
         {
-          if (( the_pix->p_xyz[0] == 0 && xpos == 0 ) || ( the_pix->p_xyz[0] == the_grid->n_pix[0] && xpos == 2 ))
+          if (( the_pix->p_xyz[0] == 0 && |\vbtt{x_pos}| == 0 ) || ( the_pix->p_xyz[0] == the_grid->n_pix[0] && |\vbtt{x_pos}| == 2 ))
           {
             keep_neighbor = FALSE;
           }
-          else if (( the_pix->p_xyz[1] == 0 && ypos == 0 ) || ( the_pix->p_xyz[1] == the_grid->n_pix[1] && ypos == 2 ))
+          else if (( the_pix->p_xyz[1] == 0 && |\rbtt{y_pos}| == 0 ) || ( the_pix->p_xyz[1] == the_grid->n_pix[1] && |\rbtt{y_pos}| == 2 ))
           {
             keep_neighbor = FALSE;
           }
-          else if (( the_pix->p_xyz[2] == 0 && zpos == 0 ) || ( the_pix->p_xyz[2] == the_grid->n_pix[2] && zpos == 2 ))
+          else if (( the_pix->p_xyz[2] == 0 && |\obtt{z_pos}| == 0 ) || ( the_pix->p_xyz[2] == the_grid->n_pix[2] && |\obtt{z_pos}| == 2 ))
           {
             keep_neighbor = FALSE;
           }
         }
         if ( keep_neighbor )
         {
-          nid = the_pix->pid + pmod[xpos] + pmod[ypos] * the_grid->n_pix[0] + pmod[zpos] * the_grid->n_xy;
-          if ( use_pbc ) nid += pbc_shift[xpos][ypos][zpos];
+          nid = the_pix->pid + pmod[|\vbtt{x_pos}|] + pmod[|\rbtt{y_pos}|] * the_grid->n_pix[0] + pmod[|\obtt{z_pos}|] * the_grid->n_xy;
+          if ( use_pbc ) nid += pbc_shift[|\vbtt{x_pos}|][|\rbtt{y_pos}|][|\obtt{z_pos}|];
           the_pix->pixel_neighbors[nnp] = nid;
           nnp ++ ;
         }

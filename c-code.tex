@@ -226,7 +226,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )         // For x, y and z
   {
     // correction if the number of pixel(s) on '|\dbtt{axis}|' is too small
-    grid->n_pix[|\dbtt{axis}|] = (grid->n_pix[|\dbtt{axis}|] < 4) ? |\un| : grid->n_pix[|\dbtt{axis}|];
+    grid->n_pix[|\dbtt{axis}|] = (grid->n_pix[|\dbtt{axis}|] < |\quatre|) ? |\un| : grid->n_pix[|\dbtt{axis}|];
   }
   grid->n_xy = grid->n_pix[|\zero|] * grid->n_pix[|\un|]; // number of pixels on the plan 'xy'
   grid->pixels = grid->n_xy * grid->n_pix[|\deux|];   // total number of pixels in the grid
@@ -281,7 +281,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
 void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
 {
   int |\dbtt{axis}|;                       // loop iterator axis id (1=x , 2=y , 3= z)
-  int |\vbtt{xpos}|, |\rbtt{ypos}|, |\obtt{zpos}|;           // neighbor position on x, y and z
+  int |\vbtt{x_pos}|, |\rbtt{y_pos}|, |\obtt{z_pos}|;        // neighbor position on x, y and z
   int l_start[|\trois|] = { |\zero|, |\zero|, |\zero|};    // loop iterators starting value
   int l_end[|\trois|] = { |\trois|, |\trois|, |\trois|};      // loop iterators ending value
   int pmod[|\trois|] = {-|\un|, |\zero|, |\un|};       // position modifiers
@@ -311,32 +311,32 @@ void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
     }
   }
   |\bftt{nnp}| = |\zero|;
-  for ( |\vbtt{xpos}| = l_start[|\zero|] ; |\vbtt{xpos}| < l_end[|\zero|] ; |\vbtt{xpos}| ++ )
+  for ( |\vbtt{x_pos}| = l_start[|\zero|] ; |\vbtt{x_pos}| < l_end[|\zero|] ; |\vbtt{x_pos}| ++ )
   {
-    for ( |\rbtt{ypos}| = l_start[|\un|] ; |\rbtt{ypos}| < l_end[|\un|] ; |\rbtt{ypos}| ++ )
+    for ( |\rbtt{y_pos}| = l_start[|\un|] ; |\rbtt{y_pos}| < l_end[|\un|] ; |\rbtt{y_pos}| ++ )
     {
-      for ( |\obtt{zpos}| = l_start[|\deux|] ; |\obtt{zpos}| < l_end[|\deux|] ; |\obtt{zpos}| ++ )
+      for ( |\obtt{z_pos}| = l_start[|\deux|] ; |\obtt{z_pos}| < l_end[|\deux|] ; |\obtt{z_pos}| ++ )
       {
         keep_neighbor = TRUE;
         if ( ! use_pbc && boundary )
         {
-          if (( the_pix->p_xyz[|\zero|] == |\zero| && |\vbtt{xpos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_xyz[|\zero|] == the_grid->n_pix[|\zero|] && |\vbtt{xpos}| == |\deux| ))
+          if (( the_pix->p_xyz[|\zero|] == |\zero| && |\vbtt{x_pos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_xyz[|\zero|] == the_grid->n_pix[|\zero|] && |\vbtt{x_pos}| == |\deux| ))
           {
             keep_neighbor = FALSE;
           }
-          else if (( the_pix->p_xyz[|\un|] == |\zero| && |\rbtt{ypos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_xyz[|\un|] == the_grid->n_pix[|\un|] && |\rbtt{ypos}| == |\deux| ))
+          else if (( the_pix->p_xyz[|\un|] == |\zero| && |\rbtt{y_pos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_xyz[|\un|] == the_grid->n_pix[|\un|] && |\rbtt{y_pos}| == |\deux| ))
           {
             keep_neighbor = FALSE;
           }
-          else if (( the_pix->p_xyz[|\deux|] == |\zero| && |\obtt{zpos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_xyz[|\deux|] == the_grid->n_pix[|\deux|] && |\obtt{zpos}| == |\deux| ))
+          else if (( the_pix->p_xyz[|\deux|] == |\zero| && |\obtt{z_pos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_xyz[|\deux|] == the_grid->n_pix[|\deux|] && |\obtt{z_pos}| == |\deux| ))
           {
             keep_neighbor = FALSE;
           }
         }
         if ( keep_neighbor )
         {
-          nid = the_pix->pid + pmod[|\vbtt{xpos}|] + pmod[|\rbtt{ypos}|] * the_grid->n_pix[|\zero|] + pmod[|\obtt{zpos}|] * the_grid->n_xy;
-          if ( use_pbc ) nid += pbc_shift[|\vbtt{xpos}|][|\rbtt{ypos}|][|\obtt{zpos}|];
+          nid = the_pix->pid + pmod[|\vbtt{x_pos}|] + pmod[|\rbtt{y_pos}|] * the_grid->n_pix[|\zero|] + pmod[|\obtt{z_pos}|] * the_grid->n_xy;
+          if ( use_pbc ) nid += pbc_shift[|\vbtt{x_pos}|][|\rbtt{y_pos}|][|\obtt{z_pos}|];
           the_pix->pixel_neighbors[|\bftt{nnp}|] = nid;
           |\bftt{nnp}| ++ ;
         }

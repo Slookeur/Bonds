@@ -157,7 +157,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   endif
   do axis = 1 , 3                                      ! for x, y and z
     ! correction if the number of pixel(s) on 'axis' is too small
-    if ( grid%n_pix(axis) .lt. 4 ) then
+    if ( grid%n_pix(axis) .lt. |\quatre| ) then
       grid%n_pix(axis) = 1
     endif
   enddo
@@ -204,7 +204,7 @@ SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
   TYPE (pixel_grid), INTENT(INOUT)     :: the_grid                ! pointer to the pixel grid
   TYPE (pixel), POINTER, INTENT(INOUT) :: the_pix                 ! pointer to the pixel
   INTEGER                              :: axis                    ! loop iterator axis id (1=x, 2=y, 3=z)
-  INTEGER                              :: xpos, ypos, zpos        ! neighbor position on x, y and z
+  INTEGER                              :: |\vbtt{x_pos}|, |\rbtt{y_pos}|, |\obtt{z_pos}|     ! neighbor position on x, y and z
   INTEGER, DIMENSION(3)                :: l_start = (\1, 1, 1)    ! loop iterators starting value
   INTEGER, DIMENSION(3)                :: l_end = (\3, 3, 3)      ! loop iterators ending value
   INTEGER, DIMENSION(3)                :: pmod = (\-1, 0, 1)      ! position modifiers
@@ -230,31 +230,31 @@ SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
     endif
   enddo
   nnp = 0
-  do xpos = l_start(1) , l_end(1)
-    do ypos = l_start(2) , l_end(2)
-      do zpos = l_start(3) , l_end(3)
+  do |\vbtt{x_pos}| = l_start(1) , l_end(1)
+    do |\rbtt{y_pos}| = l_start(2) , l_end(2)
+      do |\obtt{z_pos}| = l_start(3) , l_end(3)
         keep_neighbor = .true.
         if ( .not. use_pbc .and. boundary ) then
-          if ( the_pix%p_xyz(1) .eq. 1 .and. xpos .eq. 1 ) then
+          if ( the_pix%p_xyz(1) .eq. 1 .and. |\vbtt{x_pos}| .eq. 1 ) then
             keep_neighbor = .false.
-          else if ( the_pix%p_xyz(1) .eq. the_grid%n_pix(1) .and. xpos .eq. 3 ) then
+          else if ( the_pix%p_xyz(1) .eq. the_grid%n_pix(1) .and. |\vbtt{x_pos}| .eq. 3 ) then
             keep_neighbor = .false.
-          else if ( the_pix%p_xyz(2) .eq. 1 .and. ypos .eq. 1 ) then
+          else if ( the_pix%p_xyz(2) .eq. 1 .and. |\rbtt{y_pos}| .eq. 1 ) then
             keep_neighbor = .false.
-          else if ( the_pix%p_xyz(2) .eq. the_grid%n_pix(2) .and. ypos .eq. 3 ) then
+          else if ( the_pix%p_xyz(2) .eq. the_grid%n_pix(2) .and. |\rbtt{y_pos}| .eq. 3 ) then
             keep_neighbor = .false.
-          else if ( the_pix%p_xyz(3) .eq. 1 .and. zpos .eq. 1 ) then
+          else if ( the_pix%p_xyz(3) .eq. 1 .and. |\obtt{z_pos}| .eq. 1 ) then
             keep_neighbor = .false.
-          else if ( the_pix%p_xyz(3) .eq. the_grid%n_pix(3) .and. zpos .eq. 3 ) then
+          else if ( the_pix%p_xyz(3) .eq. the_grid%n_pix(3) .and. |\obtt{z_pos}| .eq. 3 ) then
             keep_neighbor = .false.
           endif
         endif
         if ( keep_neighbor ) then
           ! evaluating neighbor pixel number in the grid
-          nid = the_pix%pid + pmod(xpos) + pmod(ypos) * the_grid%n_pix(1) + pmod(zpos) * the_grid%n_xy
+          nid = the_pix%pid + pmod(|\vbtt{x_pos}|) + pmod(|\rbtt{y_pos}|) * the_grid%n_pix(1) + pmod(|\obtt{z_pos}|) * the_grid%n_xy
           if ( use_pbc ) then
             ! correcting the value if PBC are used
-            nid = nid + pbc_shift(xpos, ypos, zpos)
+            nid = nid + pbc_shift(|\vbtt{x_pos}|, |\rbtt{y_pos}|, |\obtt{z_pos}|)
           endif
           the_pix%pixel_neighbors(nnp) = nid
           nnp = nnp + 1

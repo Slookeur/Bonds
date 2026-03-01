@@ -198,85 +198,72 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
 
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{}
-pixel\_grid * prepare\_pixel\_grid (bool use\_pbc)
-{
-  pixel\_grid * grid;        // pointer to the pixel grid to create
-  int \dbtt{axis};                 // loop iterator axis id (0=x, 1=y, 2=z)
-  int \cbtt{aid};                  // loop iterator atom number (0, atoms--1)
-  int pixel\_num;            // pixel number in the grid
-  int pixel\_pos[\trois];         // pixel coordinates in the grid
-  float cmin[\trois], cmax[\trois];   // float coordinates min, max values
-  float f\_coord[\trois];         // float fractional coordinates
+{\footnotesize{
+\Procedure{prepare\_pixel\_grid}{use\_pbc, l\_params[\trois], cutoff, c\_cooord[][\trois]}
+  \State
+  \State Input:
+  \State  \qquad - use\_pbc : flag to set if PBC are used or not
+  \State  \qquad - l\_params[\trois] : lattice parameters A, B and C
+  \State  \qquad - cutoff : cutoff radius to define first neighbor atoms
+  \State
+  \State Output:
+  \State  \qquad - grid : a pixel grid data structure
+  \State
 
-  grid = malloc(sizeof*grid);
-  if ( ! use\_pbc )                              // without periodic boundary conditions
-  {
-    for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ ) cmin[\dbtt{axis}] = cmax[\dbtt{axis}] = c\_coord[\zero][\dbtt{axis}];
-    for ( \cbtt{aid} = \un ; \cbtt{aid} < atoms ; \cbtt{aid} ++ )      // For all atoms
-    {
-      for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )     // For x, y and z
-      {
-        cmin[\dbtt{axis}] = min(cmin[\dbtt{axis}], c\_coord[\cbtt{aid}][\dbtt{axis}]);
-        cmax[\dbtt{axis}] = max(cmax[\dbtt{axis}], c\_coord[\cbtt{aid}][\dbtt{axis}]);
-      }
-    }
-    for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )       // For x, y and z
-    {
-      grid->n\_pix[\dbtt{axis}] = (int)((cmax[\dbtt{axis}] - cmin[\dbtt{axis}]) / cutoff) + \un; // number of pixel(s) on axis '\dbtt{axis}'
-    }
-  }
-  else  // using periodic boundary conditions
-  {
-    for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )       // For x, y and z
-    {
-      grid->n\_pix[\dbtt{axis}] = (int)(l\_params[\dbtt{axis}] / cutoff) + \un; // number of pixel(s) on axis '\dbtt{axis}'
-    }
-  }
-  for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )         // For x, y and z
-  {
-    // correction if the number of pixel(s) on '\dbtt{axis}' is too small
-    grid->n\_pix[\dbtt{axis}] = (grid->n\_pix[\dbtt{axis}] < 4) ? \un : grid->n\_pix[\dbtt{axis}];
-  }
-  grid->n\_xy = grid->n\_pix[\zero] * grid->n\_pix[\un]; // number of pixels on the plan 'xy'
-  grid->pixels = grid->n\_xy * grid->n\_pix[\deux];   // total number of pixels in the grid
-  grid->pixel\_list = malloc (grid->pixels*sizeof*grid->pixel\_list);
-  for ( pixel\_num = \zero ; pixel\_num < grid->pixels ; pixel\_num ++ )
-  {
-    grid->pixel\_list[pixel\_num].pid = pixel\_num;
-    grid->pixel\_list[pixel\_num].patoms = \zero;
-    grid->pixel\_list[pixel\_num].tested = FALSE;
-  }
-  if ( ! use\_pbc )                              // without periodic boundary conditions
-  {
-    for ( \cbtt{aid} = \zero ; \cbtt{aid} < atoms ; \cbtt{aid} ++ )      // for all atoms
-    {
-      for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )     // for x, y and z
-      {
-        pixel\_pos[\dbtt{axis}] = (int)((c\_coord[\cbtt{aid}][\dbtt{axis}] - cmin[\dbtt{axis}])/cutoff);
-      }
-      pixel\_num = pixel\_pos[\zero] + pixel\_pos[\un] * grid->n\_pix[\zero] + pixel\_pos[\deux] * grid->n\_xy;
-      add\_atom\_to\_pixel (grid, pixel\_num, pixel\_pos, \cbtt{aid}, c\_coord[\cbtt{aid}]);
-    }
-  }
-  else                                          // using periodic boundary conditions
-  {
-    for ( \cbtt{aid} = \zero ; \cbtt{aid} < atoms ; \cbtt{aid} ++ )      // for all atoms
-    {
-      // with 'matrix\_multiplication' a user defined function to perform the operation
-      f\_coord = matrix\_multiplication (cart\_to\_frac, c\_coord[\cbtt{aid}]);
-      for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )     // for x, y and z
-      {
-        f\_coord[\dbtt{axis}] = f\_coord[\dbtt{axis}] - floorf(f\_coord[\dbtt{axis}]);
-        pixel\_pos[\dbtt{axis}] = (int)((f\_coord[\dbtt{axis}] * grid->n\_pix[\dbtt{axis}]);
-      }
-      pixel\_num = pixel\_pos[\zero] + pixel\_pos[\un] * grid->n\_pix[\zero] + pixel\_pos[\deux] * grid->n\_xy;
-      add\_atom\_to\_pixel (\& grid->pixel\_list[pixel\_num], \cbtt{aid}, f\_coord);
-    }
-  }
-  return grid;
-}
+  \If{use\_pbc}
+    \For{\dbtt{axis} = \un, $\dots$, \trois}
+      \Sate grid->n\_pix[\dbtt{axis}] = $\left\lfloor (l\_params[\dbtt{axis}] / cutoff) \right\rfloor$ + \un
+    \EndFor
+  \Else
+    \For{\dbtt{axis} = \un, $\dots$, \trois}
+      \State cmin = cmax = c\_coord[\un][\dbtt{axis}]
+    \EndFor
+    \For{\dbtt{aid} = \deux, $\dots$, atoms}
+      \For{\dbtt{axis} = \un, $\dots$, \trois}
+	\State cmin = min (cmin, c\_coord[\cbtt{aid}][\dbtt{axis}])
+	\State cmax = min (cmax, c\_coord[\cbtt{aid}][\dbtt{axis}])
+      \EndFor
+    \EndFor
+    \For{\dbtt{axis} = \un, $\dots$, \trois}
+      \Sate grid->n\_pix[\dbtt{axis}] = $\left\lfloor (cmax[\dbtt{axis} - cmin[\dbtt{axis}] / cutoff) \right\rfloor$ + \un
+    \EndFor
+  \EndIf
+  \State
+  \For{\dbtt{axis} = \un, $\dots$, \trois}
+    \If{grid->n\_pix[\dbtt{axis}] < \quatre}
+      \State grid->n\_pix[\dbtt{axis}] = \un
+    \EndIf
+  \EndFor
+  \State grid->n\_xy = grid->n\_pix[\un] $\times$ grid->n\_pix[\deux]
+  \State grid->pixels = grid->n\_xy $\times$ grid->n\_pix[\trois]
+  \For{pixel\_num = \un, $\dots$, grid->pixels}
+    \State grid->pixel\_list[pixel\_num].pid = pixel\_num
+    \State grid->pixel\_list[pixel\_num].patoms = \zero
+    \State grid->pixel\_list[pixel\_num].tested = FALSE
+  \EndFor
+  \State
+  \If{use\_pbc}
+    \For{\dbtt{aid} = \un, $\dots$, atoms}
+      \State f\_coord = matrix\_multiplication (cart\_to\_frac, c\_coord[\cbtt{aid}])
+      \For{\dbtt{axis} = \un, $\dots$, \trois}
+        \State f\_coord[\dbtt{axis}] -= $\left \lfloor$ f\_coord[\dbtt{axis}] $\right\rfloor$
+        \State  pixel\_pos[\dbtt{axis}] = $\left \lfloor$ f\_coord[\dbtt{axis}] $\times$ grid->n\_pix[\dbtt{axis}] $\right\rfloor$
+      \EndFor
+      \State pixel\_num = pixel\_pos[\un] + pixel\_pos[\deux] $\times$ grid->n\_pix[\un] + pixel\_pos[\trois] $\times$ grid->n\_xy
+      \State add\_atom\_to\_pixel (\& grid->pixel\_list[pixel\_num], \cbtt{aid}, f\_coord)
+    \EndFor
+  \Else
+    \For{\dbtt{aid} = \un, $\dots$, atoms}
+      \For{\dbtt{axis} = \un, $\dots$, \trois}
+	\State  pixel\_pos[\dbtt{axis}] = $\left \lfloor$ (c\_coord[\dbtt{axis}] - cmin[\dbtt{axis}]) / Cutoff $\right\rfloor$
+      \EndFor
+      \State pixel\_num = pixel\_pos[\un] + pixel\_pos[\deux] $\times$ grid->n\_pix[\un] + pixel\_pos[\trois] $\times$ grid->n\_xy
+      \State add\_atom\_to\_pixel (\& grid->pixel\_list[pixel\_num], \cbtt{aid}, c\_coord)
+    \EndFor
+  \EndIf
+  \Return grid
 \EndProcedure
+}}
 \end{algorithmic}
 \end{algorithm}
 

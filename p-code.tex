@@ -150,7 +150,7 @@ def prepare_pixel_grid(use_pbc : bool):
   
   for |\dbtt{axis}| in range(|\trois|):                              # for x, y and z
     # correction if the number of pixels on '|\dbtt{axis}|' is too small
-    grid.n_pix[|\dbtt{axis}|] = |\un| if grid.n_pix[|\dbtt{axis}|] < 4 else grid.n_pix[|\dbtt{axis}|]
+    grid.n_pix[|\dbtt{axis}|] = |\un| if grid.n_pix[|\dbtt{axis}|] < |\quatre| else grid.n_pix[|\dbtt{axis}|]
   
   grid.n_xy = grid.n_pix[|\zero|] * grid.n_pix[|\un|]          # number of pixels on the plan 'xy'
   grid.pixels = grid.n_xy * grid.n_pix[|\deux|]            # total number of pixels in the grid
@@ -208,30 +208,30 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
       l_end[|\dbtt{axis}|] = |\deux|
 
   |\bftt{nnp}| = |\zero|  # number of neighbors
-  for |\vbtt{xpos}| in range(l_start[|\zero|], l_end[|\zero|]):
-    for |\rbtt{ypos}| in range(l_start[|\un|], l_end[|\un|]):
-      for |\obtt{zpos}| in range(l_start[|\deux|], l_end[|\deux|]):
+  for |\vbtt{x_pos}| in range(l_start[|\zero|], l_end[|\zero|]):
+    for |\rbtt{y_pos}| in range(l_start[|\un|], l_end[|\un|]):
+      for |\obtt{z_pos}| in range(l_start[|\deux|], l_end[|\deux|]):
         keep_neighbor = True
 
         if not use_pbc and boundary:
-          if the_pix.p_xyz[|\zero|] == |\zero| and |\vbtt{xpos}| == |\zero|:
+          if the_pix.p_xyz[|\zero|] == |\zero| and |\vbtt{x_pos}| == |\zero|:
             keep_neighbor = False
-          elif the_pix.p_xyz[|\zero|] == the_grid.n_pix[|\zero|] and |\vbtt{xpos}| == |\deux|:
+          elif the_pix.p_xyz[|\zero|] == the_grid.n_pix[|\zero|] and |\vbtt{x_pos}| == |\deux|:
             keep_neighbor = False
-          elif the_pix.p_xyz[|\un|] == |\zero| and |\rbtt{ypos}| == |\zero|:
+          elif the_pix.p_xyz[|\un|] == |\zero| and |\rbtt{y_pos}| == |\zero|:
             keep_neighbor = False
-          elif the_pix.p_xyz[|\un|] == the_grid.n_pix[|\un|] and |\rbtt{ypos}| == |\deux|:
+          elif the_pix.p_xyz[|\un|] == the_grid.n_pix[|\un|] and |\rbtt{y_pos}| == |\deux|:
             keep_neighbor = False
-          elif the_pix.p_xyz[|\deux|] == |\zero| and |\obtt{zpos}| == |\zero|:
+          elif the_pix.p_xyz[|\deux|] == |\zero| and |\obtt{z_pos}| == |\zero|:
             keep_neighbor = False
-          elif the_pix.p_xyz[|\deux|] == the_grid.n_pix[|\deux|] and |\obtt{zpos}| == |\deux|:
+          elif the_pix.p_xyz[|\deux|] == the_grid.n_pix[|\deux|] and |\obtt{z_pos}| == |\deux|:
             keep_neighbor = False
 
         if keep_neighbor:
           # calculate the neighbor id
-          nid = the_pix.pid + pmod[|\vbtt{xpos}|] + pmod[|\rbtt{ypos}|] * the_grid.n_pix[|\zero|] + pmod[|\obtt{zpos}|] * the_grid.n_xy
+          nid = the_pix.pid + pmod[|\vbtt{x_pos}|] + pmod[|\rbtt{y_pos}|] * the_grid.n_pix[|\zero|] + pmod[|\obtt{z_pos}|] * the_grid.n_xy
           if use_pbc:
-            nid += pbc_shift[|\vbtt{xpos}|][|\rbtt{ypos}|][|\obtt{zpos}|]
+            nid += pbc_shift[|\vbtt{x_pos}|][|\rbtt{y_pos}|][|\obtt{z_pos}|]
           the_pix.pixel_neighbors[|\bftt{nnp}|] = nid
           |\bftt{nnp}| += |\un|
 
