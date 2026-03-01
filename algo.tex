@@ -212,7 +212,7 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
 
   \If{use\_pbc}
     \For{\dbtt{axis} = \un, $\dots$, \trois}
-      \Sate grid->n\_pix[\dbtt{axis}] = $\left\lfloor (l\_params[\dbtt{axis}] / cutoff) \right\rfloor$ + \un
+      \State grid->n\_pix[\dbtt{axis}] = $\left\lfloor (l\_params[\dbtt{axis}] / cutoff) \right\rfloor$ + \un
     \EndFor
   \Else
     \For{\dbtt{axis} = \un, $\dots$, \trois}
@@ -225,7 +225,7 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
       \EndFor
     \EndFor
     \For{\dbtt{axis} = \un, $\dots$, \trois}
-      \Sate grid->n\_pix[\dbtt{axis}] = $\left\lfloor (cmax[\dbtt{axis} - cmin[\dbtt{axis}] / cutoff) \right\rfloor$ + \un
+      \State grid->n\_pix[\dbtt{axis}] = $\left\lfloor (cmax[\dbtt{axis} - cmin[\dbtt{axis}] / cutoff) \right\rfloor$ + \un
     \EndFor
   \EndIf
   \State
