@@ -241,9 +241,9 @@ SUBROUTINE find\_pixel\_neighbors (use\_pbc, the\_grid, the\_pix)
   TYPE (pixel), POINTER, INTENT(INOUT) :: the\_pix                 ! pointer to the pixel
   INTEGER                              :: \dbtt{axis}                    ! loop iterator axis id (1=x, 2=y, 3=z)
   INTEGER                              :: \vbtt{xpos}, \rbtt{ypos}, \obtt{zpos}        ! neighbor position on x, y and z
-  INTEGER, DIMENSION(\trois)                :: l\_start = (\un, \un, \un\)   ! loop iterators starting value
-  INTEGER, DIMENSION(\trois)                :: l\_end = (\trois, \trois, \trois\)     ! loop iterators ending value
-  INTEGER, DIMENSION(\trois)                :: pmod = (\-\un, \zero, \un\)     ! position modifiers
+  INTEGER, DIMENSION(\trois)                :: l\_start = (\un, \un, \un)    ! loop iterators starting value
+  INTEGER, DIMENSION(\trois)                :: l\_end = (\trois, \trois, \trois)      ! loop iterators ending value
+  INTEGER, DIMENSION(\trois)                :: pmod = (\-\un, \zero, \un)      ! position modifiers
   INTEGER                              :: \bftt{nnp}                     ! number of neighbors for pixel
   INTEGER                              :: nid                     ! neighbor id for pixel
   INTEGER, DIMENSION(\trois,\trois,\trois)            :: pbc\_shift               ! shift, correction, due to PBC
