@@ -85,7 +85,7 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
 
 \begin{algorithm}
 \begin{algorithmic}[1]
-\Procedure{Adjust PBC shift}{pixel\_grid, pixel\_coord[3], pbc\_shift[3][3][3]}
+\Procedure{Adjust PBC shift}{\xidr, \ydir, \zdir, pixel[3], pbc\_shift[3][3][3]}
   \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
     \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
       \For{\obtt{z\_pos} = \un, $\dots$, \trois}
@@ -95,13 +95,13 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
   \EndFor
   
   y
-  \If{pixel\_coord[\un] = \un}
+  \If{pixel[\un] = \un}
     \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
       \For{\obtt{z\_pos} = \un, $\dots$, \trois}
         \State pbc\_shift[\un][\rbtt{y\_pos}][\obtt{z\_pos}] = \xdir
       \EndFor
     \EndFor
-  \ElsIf{pixel\_coord[\un] = \xdir}
+  \ElsIf{pixel[\un] = \xdir}
     \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
       \For{\obtt{z\_pos} = \un, $\dots$, \trois}
         \State pbc\_shift[\trois][\rbtt{y\_pos}][\obtt{z\_pos}] = - \xdir
@@ -109,16 +109,16 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
     \EndFor
   \EndIf
 
-  \If{pixel\_coord[\deux] = \un}
+  \If{pixel[\deux] = \un}
     \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
       \For{\obtt{z\_pos} = \un, $\dots$, \trois}
-	\State pbc\_shift[\vbtt{x\_pos}][\un][\obtt{z\_pos}] += (\xdir $\times$ \ydir)
+	\State pbc\_shift[\vbtt{x\_pos}][\un][\obtt{z\_pos}] += (\xdir\ $\times$ \ydir)
       \EndFor
     \EndFor
-  \ElsIf{pixel\_coord[\deux] = \ydir}
+  \ElsIf{pixel[\deux] = \ydir}
     \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
       \For{\obtt{z\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\trois][\obtt{z\_pos}] -= (\xdir $\times$ \ydir)
+        \State pbc\_shift[\vbtt{x\_pos}][\trois][\obtt{z\_pos}] -= (\xdir\ $\times$ \ydir)
       \EndFor
     \EndFor
   \EndIf
@@ -126,13 +126,13 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
   \If{pixel\_coord[\trois] = \un}
     \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
       \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\un] += (\xdir $\times$ \ydir $\times$ \zdir)
+        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\un] += (\xdir\ $\times$ \ydir\ $\times$ \zdir)
       \EndFor
     \EndFor
   \ElsIf{pixel\_coord[\trois] = \zdir}
     \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
       \For{\rbtt{z\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\trois] -= (\xdir $\times$ \ydir $\times$ \zdir)
+        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\trois] -= (\xdir\ $\times$ \ydir\ $\times$ \zdir)
       \EndFor
     \EndFor
   \EndIf
