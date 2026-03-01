@@ -135,7 +135,7 @@ def prepare_pixel_grid(use_pbc : bool):
   
   if use_pbc:                                        # using periodic boundary conditions
     for |\dbtt{axis}| in range(|\trois|):                            # for x, y and z
-      # number of pixels on axis 'axis'
+      # number of pixels on 'axis'
       grid.n_pix[|\dbtt{axis}|] = int(l_params[|\dbtt{axis}|] / cutoff) + |\un|
   else:                                              # without periodic boundary conditions
     for |\dbtt{axis}| in range(|\trois|):
@@ -145,11 +145,11 @@ def prepare_pixel_grid(use_pbc : bool):
         cmin[|\dbtt{axis}|] = min(cmin[|\dbtt{axis}|], c_coord[|\cbtt{aid}|][|\dbtt{axis}|])
         cmax[|\dbtt{axis}|] = max(cmax[|\dbtt{axis}|], c_coord[|\cbtt{aid}|][|\dbtt{axis}|])
     for |\dbtt{axis}| in range(|\trois|):                            # for x, y and z
-      # number of pixels on axis 'axis'
+      # number of pixels on 'axis'
       grid.n_pix[|\dbtt{axis}|] = int((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / cutoff) + |\un|
   
   for |\dbtt{axis}| in range(|\trois|):                              # for x, y and z
-    # correction if the number of pixels on '|\dbtt{axis}|' is too small
+    # correction if the number of pixels on 'axis' is too small
     grid.n_pix[|\dbtt{axis}|] = |\un| if grid.n_pix[|\dbtt{axis}|] < |\quatre| else grid.n_pix[|\dbtt{axis}|]
   
   grid.n_xy = grid.n_pix[|\zero|] * grid.n_pix[|\un|]          # number of pixels on the plan 'xy'

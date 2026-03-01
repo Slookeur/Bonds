@@ -200,14 +200,14 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   float f_coord[|\trois|];         // float fractional coordinates
 
   grid = malloc(sizeof*grid);
-  if ( use_pbc )                    // using periodic boundary conditions
+  if ( use_pbc )                              // using periodic boundary conditions
   {
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )       // For x, y and z
     {
-      grid->n_pix[|\dbtt{axis}|] = (int)(l_params[|\dbtt{axis}|] / cutoff) + |\un|; // number of pixel(s) on axis '|\dbtt{axis}|'
+      grid->n_pix[|\dbtt{axis}|] = (int)(l_params[|\dbtt{axis}|] / cutoff) + |\un|; // number of pixel(s) on 'axis'
     }
   }
-  else                              // without periodic boundary conditions
+  else                                        // without periodic boundary conditions
   {
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ ) cmin[|\dbtt{axis}|] = cmax[|\dbtt{axis}|] = c_coord[|\zero|][|\dbtt{axis}|];
     for ( |\cbtt{aid}| = |\un| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )      // For all atoms
@@ -220,12 +220,12 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     }
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )       // For x, y and z
     {
-      grid->n_pix[|\dbtt{axis}|] = (int)((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / cutoff) + |\un|; // number of pixel(s) on axis '|\dbtt{axis}|'
+      grid->n_pix[|\dbtt{axis}|] = (int)((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / cutoff) + |\un|; // number of pixel(s) on 'axis'
     }
   }
   for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )         // For x, y and z
   {
-    // correction if the number of pixel(s) on '|\dbtt{axis}|' is too small
+    // correction if the number of pixel(s) on 'axis' is too small
     grid->n_pix[|\dbtt{axis}|] = (grid->n_pix[|\dbtt{axis}|] < |\quatre|) ? |\un| : grid->n_pix[|\dbtt{axis}|];
   }
   grid->n_xy = grid->n_pix[|\zero|] * grid->n_pix[|\un|]; // number of pixels on the plan 'xy'

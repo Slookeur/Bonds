@@ -117,7 +117,7 @@ def prepare_pixel_grid(use_pbc : bool):
   
   if use_pbc:                                        # using periodic boundary conditions
     for axis in range(3):                            # for x, y and z
-      # number of pixels on axis 'axis'
+      # number of pixels on 'axis'
       grid.n_pix[axis] = int(l_params[axis] / cutoff) + 1
   else:                                              # without periodic boundary conditions
     for axis in range(3):
@@ -127,7 +127,7 @@ def prepare_pixel_grid(use_pbc : bool):
         cmin[axis] = min(cmin[axis], c_coord[aid][axis])
         cmax[axis] = max(cmax[axis], c_coord[aid][axis])
     for axis in range(3):                            # for x, y and z
-      # number of pixels on axis 'axis'
+      # number of pixels on 'axis'
       grid.n_pix[axis] = int((cmax[axis] - cmin[axis]) / cutoff) + 1
   
   for axis in range(3):                              # for x, y and z

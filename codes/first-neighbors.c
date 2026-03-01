@@ -180,14 +180,14 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   float f_coord[3];         // float fractional coordinates
 
   grid = malloc(sizeof*grid);
-  if ( use_pbc )                    // using periodic boundary conditions
+  if ( use_pbc )                              // using periodic boundary conditions
   {
     for ( axis = 0 ; axis < 3 ; axis ++ )       // For x, y and z
     {
-      grid->n_pix[axis] = (int)(l_params[axis] / cutoff) + 1; // number of pixel(s) on axis 'axis'
+      grid->n_pix[axis] = (int)(l_params[axis] / cutoff) + 1; // number of pixel(s) on 'axis'
     }
   }
-  else                              // without periodic boundary conditions
+  else                                        // without periodic boundary conditions
   {
     for ( axis = 0 ; axis < 3 ; axis ++ ) cmin[axis] = cmax[axis] = c_coord[0][axis];
     for ( aid = 1 ; aid < atoms ; aid ++ )      // For all atoms
@@ -200,7 +200,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     }
     for ( axis = 0 ; axis < 3 ; axis ++ )       // For x, y and z
     {
-      grid->n_pix[axis] = (int)((cmax[axis] - cmin[axis]) / cutoff) + 1; // number of pixel(s) on axis 'axis'
+      grid->n_pix[axis] = (int)((cmax[axis] - cmin[axis]) / cutoff) + 1; // number of pixel(s) on 'axis'
     }
   }
   for ( axis = 0 ; axis < 3 ; axis ++ )         // For x, y and z

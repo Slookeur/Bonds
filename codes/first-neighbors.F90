@@ -136,7 +136,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   
   if ( use_pbc ) then                                  ! using periodic boundary conditions
       do axis = 1 , 3                                    ! for x, y and z
-      ! number of pixel(s) on axis 'axis'
+      ! number of pixel(s) on 'axis'
       grid%n_pix(axis) = INT(l_params(axis) / cutoff) + 1
     enddo
   else                                                 ! without periodic boundary conditions
@@ -151,7 +151,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
       enddo
     enddo
     do axis = 1 , 3                                    ! for x, y and z
-      ! number of pixel(s) on axis 'axis'
+      ! number of pixel(s) on 'axis'
       grid%n_pix(axis) = INT((cmax(axis) - cmin(axis)) / cutoff) + 1
     enddo
   endif

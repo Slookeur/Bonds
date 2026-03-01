@@ -157,7 +157,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   
   if ( use_pbc ) then                                  ! using periodic boundary conditions
       do |\dbtt{axis}| = |\un| , |\trois|                                    ! for x, y and z
-      ! number of pixel(s) on |\dbtt{axis}| '|\dbtt{axis}|'
+      ! number of pixel(s) on 'axis'
       grid%n_pix(|\dbtt{axis}|) = INT(l_params(|\dbtt{axis}|) / cutoff) + |\un|
     enddo
   else                                                 ! without periodic boundary conditions
@@ -172,12 +172,12 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
       enddo
     enddo
     do |\dbtt{axis}| = |\un| , |\trois|                                    ! for x, y and z
-      ! number of pixel(s) on |\dbtt{axis}| '|\dbtt{axis}|'
+      ! number of pixel(s) on 'axis'
       grid%n_pix(|\dbtt{axis}|) = INT((cmax(|\dbtt{axis}|) - cmin(|\dbtt{axis}|)) / cutoff) + |\un|
     enddo
   endif
   do |\dbtt{axis}| = |\un| , |\trois|                                      ! for x, y and z
-    ! correction if the number of pixel(s) on '|\dbtt{axis}|' is too small
+    ! correction if the number of pixel(s) on 'axis' is too small
     if ( grid%n_pix(|\dbtt{axis}|) .lt. |\quatre| ) then
       grid%n_pix(|\dbtt{axis}|) = |\un|
     endif
