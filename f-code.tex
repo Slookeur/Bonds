@@ -277,7 +277,7 @@ SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
         endif
         if ( keep_neighbor ) then
           ! evaluating neighbor pixel number in the grid
-          nid = the_pix%pid + pmod(|\vbtt{x\\_pos}|) + pmod(|\rbtt{y\\_pos}|) * the_grid%n_pix(|\un|) + pmod(|\obtt{z\\_pos}|) * the_grid%n_xy
+          nid = the_pix%pid + pmod(|\vbtt{x\_pos}|) + pmod(|\rbtt{y\_pos}|) * the_grid%n_pix(|\un|) + pmod(|\obtt{z\_pos}|) * the_grid%n_xy
           if ( use_pbc ) then
             ! correcting the value if PBC are used
             nid = nid + pbc_shift(|\vbtt{x\_pos}|, |\rbtt{y\_pos}|, |\obtt{z\_pos}|)
