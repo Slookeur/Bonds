@@ -200,14 +200,14 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   float f_coord[|\trois|];         // float fractional coordinates
 
   grid = malloc(sizeof*grid);
-  if ( use_pbc )                              // using periodic boundary conditions
+  if ( use_pbc )                                // using periodic boundary conditions
   {
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )       // For x, y and z
     {
       grid->n_pix[|\dbtt{axis}|] = (int)(l_params[|\dbtt{axis}|] / cutoff) + |\un|; // number of pixel(s) on 'axis'
     }
   }
-  else                                        // without periodic boundary conditions
+  else                                          // without periodic boundary conditions
   {
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ ) cmin[|\dbtt{axis}|] = cmax[|\dbtt{axis}|] = c_coord[|\zero|][|\dbtt{axis}|];
     for ( |\cbtt{aid}| = |\un| ; |\cbtt{aid}| < atoms ; |\cbtt{aid}| ++ )      // For all atoms
