@@ -1,5 +1,15 @@
 \section{Algorithms and Pseudocodes}
 
+\newcommand{\xdir}{\mbtt{x}}
+\newcommand{\ydir}{\mbtt{y}}
+\newcommand{\zdir}{\mbtt{z}}
+\newcommand{\xmin}{\mbtt{x$_{min}$}}
+\newcommand{\ymin}{\mbtt{y$_{min}$}}
+\newcommand{\zmin}{\mbtt{z$_{min}$}}
+\newcommand{\xmax}{\mbtt{x$_{max}$}}
+\newcommand{\ymax}{\mbtt{y$_{max}$}}
+\newcommand{\zmax}{\mbtt{z$_{max}$}}
+
 \subsection{Data structures and global variables}
 \label{algo-pc-data}
 
@@ -76,52 +86,53 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
 \begin{algorithm}
 \begin{algorithmic}[1]
 \Procedure{Adjust PBC shift}{pixel\_grid, pixel\_coord[3], pbc\_shift[3][3][3]}
-  \For{\vbtt{x\_pos} = 1, $\dots$, \trois}
-    \For{\rbtt{y\_pos} = 1, $\dots$, \trois}
-      \For{\obtt{z\_pos} = 1, $\dots$, \trois}
+  \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
+    \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
+      \For{\obtt{z\_pos} = \un, $\dots$, \trois}
         \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\obtt{z\_pos}] = \zero
       \EndFor
     \EndFor
   \EndFor
   
-  \If{pixel\_coord[\zero] = \zero}
-    \For{\rbtt{y\_pos} = 1, $\dots$, \trois}
-      \For{\obtt{z\_pos} = 1, $\dots$, \trois}
-        \State pbc\_shift[\zero][\rbtt{y\_pos}][\obtt{z\_pos}] = grid.n\_pix[\zero]
+  y
+  \If{pixel\_coord[\xdir] = \xmin}
+    \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
+      \For{\obtt{z\_pos} = \un, $\dots$, \trois}
+        \State pbc\_shift[\un][\rbtt{y\_pos}][\obtt{z\_pos}] = \xmax
       \EndFor
     \EndFor
-  \ElsIf{pixel\_coord[\zero] = grid.n\_pix[\zero]-1}
-    \For{\rbtt{y\_pos} = 1, $\dots$, \trois}
-      \For{\obtt{z\_pos} = 1, $\dots$, \trois}
-        \State pbc\_shift[\zero][\rbtt{y\_pos}][\obtt{z\_pos}] = - grid.n\_pix[\zero]
-      \EndFor
-    \EndFor
-  \EndIf
-
-  \If{pixel\_coord[\un] = \zero}
-    \For{\vbtt{x\_pos} = 1, $\dots$, \trois}
-      \For{\obtt{z\_pos} = 1, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\zero][\obtt{z\_pos}] += grid.n\_xy
-      \EndFor
-    \EndFor
-  \ElsIf{pixel\_coord[\un] = grid.n\_pix[\un]-1}
-    \For{\vbtt{x\_pos} = 1, $\dots$, \trois}
-      \For{\obtt{z\_pos} = 1, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\zero][\obtt{z\_pos}] -= grid.n\_xy
+  \ElsIf{pixel\_coord[\xdir] = \xmax}
+    \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
+      \For{\obtt{z\_pos} = \un, $\dots$, \trois}
+        \State pbc\_shift[\trois][\rbtt{y\_pos}][\obtt{z\_pos}] = - \xmax
       \EndFor
     \EndFor
   \EndIf
 
-  \If{pixel\_coord[\deux] = \zero}
-    \For{\vbtt{x\_pos} = 1, $\dots$, \trois}
-      \For{\rbtt{y\_pos} = 1, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\zero] += grid.pixels
+  \If{pixel\_coord[\ydir] = \ymin}
+    \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
+      \For{\obtt{z\_pos} = \un, $\dots$, \trois}
+	\State pbc\_shift[\vbtt{x\_pos}][\un][\obtt{z\_pos}] += (\xmax $\times$ \ymax)
       \EndFor
     \EndFor
-  \ElsIf{pixel\_coord[\deux] = grid.n\_pix[\deux]-1}
-    \For{\vbtt{x\_pos} = 1, $\dots$, \trois}
-      \For{\rbtt{z\_pos} = 1, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\deux] -= grid.pixels
+  \ElsIf{pixel\_coord[\ydir] = \ymax}
+    \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
+      \For{\obtt{z\_pos} = \un, $\dots$, \trois}
+        \State pbc\_shift[\vbtt{x\_pos}][\trois][\obtt{z\_pos}] -= (\xmax $\times$ \ymax)
+      \EndFor
+    \EndFor
+  \EndIf
+
+  \If{pixel\_coord[\zdir] = \zmin}
+    \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
+      \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
+        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\un] += (\xmax $\times$ \ymax $\times$ \zmax)
+      \EndFor
+    \EndFor
+  \ElsIf{pixel\_coord[\zdir] = \zmax}
+    \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
+      \For{\rbtt{z\_pos} = \un, $\dots$, \trois}
+        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\trois] -= (\xmax $\times$ \ymax $\times$ \zmax)
       \EndFor
     \EndFor
   \EndIf
