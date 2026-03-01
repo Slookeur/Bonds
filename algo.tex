@@ -1,10 +1,10 @@
 \section{Algorithms and Pseudocodes}
 
-\newcommand{\xdir}{\mbtt{x}}
-\newcommand{\ydir}{\mbtt{y}}
-\newcommand{\zdir}{\mbtt{z}}
-\newcommand{\xydir}{\dbtt{xy}}
-\newcommand{\xyzdir}{\rbtt{xyz}}
+\newcommand{\xdir}{\cbtt{nx}}
+\newcommand{\ydir}{\cbtt{ny}}
+\newcommand{\zdir}{\cbtt{nz}}
+\newcommand{\xydir}{\dbtt{nxy}}
+\newcommand{\xyzdir}{\rbtt{nxyz}}
 \newcommand{\xmin}{\mbtt{x$_{min}$}}
 \newcommand{\ymin}{\mbtt{y$_{min}$}}
 \newcommand{\zmin}{\mbtt{z$_{min}$}}
@@ -88,52 +88,52 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
 \begin{algorithm}
 \begin{algorithmic}[1]
 \Procedure{pbc\_shift}{\xdir, \ydir, \zdir, \xydir, \xyzdir, pixel[3], shift[3][3][3]}
-  \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
-    \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
-      \For{\obtt{z\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\obtt{z\_pos}] = \zero
+  \For{\vbtt{x} = \un, $\dots$, \trois}
+    \For{\rbtt{y} = \un, $\dots$, \trois}
+      \For{\obtt{z} = \un, $\dots$, \trois}
+        \State shift[\vbtt{x}][\rbtt{y}][\obtt{z}] = \zero
       \EndFor
     \EndFor
   \EndFor
   
   \If{pixel[\un] = \un}
-    \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
-      \For{\obtt{z\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\un][\rbtt{y\_pos}][\obtt{z\_pos}] = \xdir
+    \For{\rbtt{y} = \un, $\dots$, \trois}
+      \For{\obtt{z} = \un, $\dots$, \trois}
+        \State shift[\un][\rbtt{y}][\obtt{z}] = \xdir
       \EndFor
     \EndFor
   \ElsIf{pixel[\un] = \xdir}
-    \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
-      \For{\obtt{z\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\trois][\rbtt{y\_pos}][\obtt{z\_pos}] = - \xdir
+    \For{\rbtt{y} = \un, $\dots$, \trois}
+      \For{\obtt{z} = \un, $\dots$, \trois}
+        \State shift[\trois][\rbtt{y}][\obtt{z}] = - \xdir
       \EndFor
     \EndFor
   \EndIf
 
   \If{pixel[\deux] = \un}
-    \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
-      \For{\obtt{z\_pos} = \un, $\dots$, \trois}
-	\State pbc\_shift[\vbtt{x\_pos}][\un][\obtt{z\_pos}] += \xydir
+    \For{\vbtt{x} = \un, $\dots$, \trois}
+      \For{\obtt{z} = \un, $\dots$, \trois}
+	\State shift[\vbtt{x}][\un][\obtt{z}] += \xydir
       \EndFor
     \EndFor
   \ElsIf{pixel[\deux] = \ydir}
-    \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
-      \For{\obtt{z\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\trois][\obtt{z\_pos}] -= \xydir
+    \For{\vbtt{x} = \un, $\dots$, \trois}
+      \For{\obtt{z} = \un, $\dots$, \trois}
+        \State shift[\vbtt{x}][\trois][\obtt{z}] -= \xydir
       \EndFor
     \EndFor
   \EndIf
 
   \If{pixel\_coord[\trois] = \un}
-    \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
-      \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\un] += \xyzdir
+    \For{\vbtt{x} = \un, $\dots$, \trois}
+      \For{\rbtt{y} = \un, $\dots$, \trois}
+        \State shift[\vbtt{x}][\rbtt{y}][\un] += \xyzdir
       \EndFor
     \EndFor
   \ElsIf{pixel\_coord[\trois] = \zdir}
-    \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
-      \For{\rbtt{z\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\trois] -= \xyzdir
+    \For{\vbtt{x} = \un, $\dots$, \trois}
+      \For{\rbtt{z} = \un, $\dots$, \trois}
+        \State shift[\vbtt{x}][\rbtt{y}][\trois] -= \xyzdir
       \EndFor
     \EndFor
   \EndIf
