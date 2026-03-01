@@ -75,74 +75,74 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
 \begin{algorithm}
 void set\_pbc\_shift (pixel\_grid * grid, int pixel\_coord[\trois], int pbc\_shift[\trois][\trois][\trois])
 {
-  int \vbtt{x\\_pos}, \rbtt{y\\_pos}, \obtt{z\\_pos}; // loop iterators
-  for ( \vbtt{x\\_pos} = \zero ; \vbtt{x\\_pos} < \trois ; \vbtt{x\\_pos} ++ )
+  int \vbtt{x\_pos}, \rbtt{y\_pos}, \obtt{z\_pos}; // loop iterators
+  for ( \vbtt{x\_pos} = \zero ; \vbtt{x\_pos} < \trois ; \vbtt{x\_pos} ++ )
   {
-    for ( \rbtt{y\\_pos} = \zero ; \rbtt{y\\_pos} < \trois ; \rbtt{y\\_pos} ++ )
+    for ( \rbtt{y\_pos} = \zero ; \rbtt{y\_pos} < \trois ; \rbtt{y\_pos} ++ )
     {
-      for ( \obtt{z\\_pos} = \zero ; \obtt{z\\_pos} < \trois ; \obtt{z\\_pos} ++ )
+      for ( \obtt{z\_pos} = \zero ; \obtt{z\_pos} < \trois ; \obtt{z\_pos} ++ )
       {
-        pbc\_shift[\vbtt{x\\_pos}][\rbtt{y\\_pos}][\obtt{z\\_pos}] = \zero;             // initialization without any shift
+        pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\obtt{z\_pos}] = \zero;             // initialization without any shift
       }
     }
   }
   if ( pixel\_coord[\zero] == \zero )                            // pixel position on 'x' is min
   {
-    for ( \rbtt{y\\_pos} = \zero ; \rbtt{y\\_pos} < \trois ; \rbtt{y\\_pos} ++ )
+    for ( \rbtt{y\_pos} = \zero ; \rbtt{y\_pos} < \trois ; \rbtt{y\_pos} ++ )
     {
-      for ( \obtt{z\\_pos} = \zero ; \obtt{z\\_pos} < \trois ; \obtt{z\\_pos} ++ )
+      for ( \obtt{z\_pos} = \zero ; \obtt{z\_pos} < \trois ; \obtt{z\_pos} ++ )
       {
-        pbc\_shift[\zero][\rbtt{y\\_pos}][\obtt{z\\_pos}] = grid->n\_pix[\zero];
+        pbc\_shift[\zero][\rbtt{y\_pos}][\obtt{z\_pos}] = grid->n\_pix[\zero];
       }
     }
   }
   else if ( pixel\_coord[\zero] == grid->n\_pix[\zero] - \un )      // pixel position on 'x' is max
   {
-    for ( \rbtt{y\\_pos} = \zero ; \rbtt{y\\_pos} < \trois ; \rbtt{y\\_pos} ++ )
+    for ( \rbtt{y\_pos} = \zero ; \rbtt{y\_pos} < \trois ; \rbtt{y\_pos} ++ )
     {
-      for ( \obtt{z\\_pos} = \zero ; \obtt{z\\_pos} < \trois ; \obtt{z\\_pos} ++ )
+      for ( \obtt{z\_pos} = \zero ; \obtt{z\_pos} < \trois ; \obtt{z\_pos} ++ )
       {
-        pbc\_shift[\deux][\rbtt{y\\_pos}][\obtt{z\\_pos}] = - grid->n\_pix[\zero];
+        pbc\_shift[\deux][\rbtt{y\_pos}][\obtt{z\_pos}] = - grid->n\_pix[\zero];
       }
     }
   }
   if ( pixel\_coord[\un] == \zero )                            // pixel position on 'y' is min
   {
-    for ( \vbtt{x\\_pos} = \zero ; \vbtt{x\\_pos} < \trois ; \vbtt{x\\_pos} ++ )
+    for ( \vbtt{x\_pos} = \zero ; \vbtt{x\_pos} < \trois ; \vbtt{x\_pos} ++ )
     {
-      for ( \obtt{z\\_pos} = \zero ; \obtt{z\\_pos} < \trois ; \obtt{z\\_pos} ++ )
+      for ( \obtt{z\_pos} = \zero ; \obtt{z\_pos} < \trois ; \obtt{z\_pos} ++ )
       {
-        pbc\_shift[\vbtt{x\\_pos}][\zero][\obtt{z\\_pos}] += grid->n\_xy;
+        pbc\_shift[\vbtt{x\_pos}][\zero][\obtt{z\_pos}] += grid->n\_xy;
       }
     }
   }
   else if ( pixel\_coord[\un] == grid->n\_pix[\un] - \un )      // pixel position on 'y' is max
   {
-    for ( \vbtt{x\\_pos} = \zero ; \vbtt{x\\_pos} < \trois ; \vbtt{x\\_pos} ++ )
+    for ( \vbtt{x\_pos} = \zero ; \vbtt{x\_pos} < \trois ; \vbtt{x\_pos} ++ )
     {
-      for ( \obtt{z\\_pos} = \zero ; \obtt{z\\_pos} < \trois ; \obtt{z\\_pos} ++ )
+      for ( \obtt{z\_pos} = \zero ; \obtt{z\_pos} < \trois ; \obtt{z\_pos} ++ )
       {
-        pbc\_shift[\vbtt{x\\_pos}][\deux][\obtt{z\\_pos}] -= grid->n\_xy;
+        pbc\_shift[\vbtt{x\_pos}][\deux][\obtt{z\_pos}] -= grid->n\_xy;
       }
     }
   }
   if ( pixel\_coord[\deux] == \zero )                            // pixel position on 'z' is min
   {
-    for ( \vbtt{x\\_pos} = \zero ; \vbtt{x\\_pos} < \trois ; \vbtt{x\\_pos} ++ )
+    for ( \vbtt{x\_pos} = \zero ; \vbtt{x\_pos} < \trois ; \vbtt{x\_pos} ++ )
     {
-      for ( \rbtt{y\\_pos} = \zero ; \rbtt{y\\_pos} < \trois ; \rbtt{y\\_pos} ++ )
+      for ( \rbtt{y\_pos} = \zero ; \rbtt{y\_pos} < \trois ; \rbtt{y\_pos} ++ )
       {
-        pbc\_shift[\vbtt{x\\_pos}][\rbtt{y\\_pos}][\zero] += grid->pixels;
+        pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\zero] += grid->pixels;
       }
     }
   }
   else if ( pixel\_coord[\deux] == grid->n\_pix[\deux] - \un )      // pixel position on 'z' is max
   {
-    for ( \vbtt{x\\_pos} = \zero ; \vbtt{x\\_pos} < \trois ; \vbtt{x\\_pos} ++ )
+    for ( \vbtt{x\_pos} = \zero ; \vbtt{x\_pos} < \trois ; \vbtt{x\_pos} ++ )
     {
-      for ( \rbtt{y\\_pos} = \zero ; \rbtt{y\\_pos} < \trois ; \rbtt{y\\_pos} ++ )
+      for ( \rbtt{y\_pos} = \zero ; \rbtt{y\_pos} < \trois ; \rbtt{y\_pos} ++ )
       {
-        pbc\_shift[\vbtt{x\\_pos}][\rbtt{y\\_pos}][\deux] -= grid->pixels;
+        pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\deux] -= grid->pixels;
       }
     }
   }

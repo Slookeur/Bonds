@@ -64,40 +64,40 @@ frac\_to\_cart = np.zeros((\trois, \trois))                                     
 # - int pbc\_shift[\trois][\trois][\trois]   : the shift, correction, to be calculated
 def set\_pbc\_shift(pixel\_grid : PixelGrid, pixel\_coord : np.ndarray, pbc\_shift : np.ndarray):
   # Initialize pbc\_shift to zero
-  for \vbtt{x\\_pos} in range(\trois):
-    for \rbtt{y\\_pos} in range(\trois):
-      for \obtt{z\\_pos} in range(\trois):
-        pbc\_shift[\vbtt{x\\_pos}][\rbtt{y\\_pos}][\obtt{z\\_pos}] = \zero        # initialization without any shift
+  for \vbtt{x\_pos} in range(\trois):
+    for \rbtt{y\_pos} in range(\trois):
+      for \obtt{z\_pos} in range(\trois):
+        pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\obtt{z\_pos}] = \zero        # initialization without any shift
 
   if pixel\_coord[\zero] == \zero:                         # pixel position on 'x' is min
-    for \rbtt{y\\_pos} in range(\trois):
-      for \obtt{z\\_pos} in range(\trois):
-        pbc\_shift[\zero][\rbtt{y\\_pos}][\obtt{z\\_pos}] = pixel\_grid.n\_pix[\zero]
+    for \rbtt{y\_pos} in range(\trois):
+      for \obtt{z\_pos} in range(\trois):
+        pbc\_shift[\zero][\rbtt{y\_pos}][\obtt{z\_pos}] = pixel\_grid.n\_pix[\zero]
 
   elif pixel\_coord[\zero] == pixel\_grid.n\_pix[\zero] - \un: # pixel position on 'x' is max
-    for \rbtt{y\\_pos} in range(\trois):
-      for \obtt{z\\_pos} in range(\trois):
-        pbc\_shift[\deux][\rbtt{y\\_pos}][\obtt{z\\_pos}] = -pixel\_grid.n\_pix[\zero]
+    for \rbtt{y\_pos} in range(\trois):
+      for \obtt{z\_pos} in range(\trois):
+        pbc\_shift[\deux][\rbtt{y\_pos}][\obtt{z\_pos}] = -pixel\_grid.n\_pix[\zero]
 
   if pixel\_coord[\un] == \zero:                         # pixel position on 'y' is min
-    for \vbtt{x\\_pos} in range(\trois):
-      for \obtt{z\\_pos} in range(\trois):
-        pbc\_shift[\vbtt{x\\_pos}][\zero][\obtt{z\\_pos}] += pixel\_grid.n\_xy
+    for \vbtt{x\_pos} in range(\trois):
+      for \obtt{z\_pos} in range(\trois):
+        pbc\_shift[\vbtt{x\_pos}][\zero][\obtt{z\_pos}] += pixel\_grid.n\_xy
 
   elif pixel\_coord[\un] == pixel\_grid.n\_pix[\un] - \un: # pixel position on 'y' is max
-    for \vbtt{x\\_pos} in range(\trois):
-      for \obtt{z\\_pos} in range(\trois):
-        pbc\_shift[\vbtt{x\\_pos}][\deux][\obtt{z\\_pos}] -= pixel\_grid.n\_xy
+    for \vbtt{x\_pos} in range(\trois):
+      for \obtt{z\_pos} in range(\trois):
+        pbc\_shift[\vbtt{x\_pos}][\deux][\obtt{z\_pos}] -= pixel\_grid.n\_xy
 
   if pixel\_coord[\deux] == \zero:                         # pixel position on 'z' is min
-    for \vbtt{x\\_pos} in range(\trois):
-      for \rbtt{y\\_pos} in range(\trois):
-        pbc\_shift[\vbtt{x\\_pos}][\rbtt{y\\_pos}][\zero] += pixel\_grid.pixels
+    for \vbtt{x\_pos} in range(\trois):
+      for \rbtt{y\_pos} in range(\trois):
+        pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\zero] += pixel\_grid.pixels
 
   elif pixel\_coord[\deux] == pixel\_grid.n\_pix[\deux] - \un: # pixel position on 'z' is max
-    for \vbtt{x\\_pos} in range(\trois):
-      for \rbtt{y\\_pos} in range(\trois):
-        pbc\_shift[\vbtt{x\\_pos}][\rbtt{y\\_pos}][\deux] -= pixel\_grid.pixels
+    for \vbtt{x\_pos} in range(\trois):
+      for \rbtt{y\_pos} in range(\trois):
+        pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\deux] -= pixel\_grid.pixels
 \end{algorithm}
 
 \clearpage

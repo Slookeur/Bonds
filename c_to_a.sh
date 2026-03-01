@@ -11,6 +11,7 @@ function clean {
   sed 's/|//g' tmp_b > tmp_a
   sed 's/\\label{/\\label{algo-/g' tmp_a > tmp_b
   sed 's/_/\\_/g' tmp_b > tmp_a
+  sed 's/\\\\/\\/g' tmp_a > tmp_b
   #sed 's/|\\zero|/0/g' tmp_b > tmp_a
   #sed 's/|\\un|/1/g' tmp_a > tmp_b
   #sed 's/|\\deux|/2/g' tmp_b > tmp_a
@@ -35,8 +36,8 @@ function clean {
   #sed 's/|\\dbtt{axis}|/axis/g' tmp_a > tmp_b
   # sed 's/\\AA\\/Angstrom/g' tmp_a > tmp_b
 
-  rm -f tmp_b
-  mv tmp_a $out
+  rm -f tmp_a
+  mv tmp_b $out
 }
 
 
