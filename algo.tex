@@ -3,6 +3,8 @@
 \newcommand{\xdir}{\mbtt{x}}
 \newcommand{\ydir}{\mbtt{y}}
 \newcommand{\zdir}{\mbtt{z}}
+\newcommand{\xydir}{\bbtt{xy}}
+\newcommand{\xyzdir}{\rbtt{xyz}}
 \newcommand{\xmin}{\mbtt{x$_{min}$}}
 \newcommand{\ymin}{\mbtt{y$_{min}$}}
 \newcommand{\zmin}{\mbtt{z$_{min}$}}
@@ -85,7 +87,7 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
 
 \begin{algorithm}
 \begin{algorithmic}[1]
-\Procedure{Adjust PBC shift}{\xdir, \ydir, \zdir, pixel[3], shift[3][3][3]}
+\Procedure{pbc\_shift}{\xdir, \ydir, \zdir, \xydir, \xyzdir, pixel[3], shift[3][3][3]}
   \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
     \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
       \For{\obtt{z\_pos} = \un, $\dots$, \trois}
@@ -111,13 +113,13 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
   \If{pixel[\deux] = \un}
     \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
       \For{\obtt{z\_pos} = \un, $\dots$, \trois}
-	\State pbc\_shift[\vbtt{x\_pos}][\un][\obtt{z\_pos}] += (\xdir\ $\times$ \ydir)
+	\State pbc\_shift[\vbtt{x\_pos}][\un][\obtt{z\_pos}] += \xydir
       \EndFor
     \EndFor
   \ElsIf{pixel[\deux] = \ydir}
     \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
       \For{\obtt{z\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\trois][\obtt{z\_pos}] -= (\xdir\ $\times$ \ydir)
+        \State pbc\_shift[\vbtt{x\_pos}][\trois][\obtt{z\_pos}] -= \xydir
       \EndFor
     \EndFor
   \EndIf
@@ -125,13 +127,13 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
   \If{pixel\_coord[\trois] = \un}
     \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
       \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\un] += (\xdir\ $\times$ \ydir\ $\times$ \zdir)
+        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\un] += \xyzdir
       \EndFor
     \EndFor
   \ElsIf{pixel\_coord[\trois] = \zdir}
     \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
       \For{\rbtt{z\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\trois] -= (\xdir\ $\times$ \ydir\ $\times$ \zdir)
+        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\trois] -= \xyzdir
       \EndFor
     \EndFor
   \EndIf
