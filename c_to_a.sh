@@ -6,7 +6,7 @@ function clean {
 
   sed 's/lstlisting/algorithm/g' $file > tmp_a
   sed 's/\[language=C\]//g' tmp_a > tmp_b
-  sed 's/\[language=\[90\]FORTRAN}\]//g' tmp_b > tmp_a
+  sed 's/\[language={\[90\]FORTRAN}\]//g' tmp_b > tmp_a
   sed 's/\[language=Python\]//g' tmp_a > tmp_b
   sed 's/|//g' tmp_b > tmp_a
   sed 's/\\label{/\\label{algo-/g' tmp_a > tmp_b

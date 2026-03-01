@@ -5,7 +5,7 @@
 \subsection{FORTRAN90 code: data structures and global variables}
 \label{algo-f-pc-data}
 
-\begin{algorithm}[language={[90]FORTRAN}]
+\begin{algorithm}
 ! global data structures and variables used in the next code sections
 MODULE parameters
   
@@ -62,7 +62,7 @@ END MODULE parameters
 
 \subsection{FORTRAN90 code: set pixel periodic boundary condition shift}
 \label{algo-f-set-pshift}
-\begin{algorithm}[language={[90]FORTRAN}]
+\begin{algorithm}
 SUBROUTINE set\_pbc\_shift (grid, pixel\_coord, pbc\_shift)
   
   USE parameters
@@ -99,7 +99,7 @@ END SUBROUTINE set\_pbc\_shift
 
 \subsection{FORTRAN90 code: add atom to pixel}
 \label{algo-c-add\_atom\_pixel}
-\begin{algorithm}[language={[90]FORTRAN}]
+\begin{algorithm}
 SUBROUTINE add\_atom\_to\_pixel (the\_pixel, pixel\_coord, atom\_id, atom\_coord)
 
   USE parameters
@@ -137,7 +137,7 @@ END SUBROUTINE
 \subsection{FORTRAN90 code: preparation of the pixel grid}
 \label{algo-f-pc-grid}
 
-\begin{algorithm}[language={[90]FORTRAN}]
+\begin{algorithm}
 ! preparation of the pixel grid
 SUBROUTINE prepare\_pixel\_grid (use\_pbc, grid)
   
@@ -217,7 +217,7 @@ END SUBROUTINE prepare\_pixel\_grid
 
 \subsection{FORTRAN90 code: finding pixel neighbors}
 \label{algo-f-find-pn}
-\begin{algorithm}[language={[90]FORTRAN}]
+\begin{algorithm}
 SUBROUTINE find\_pixel\_neighbors (use\_pbc, the\_grid, the\_pix)
   
   USE parameters
@@ -294,7 +294,7 @@ END SUBROUTINE find\_pixel\_neighbors
 
 \subsection{FORTRAN90 code: inter-atomic distance calculation}
 
-\begin{algorithm}[language={[90]FORTRAN}]
+\begin{algorithm}
 ! evaluating the interatomic distance between 2 pixel atoms
 SUBROUTINE evaluate\_distance (use\_pbc, at\_i, at\_j, dist)
   
@@ -334,7 +334,7 @@ END SUBROUTINE evaluate\_distance
 \subsection{FORTRAN90 code: pixel search for first neighbor atoms}
 \label{algo-f-pc-pixel}
 
-\begin{algorithm}[language={[90]FORTRAN}]
+\begin{algorithm}
 SUBROUTINE pixel\_search\_for\_neighbors (use\_pbc)
 
   USE parameters
