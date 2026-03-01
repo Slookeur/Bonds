@@ -259,7 +259,7 @@ pixel\_grid * prepare\_pixel\_grid (bool use\_pbc)
         pixel\_pos[\dbtt{axis}] = (int)((f\_coord[\dbtt{axis}] * grid->n\_pix[\dbtt{axis}]);
       }
       pixel\_num = pixel\_pos[\zero] + pixel\_pos[\un] * grid->n\_pix[\zero] + pixel\_pos[\deux] * grid->n\_xy;
-      add\_atom\_to\_pixel (& grid->pixel\_list[pixel\_num], \cbtt{aid}, f\_coord);
+      add\_atom\_to\_pixel (\& grid->pixel\_list[pixel\_num], \cbtt{aid}, f\_coord);
     }
   }
   return grid;
@@ -315,17 +315,17 @@ void find\_pixel\_neighbors (bool use\_pbc, pixel\_grid * the\_grid, pixel * the
       for ( \obtt{zpos} = l\_start[\deux] ; \obtt{zpos} < l\_end[\deux] ; \obtt{zpos} ++ )
       {
         keep\_neighbor = TRUE;
-        if ( ! use\_pbc && boundary )
+        if ( ! use\_pbc \&\& boundary )
         {
-          if (( the\_pix->p\_xyz[\zero] == \zero && \vbtt{xpos} == \zero ) \textbar\textbar ( the\_pix->p\_xyz[\zero] == the\_grid->n\_pix[\zero] && \vbtt{xpos} == \deux ))
+          if (( the\_pix->p\_xyz[\zero] == \zero \&\& \vbtt{xpos} == \zero ) \textbar\textbar ( the\_pix->p\_xyz[\zero] == the\_grid->n\_pix[\zero] \&\& \vbtt{xpos} == \deux ))
           {
             keep\_neighbor = FALSE;
           }
-          else if (( the\_pix->p\_xyz[\un] == \zero && \rbtt{ypos} == \zero ) \textbar\textbar ( the\_pix->p\_xyz[\un] == the\_grid->n\_pix[\un] && \rbtt{ypos} == \deux ))
+          else if (( the\_pix->p\_xyz[\un] == \zero \&\& \rbtt{ypos} == \zero ) \textbar\textbar ( the\_pix->p\_xyz[\un] == the\_grid->n\_pix[\un] \&\& \rbtt{ypos} == \deux ))
           {
             keep\_neighbor = FALSE;
           }
-          else if (( the\_pix->p\_xyz[\deux] == \zero && \obtt{zpos} == \zero ) \textbar\textbar ( the\_pix->p\_xyz[\deux] == the\_grid->n\_pix[\deux] && \obtt{zpos} == \deux ))
+          else if (( the\_pix->p\_xyz[\deux] == \zero \&\& \obtt{zpos} == \zero ) \textbar\textbar ( the\_pix->p\_xyz[\deux] == the\_grid->n\_pix[\deux] \&\& \obtt{zpos} == \deux ))
           {
             keep\_neighbor = FALSE;
           }
@@ -408,7 +408,7 @@ void pixel\_search\_for\_neighbors (bool use\_pbc)
   for ( \vbtt{pix} = \zero ; \vbtt{pix} < all\_pixels->pixels ; \vbtt{pix} ++ )
   {
     // setting 'pix\_i' as pointer to pixel number 'pix'
-    pix\_i = & all\_pixels->pixel\_list[\vbtt{pix}];
+    pix\_i = \& all\_pixels->pixel\_list[\vbtt{pix}];
     // if pixel 'pix\_i' contains atom(s)
     if ( pix\_i->patoms )
     {
@@ -419,11 +419,11 @@ void pixel\_search\_for\_neighbors (bool use\_pbc)
       {
         \rbtt{pjx} = pix\_i->pixel\_neighbors[pid];
         // setting 'pix\_j' as pointer to pixel number 'pjx'
-        pix\_j = & all\_pixels->pixel\_list[\rbtt{pjx}];
+        pix\_j = \& all\_pixels->pixel\_list[\rbtt{pjx}];
         // checking pixel 'pix\_j' if it:
         // - contains atom(s)
         // - was not tested, otherwise the analysis would have been performed already
-        if ( pix\_j->patoms && ! pix\_j->tested )
+        if ( pix\_j->patoms \&\& ! pix\_j->tested )
         {
           // if 'pix\_i' and 'pix\_j' are the same, only test pair of different atoms
           l\_end = (\rbtt{pjx} != \vbtt{pix}) ? \zero : \un;
@@ -431,13 +431,13 @@ void pixel\_search\_for\_neighbors (bool use\_pbc)
           for ( \dbtt{aid} = \zero ; \dbtt{aid} < pix\_i->patoms - l\_end ; \dbtt{aid} ++ )
           {
             // set pointer to the first atom to test
-            at\_i = & pix\_i->pix\_atoms[\dbtt{aid}];
+            at\_i = \& pix\_i->pix\_atoms[\dbtt{aid}];
             lstart = (\rbtt{pjx} != \vbtt{pix}) ? \zero : \dbtt{aid} + \un;
             // for all atom(s) in 'pix\_j'
             for ( \cbtt{bid} = l\_start ; \cbtt{bid} < pix\_j->patoms ; \cbtt{bid} ++ )
             {
               // set pointer to the second atom to test
-              at\_j = & pix\_j->pix\_atoms[\cbtt{bid}];
+              at\_j = \& pix\_j->pix\_atoms[\cbtt{bid}];
               // evaluate interatomic distance
               Dij = evaluate\_distance (use\_pbc, at\_i, at\_j);
               if ( Dij.length < cutoff\_squared )
