@@ -138,8 +138,8 @@ def add\_atom\_to\_pixel(the\_pixel: Pixel, pixel\_coord: np.ndarray, atom\_id: 
 \# - bool use\_pbc : flag to set if PBC are used or not
 def prepare\_pixel\_grid(use\_pbc : bool):
   grid = PixelGrid()                                 \# create a new pixel grid
-  cmin = [float(\textquotesingleinf\textquotesingle)] * \trois                          \# initialize to infinity
-  cmax = [-float(\textquotesingleinf\textquotesingle)] * \trois                         \# initialize to negative infinity
+  cmin = [float({\textquotesingle}inf{\textquotesingle})] * \trois                          \# initialize to infinity
+  cmax = [-float({\textquotesingle}inf{\textquotesingle})] * \trois                         \# initialize to negative infinity
   pixel\_pos = np.zeros(3, dtype=int)
   
   if not use\_pbc:                                    \# without periodic boundary conditions
