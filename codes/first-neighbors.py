@@ -115,7 +115,11 @@ def prepare_pixel_grid(use_pbc : bool):
   cmax = [-float('inf')] * 3                         # initialize to negative infinity
   pixel_pos = np.zeros(3, dtype=int)
   
-  if not use_pbc:                                    # without periodic boundary conditions
+  if use_pbc:                                        # using periodic boundary conditions
+    for axis in range(3):                            # for x, y and z
+      # number of pixels on axis 'axis'
+      grid.n_pix[axis] = int(l_params[axis] / cutoff) + 1
+  else:                                              # without periodic boundary conditions
     for axis in range(3):
       cmin[axis] = cmax[axis] = c_coord[0][axis]
     for aid in range(1, atoms):                      # for all atoms
@@ -125,10 +129,6 @@ def prepare_pixel_grid(use_pbc : bool):
     for axis in range(3):                            # for x, y and z
       # number of pixels on axis 'axis'
       grid.n_pix[axis] = int((cmax[axis] - cmin[axis]) / cutoff) + 1
-  else:                                              # Using periodic boundary conditions
-    for axis in range(3):                            # for x, y and z
-      # number of pixels on axis 'axis'
-      grid.n_pix[axis] = int(l_params[axis] / cutoff) + 1
   
   for axis in range(3):                              # for x, y and z
     # correction if the number of pixels on 'axis' is too small
@@ -139,13 +139,7 @@ def prepare_pixel_grid(use_pbc : bool):
   
   grid.pixel_list = [Pixel(pid=i) for i in range(grid.pixels)]
 
-  if not use_pbc:                                    # without periodic boundary conditions
-    for aid in range(atoms):                         # for all atoms
-      for axis in range(3):                          # for x, y and z
-        pixel_pos[axis] = int((c_coord[aid][axis] - cmin[axis]) / cutoff)
-      pixel_num = pixel_pos[0] + pixel_pos[1] * grid.n_pix[0] + pixel_pos[2] * grid.n_xy
-      add_atom_to_pixel(grid.pixel_list[pixel_num], pixel_pos, aid, c_coord[aid])
-  else:                                              # using periodic boundary conditions
+  if use_pbc:                                        # using periodic boundary conditions
     for aid in range(atoms):                         # for all atoms
       # with 'matrix_multiplication' a user defined function to perform the operation
       f_coord = matrix_multiplication(cart_to_frac, c_coord[aid])
@@ -154,7 +148,13 @@ def prepare_pixel_grid(use_pbc : bool):
         pixel_pos[axis] = int(f_coord[axis] * grid.n_pix[axis])
       pixel_num = pixel_pos[0] + pixel_pos[1] * grid.n_pix[0] + pixel_pos[2] * grid.n_xy
       add_atom_to_pixel(grid.pixel_list[pixel_num], pixel_pos, aid, f_coord)
-  
+  else:                                              # without periodic boundary conditions
+    for aid in range(atoms):                         # for all atoms
+      for axis in range(3):                          # for x, y and z
+        pixel_pos[axis] = int((c_coord[aid][axis] - cmin[axis]) / cutoff)
+      pixel_num = pixel_pos[0] + pixel_pos[1] * grid.n_pix[0] + pixel_pos[2] * grid.n_xy
+      add_atom_to_pixel(grid.pixel_list[pixel_num], pixel_pos, aid, c_coord[aid])
+ 
   return grid
 
 

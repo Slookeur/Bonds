@@ -180,7 +180,14 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   float f_coord[3];         // float fractional coordinates
 
   grid = malloc(sizeof*grid);
-  if ( ! use_pbc )                              // without periodic boundary conditions
+  if ( use_pbc )                    // using periodic boundary conditions
+  {
+    for ( axis = 0 ; axis < 3 ; axis ++ )       // For x, y and z
+    {
+      grid->n_pix[axis] = (int)(l_params[axis] / cutoff) + 1; // number of pixel(s) on axis 'axis'
+    }
+  }
+  else                              // without periodic boundary conditions
   {
     for ( axis = 0 ; axis < 3 ; axis ++ ) cmin[axis] = cmax[axis] = c_coord[0][axis];
     for ( aid = 1 ; aid < atoms ; aid ++ )      // For all atoms
@@ -194,13 +201,6 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     for ( axis = 0 ; axis < 3 ; axis ++ )       // For x, y and z
     {
       grid->n_pix[axis] = (int)((cmax[axis] - cmin[axis]) / cutoff) + 1; // number of pixel(s) on axis 'axis'
-    }
-  }
-  else  // using periodic boundary conditions
-  {
-    for ( axis = 0 ; axis < 3 ; axis ++ )       // For x, y and z
-    {
-      grid->n_pix[axis] = (int)(l_params[axis] / cutoff) + 1; // number of pixel(s) on axis 'axis'
     }
   }
   for ( axis = 0 ; axis < 3 ; axis ++ )         // For x, y and z
@@ -217,19 +217,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     grid->pixel_list[pixel_num].patoms = 0;
     grid->pixel_list[pixel_num].tested = FALSE;
   }
-  if ( ! use_pbc )                              // without periodic boundary conditions
-  {
-    for ( aid = 0 ; aid < atoms ; aid ++ )      // for all atoms
-    {
-      for ( axis = 0 ; axis < 3 ; axis ++ )     // for x, y and z
-      {
-        pixel_pos[axis] = (int)((c_coord[aid][axis] - cmin[axis])/cutoff);
-      }
-      pixel_num = pixel_pos[0] + pixel_pos[1] * grid->n_pix[0] + pixel_pos[2] * grid->n_xy;
-      add_atom_to_pixel (grid, pixel_num, pixel_pos, aid, c_coord[aid]);
-    }
-  }
-  else                                          // using periodic boundary conditions
+  if ( use_pbc )                                // using periodic boundary conditions
   {
     for ( aid = 0 ; aid < atoms ; aid ++ )      // for all atoms
     {
@@ -242,6 +230,18 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
       }
       pixel_num = pixel_pos[0] + pixel_pos[1] * grid->n_pix[0] + pixel_pos[2] * grid->n_xy;
       add_atom_to_pixel (& grid->pixel_list[pixel_num], aid, f_coord);
+    }
+  }
+  else                                          // without periodic boundary conditions
+  {
+    for ( aid = 0 ; aid < atoms ; aid ++ )      // for all atoms
+    {
+      for ( axis = 0 ; axis < 3 ; axis ++ )     // for x, y and z
+      {
+        pixel_pos[axis] = (int)((c_coord[aid][axis] - cmin[axis])/cutoff);
+      }
+      pixel_num = pixel_pos[0] + pixel_pos[1] * grid->n_pix[0] + pixel_pos[2] * grid->n_xy;
+      add_atom_to_pixel (grid, pixel_num, pixel_pos, aid, c_coord[aid]);
     }
   }
   return grid;

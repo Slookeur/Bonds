@@ -134,7 +134,12 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   REAL, DIMENSION(3)               :: cmin, cmax       ! real precision coordinates min, max
   REAL, DIMENSION(3)               :: f_coord          ! real precision fractional coordinates
   
-  if ( .not. use_pbc ) then                            ! without periodic boundary conditions
+  if ( use_pbc ) then                                  ! using periodic boundary conditions
+      do axis = 1 , 3                                    ! for x, y and z
+      ! number of pixel(s) on axis 'axis'
+      grid%n_pix(axis) = INT(l_params(axis) / cutoff) + 1
+    enddo
+  else                                                 ! without periodic boundary conditions
     do axis = 1 , 3
       cmin(axis) = c_coord(1,axis)
       cmax(axis) = c_coord(1,axis)
@@ -148,11 +153,6 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
     do axis = 1 , 3                                    ! for x, y and z
       ! number of pixel(s) on axis 'axis'
       grid%n_pix(axis) = INT((cmax(axis) - cmin(axis)) / cutoff) + 1
-    enddo
-  else                                                 ! using periodic boundary conditions
-    do axis = 1 , 3                                    ! for x, y and z
-      ! number of pixel(s) on axis 'axis'
-      grid%n_pix(axis) = INT(l_params(axis) / cutoff) + 1
     enddo
   endif
   do axis = 1 , 3                                      ! for x, y and z
@@ -171,16 +171,8 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
     grid%pixel_list(pixel_num)%patoms = 0
     grid%pixel_list(pixel_num)%tested = .false.
   enddo
-  if ( .not. use_pbc ) then                            ! without periodic boundary conditions
-    do aid = 1 , atoms                                 ! for all atoms
-      do axis = 1 , 3                                  ! for x, y and z
-        pixel_pos(axis) = INT( (c_coord(aid,axis) - cmin(axis) )/ cutoff)
-      enddo
-      pixel_num = pixel_pos(1) + pixel_pos(2) * grid%n_pix(1) + pixel_pos(3) * grid%n_xy + 1
-      call add_atom_to_pixel (grid%pixel_list(pixel_num), pixel_pos, aid, c_coord(aid,:))
-    enddo
-  else                                                 ! using periodic boundary conditions
-    do aid = 1 , atoms                                 ! for all atoms
+  if ( use_pbc ) then                                  ! using periodic boundary conditions
+  do aid = 1 , atoms                                 ! for all atoms
      f_coord = MATMUL ( c_coord(aid), cart_to_frac )
      do axis = 1 , 3                                   ! for x, y and z
        f_coord(axis) = f_coord(axis) - floor(f_coord(axis))
@@ -188,6 +180,14 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
      enddo
      pixel_num = pixel_pos(1) + pixel_pos(2) * grid%n_pix(1) + pixel_pos(3) * grid%n_xy + 1
      call add_atom_to_pixel (grid%pixel_list(pixel_num), pixel_pos, aid, f_coord)
+    enddo
+  else                                                 ! without periodic boundary conditions
+    do aid = 1 , atoms                                 ! for all atoms
+      do axis = 1 , 3                                  ! for x, y and z
+        pixel_pos(axis) = INT( (c_coord(aid,axis) - cmin(axis) )/ cutoff)
+      enddo
+      pixel_num = pixel_pos(1) + pixel_pos(2) * grid%n_pix(1) + pixel_pos(3) * grid%n_xy + 1
+      call add_atom_to_pixel (grid%pixel_list(pixel_num), pixel_pos, aid, c_coord(aid,:))
     enddo
   endif
 
