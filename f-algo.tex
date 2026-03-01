@@ -6,6 +6,7 @@
 \label{algo-f-pc-data}
 
 \begin{algorithm}
+\begin{algorithmic}
 ! global data structures and variables used in the next code sections
 MODULE parameters
   
@@ -56,6 +57,7 @@ MODULE parameters
   REAL, DIMENSION(\trois,\trois)                              :: frac\_to\_cart       ! fractional to Cartesian coordinates matrix
 
 END MODULE parameters
+\end{algorithmic}
 \end{algorithm}
 
 \clearpage
@@ -63,6 +65,7 @@ END MODULE parameters
 \subsection{FORTRAN90 code: set pixel periodic boundary condition shift}
 \label{algo-f-set-pshift}
 \begin{algorithm}
+\begin{algorithmic}
 SUBROUTINE set\_pbc\_shift (grid, pixel\_coord, pbc\_shift)
   
   USE parameters
@@ -93,6 +96,7 @@ SUBROUTINE set\_pbc\_shift (grid, pixel\_coord, pbc\_shift)
   endif
   
 END SUBROUTINE set\_pbc\_shift
+\end{algorithmic}
 \end{algorithm}
 
 \clearpage
@@ -100,6 +104,7 @@ END SUBROUTINE set\_pbc\_shift
 \subsection{FORTRAN90 code: add atom to pixel}
 \label{algo-c-add\_atom\_pixel}
 \begin{algorithm}
+\begin{algorithmic}
 SUBROUTINE add\_atom\_to\_pixel (the\_pixel, pixel\_coord, atom\_id, atom\_coord)
 
   USE parameters
@@ -130,6 +135,7 @@ SUBROUTINE add\_atom\_to\_pixel (the\_pixel, pixel\_coord, atom\_id, atom\_coord
   enddo
 
 END SUBROUTINE
+\end{algorithmic}
 \end{algorithm}
 
 \clearpage
@@ -138,6 +144,7 @@ END SUBROUTINE
 \label{algo-f-pc-grid}
 
 \begin{algorithm}
+\begin{algorithmic}
 ! preparation of the pixel grid
 SUBROUTINE prepare\_pixel\_grid (use\_pbc, grid)
   
@@ -211,6 +218,7 @@ SUBROUTINE prepare\_pixel\_grid (use\_pbc, grid)
   endif
 
 END SUBROUTINE prepare\_pixel\_grid
+\end{algorithmic}
 \end{algorithm}
 
 \clearpage
@@ -218,6 +226,7 @@ END SUBROUTINE prepare\_pixel\_grid
 \subsection{FORTRAN90 code: finding pixel neighbors}
 \label{algo-f-find-pn}
 \begin{algorithm}
+\begin{algorithmic}
 SUBROUTINE find\_pixel\_neighbors (use\_pbc, the\_grid, the\_pix)
   
   USE parameters
@@ -288,6 +297,7 @@ SUBROUTINE find\_pixel\_neighbors (use\_pbc, the\_grid, the\_pix)
   the\_pix%neighbors = \bftt{nnp}
   
 END SUBROUTINE find\_pixel\_neighbors
+\end{algorithmic}
 \end{algorithm}
 
 \clearpage
@@ -295,6 +305,7 @@ END SUBROUTINE find\_pixel\_neighbors
 \subsection{FORTRAN90 code: inter-atomic distance calculation}
 
 \begin{algorithm}
+\begin{algorithmic}
 ! evaluating the interatomic distance between 2 pixel atoms
 SUBROUTINE evaluate\_distance (use\_pbc, at\_i, at\_j, dist)
   
@@ -327,6 +338,7 @@ SUBROUTINE evaluate\_distance (use\_pbc, at\_i, at\_j, dist)
   ! - the squared value for Dij: no time consuming square root calculation !
   ! - the components of the distance vector on x, y and z
 END SUBROUTINE evaluate\_distance
+\end{algorithmic}
 \end{algorithm}
 
 \clearpage
@@ -335,6 +347,7 @@ END SUBROUTINE evaluate\_distance
 \label{algo-f-pc-pixel}
 
 \begin{algorithm}
+\begin{algorithmic}
 SUBROUTINE pixel\_search\_for\_neighbors (use\_pbc)
 
   USE parameters
@@ -405,4 +418,5 @@ SUBROUTINE pixel\_search\_for\_neighbors (use\_pbc)
   enddo
   
 END SUBROUTINE pixel\_search\_for\_neighbors
+\end{algorithmic}
 \end{algorithm}

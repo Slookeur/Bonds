@@ -4,10 +4,11 @@
 \label{algo-c-pc-data}
 
 \begin{algorithm}
+\begin{algorithmic}
 // global data structures and variables used in the next code sections
 
-#define TRUE \un
-#define FALSE \zero
+\#define TRUE \un
+\#define FALSE \zero
 
 // atom in pixel data structure
 typedef struct pixel\_atom pixel\_atom;
@@ -62,6 +63,7 @@ float cutoff\_squared;      // squared value for the cutoff
 float l\_params[\trois];         // lattice a, b and c
 float cart\_to\_frac[\trois][\trois];  // Cartesian to fractional coordinates matrix
 float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates matrix
+\end{algorithmic}
 \end{algorithm}
 
 \clearpage
@@ -73,6 +75,7 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
 %// - int pixel\_coord[\trois]     : the pixel coordinates in the grid
 %// - int pbc\_shift[\trois][\trois][\trois] : the shift, correction, to be calculated
 \begin{algorithm}
+\begin{algorithmic}
 void set\_pbc\_shift (pixel\_grid * grid, int pixel\_coord[\trois], int pbc\_shift[\trois][\trois][\trois])
 {
   int \vbtt{x\_pos}, \rbtt{y\_pos}, \obtt{z\_pos}; // loop iterators
@@ -147,6 +150,7 @@ void set\_pbc\_shift (pixel\_grid * grid, int pixel\_coord[\trois], int pbc\_shi
     }
   }
 }
+\end{algorithmic}
 \end{algorithm}
 
 \clearpage
@@ -154,6 +158,7 @@ void set\_pbc\_shift (pixel\_grid * grid, int pixel\_coord[\trois], int pbc\_shi
 \subsection{C code: add atom to pixel}
 \label{algo-c-add\_atom\_pixel}
 \begin{algorithm}
+\begin{algorithmic}
 void add\_atom\_to\_pixel (pixel * the\_pixel, int pixel\_coord[\trois], int atom\_id, float atom\_coord[\trois])
 {
   int \dbtt{axis};
@@ -180,6 +185,7 @@ void add\_atom\_to\_pixel (pixel * the\_pixel, int pixel\_coord[\trois], int ato
   // increment the number of atom(s) in the pixel
   the\_pixel->patoms ++;
 }
+\end{algorithmic}
 \end{algorithm}
 
 \clearpage
@@ -187,6 +193,7 @@ void add\_atom\_to\_pixel (pixel * the\_pixel, int pixel\_coord[\trois], int ato
 \subsection{C code: preparation of the pixel grid}
 \label{algo-c-pc-grid}
 \begin{algorithm}
+\begin{algorithmic}
 pixel\_grid * prepare\_pixel\_grid (bool use\_pbc)
 {
   pixel\_grid * grid;        // pointer to the pixel grid to create
@@ -264,6 +271,7 @@ pixel\_grid * prepare\_pixel\_grid (bool use\_pbc)
   }
   return grid;
 }
+\end{algorithmic}
 \end{algorithm}
 
 \clearpage
@@ -271,6 +279,7 @@ pixel\_grid * prepare\_pixel\_grid (bool use\_pbc)
 \subsection{C code: finding pixel neighbors}
 \label{algo-c-find-pn}
 \begin{algorithm}
+\begin{algorithmic}
 // finding neighbor pixels for pixel in the grid
 // - bool use\_pbc          : flag to set if PBC are used or not
 // - pixel\_grid * the\_grid : pointer to the pixel grid
@@ -342,12 +351,14 @@ void find\_pixel\_neighbors (bool use\_pbc, pixel\_grid * the\_grid, pixel * the
   }
   the\_pix->neighbors = \bftt{nnp};
 }
+\end{algorithmic}
 \end{algorithm}
 
 \clearpage
 
 \subsection{C code: inter-atomic distance calculation}
 \begin{algorithm}
+\begin{algorithmic}
 // evaluating the interatomic distance between 2 pixel atoms
 // - bool use\_pbc      : flag to set if PBC are used or not
 // - pixel\_atom * at\_i : pointer to first pixel atom
@@ -382,6 +393,7 @@ distance evaluate\_distance (bool use\_pbc, pixel\_atom * at\_i, pixel\_atom * a
   // - the components of the distance vector on x, y and z
   return dist;
 }
+\end{algorithmic}
 \end{algorithm}
 
 \clearpage
@@ -389,6 +401,7 @@ distance evaluate\_distance (bool use\_pbc, pixel\_atom * at\_i, pixel\_atom * a
 \subsection{C code: pixel search for first neighbor atoms}
 \label{algo-c-pc-pixel}
 \begin{algorithm}
+\begin{algorithmic}
 // searching for first neighbor atoms using the grid pixelation/partitioning method
 // - bool use\_pbc : flag to set if PBC are used or not
 void pixel\_search\_for\_neighbors (bool use\_pbc)
@@ -453,4 +466,5 @@ void pixel\_search\_for\_neighbors (bool use\_pbc)
     }
   }
 }
+\end{algorithmic}
 \end{algorithm}
