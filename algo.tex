@@ -212,20 +212,20 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
 
   \If{use\_pbc}
     \For{\dbtt{axis} = \un, $\dots$, \trois}
-      \State grid->n\_pix[\dbtt{axis}] = $\left\lfloor (l\_params[\dbtt{axis}] / cutoff) \right\rfloor$ + \un
+      \State grid->n\_pix[\dbtt{axis}] = $\left\lfloor ({\textrm{l\_params[\dbtt{axis}] / cutoff}}) \right\rfloor$ + \un
     \EndFor
   \Else
     \For{\dbtt{axis} = \un, $\dots$, \trois}
       \State cmin = cmax = c\_coord[\un][\dbtt{axis}]
     \EndFor
-    \For{\dbtt{aid} = \deux, $\dots$, atoms}
+    \For{\cbtt{aid} = \deux, $\dots$, atoms}
       \For{\dbtt{axis} = \un, $\dots$, \trois}
 	\State cmin = min (cmin, c\_coord[\cbtt{aid}][\dbtt{axis}])
 	\State cmax = min (cmax, c\_coord[\cbtt{aid}][\dbtt{axis}])
       \EndFor
     \EndFor
     \For{\dbtt{axis} = \un, $\dots$, \trois}
-      \State grid->n\_pix[\dbtt{axis}] = $\left\lfloor (cmax[\dbtt{axis} - cmin[\dbtt{axis}] / cutoff) \right\rfloor$ + \un
+      \State grid->n\_pix[\dbtt{axis}] = $\left\lfloor ({\textrm{cmax[\dbtt{axis} - cmin[\dbtt{axis}] / cutoff}}) \right\rfloor$ + \un
     \EndFor
   \EndIf
   \State
