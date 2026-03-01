@@ -95,44 +95,44 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
   \EndFor
   
   y
-  \If{pixel\_coord[\xdir] = \xmin}
+  \If{pixel\_coord[\un] = \un}
     \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
       \For{\obtt{z\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\un][\rbtt{y\_pos}][\obtt{z\_pos}] = \xmax
+        \State pbc\_shift[\un][\rbtt{y\_pos}][\obtt{z\_pos}] = \xdir
       \EndFor
     \EndFor
-  \ElsIf{pixel\_coord[\xdir] = \xmax}
+  \ElsIf{pixel\_coord[\un] = \xdir}
     \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
       \For{\obtt{z\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\trois][\rbtt{y\_pos}][\obtt{z\_pos}] = - \xmax
+        \State pbc\_shift[\trois][\rbtt{y\_pos}][\obtt{z\_pos}] = - \xdir
       \EndFor
     \EndFor
   \EndIf
 
-  \If{pixel\_coord[\ydir] = \ymin}
+  \If{pixel\_coord[\deux] = \un}
     \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
       \For{\obtt{z\_pos} = \un, $\dots$, \trois}
-	\State pbc\_shift[\vbtt{x\_pos}][\un][\obtt{z\_pos}] += (\xmax $\times$ \ymax)
+	\State pbc\_shift[\vbtt{x\_pos}][\un][\obtt{z\_pos}] += (\xdir $\times$ \ydir)
       \EndFor
     \EndFor
-  \ElsIf{pixel\_coord[\ydir] = \ymax}
+  \ElsIf{pixel\_coord[\deux] = \ydir}
     \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
       \For{\obtt{z\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\trois][\obtt{z\_pos}] -= (\xmax $\times$ \ymax)
+        \State pbc\_shift[\vbtt{x\_pos}][\trois][\obtt{z\_pos}] -= (\xdir $\times$ \ydir)
       \EndFor
     \EndFor
   \EndIf
 
-  \If{pixel\_coord[\zdir] = \zmin}
+  \If{pixel\_coord[\trois] = \un}
     \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
       \For{\rbtt{y\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\un] += (\xmax $\times$ \ymax $\times$ \zmax)
+        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\un] += (\xdir $\times$ \ydir $\times$ \zdir)
       \EndFor
     \EndFor
-  \ElsIf{pixel\_coord[\zdir] = \zmax}
+  \ElsIf{pixel\_coord[\trois] = \zdir}
     \For{\vbtt{x\_pos} = \un, $\dots$, \trois}
       \For{\rbtt{z\_pos} = \un, $\dots$, \trois}
-        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\trois] -= (\xmax $\times$ \ymax $\times$ \zmax)
+        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\trois] -= (\xdir $\times$ \ydir $\times$ \zdir)
       \EndFor
     \EndFor
   \EndIf
