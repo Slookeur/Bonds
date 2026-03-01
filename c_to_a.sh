@@ -39,7 +39,7 @@ function clean {
 }
 
 
-clean 'c-code.tex' 'c-aglo.tex'
+clean 'c-code.tex' 'c-algo.tex'
 clean 'f-code.tex' 'f-algo.tex'
 clean 'p-code.tex' 'p-algo.tex'
 
