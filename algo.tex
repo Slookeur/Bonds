@@ -212,7 +212,7 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
 
   \If{use\_pbc}
     \For{\dbtt{axis} = \un, $\dots$, \trois}
-      \State grid->n\_pix[\dbtt{axis}] = $\left\lfloor ({\textrm{l\_params[\dbtt{axis}] / cutoff}}) \right\rfloor$ + \un
+      \State grid->n\_pix[\dbtt{axis}] = $\lfloor$ (l\_params[\dbtt{axis}] / cutoff) $\rfloor$ + \un
     \EndFor
   \Else
     \For{\dbtt{axis} = \un, $\dots$, \trois}
@@ -225,7 +225,7 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
       \EndFor
     \EndFor
     \For{\dbtt{axis} = \un, $\dots$, \trois}
-      \State grid->n\_pix[\dbtt{axis}] = $\left\lfloor ({\textrm{cmax[\dbtt{axis} - cmin[\dbtt{axis}] / cutoff}}) \right\rfloor$ + \un
+      \State grid->n\_pix[\dbtt{axis}] = $\lfloor$ (cmax[\dbtt{axis} - cmin[\dbtt{axis}] / cutoff) $\rfloor$ + \un
     \EndFor
   \EndIf
   \State
@@ -247,18 +247,18 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
       \State f\_coord = matrix\_multiplication (cart\_to\_frac, c\_coord[\cbtt{aid}])
       \For{\dbtt{axis} = \un, $\dots$, \trois}
         \State f\_coord[\dbtt{axis}] -= $\lfloor$ f\_coord[\dbtt{axis}] $\rfloor$
-        \State  pixel\_pos[\dbtt{axis}] = $\lfloor$ f\_coord[\dbtt{axis}] $\times$ grid->n\_pix[\dbtt{axis}] $\rfloor$
+        \State pix[\dbtt{axis}] = $\lfloor$ f\_coord[\dbtt{axis}] $\times$ grid->n\_pix[\dbtt{axis}] $\rfloor$
       \EndFor
-      \State pixel\_num = pixel\_pos[\un] + pixel\_pos[\deux] $\times$ grid->n\_pix[\un] + pixel\_pos[\trois] $\times$ grid->n\_xy
-      \State add\_atom\_to\_pixel (\& grid->pixel\_list[pixel\_num], \cbtt{aid}, f\_coord)
+      \State pixel\_id = pix[\un] + pix[\deux] $\times$ grid->n\_pix[\un] + pix[\trois] $\times$ grid->n\_xy
+      \State add\_atom\_to\_pixel (\& grid->pixel\_list[pixel\_id], \cbtt{aid}, f\_coord)
     \EndFor
   \Else
     \For{\dbtt{aid} = \un, $\dots$, atoms}
       \For{\dbtt{axis} = \un, $\dots$, \trois}
-	\State  pixel\_pos[\dbtt{axis}] = $\lfloor$ (c\_coord[\dbtt{axis}] - cmin[\dbtt{axis}]) / Cutoff $\rfloor$
+	\State  pix[\dbtt{axis}] = $\lfloor$ (c\_coord[\dbtt{axis}] - cmin[\dbtt{axis}]) / Cutoff $\rfloor$
       \EndFor
-      \State pixel\_num = pixel\_pos[\un] + pixel\_pos[\deux] $\times$ grid->n\_pix[\un] + pixel\_pos[\trois] $\times$ grid->n\_xy
-      \State add\_atom\_to\_pixel (\& grid->pixel\_list[pixel\_num], \cbtt{aid}, c\_coord)
+      \State pixel\_id = pix[\un] + pix[\deux] $\times$ grid->n\_pix[\un] + pix[\trois] $\times$ grid->n\_xy
+      \State add\_atom\_to\_pixel (\& grid->pixel\_list[pixel\_id], \cbtt{aid}, c\_coord)
     \EndFor
   \EndIf
   \Return grid
