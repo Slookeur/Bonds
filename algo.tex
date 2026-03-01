@@ -88,6 +88,7 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
 \begin{algorithmic}[1]
 {\footnotesize{
 \Procedure{pbc\_shift}{\xdir, \ydir, \zdir, \xydir, \xyzdir, pixel[\trois], shift[\trois][\trois][\trois]}
+
   \For{\vbtt{x} = \un, $\dots$, \trois}
     \For{\rbtt{y} = \un, $\dots$, \trois}
       \For{\obtt{z} = \un, $\dots$, \trois}
@@ -95,7 +96,7 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
       \EndFor
     \EndFor
   \EndFor
-  
+  \State
   \If{pixel[\un] = \un}
     \For{\rbtt{y} = \un, $\dots$, \trois}
       \For{\obtt{z} = \un, $\dots$, \trois}
@@ -109,7 +110,7 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
       \EndFor
     \EndFor
   \EndIf
-
+  \State
   \If{pixel[\deux] = \un}
     \For{\vbtt{x} = \un, $\dots$, \trois}
       \For{\obtt{z} = \un, $\dots$, \trois}
@@ -123,7 +124,7 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
       \EndFor
     \EndFor
   \EndIf
-
+  \State
   \If{pixel\_coord[\trois] = \un}
     \For{\vbtt{x} = \un, $\dots$, \trois}
       \For{\rbtt{y} = \un, $\dots$, \trois}
@@ -149,8 +150,7 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
 
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{}
-void add\_atom\_to\_pixel (pixel * the\_pixel, int pixel\_coord[\trois], int atom\_id, float atom\_coord[\trois])
+\Procedure{add\_atom\_to\_pixel}{pixel * the\_pixel, int pixel\_coord[\trois], int atom\_id, float atom\_coord[\trois]}
 {
   int \dbtt{axis};
   if (! the\_pixel->patoms) 
