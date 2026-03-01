@@ -80,9 +80,9 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
     \State \For{\rbtt{y\_pos} = 1, $\dots$, \trois}
       \State \For{\obtt{z\_pos} = 1, $\dots$, \trois}
         \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\obtt{z\_pos}] = \zero
-      \State \EndFor
-    \State \EndFor
-  \State \EndFor
+      \EndFor
+    \EndFor
+  \EndFor
   
   \State \If{pixel\_coord[\zero] = \zero}
     \State \For{\rbtt{y\_pos} = 1, $\dots$, \trois}
