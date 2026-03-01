@@ -10,10 +10,10 @@
 #define FALSE \zero
 
 // atom in pixel data structure
-typedef struct pixel_atom pixel_atom;
-struct pixel_atom
+typedef struct pixel\_atom pixel\_atom;
+struct pixel\_atom
 {
-  int atom_id;             // the atom ID
+  int atom\_id;             // the atom ID
   float coord[\trois];          // the atom coordinates on x, y and z
 };
 
@@ -22,22 +22,22 @@ typedef struct pixel pixel;
 struct pixel
 {
   int pid;                 // the pixel number
-  int p_xyz[\trois];            // the pixel coordinates in the grid
+  int p\_xyz[\trois];            // the pixel coordinates in the grid
   bool tested;             // was the pixel checked already
   int patoms;              // number of atom(s) in pixel
-  pixel_atom * pix_atoms;  // list of atom(s) in the pixel, to be allocated
+  pixel\_atom * pix\_atoms;  // list of atom(s) in the pixel, to be allocated
   int neighbors;           // number of neighbors for pixel
-  int pixel_neighbors[\mbtt{27}]; // the list of neighbor pixels, maximum 27
+  int pixel\_neighbors[\mbtt{27}]; // the list of neighbor pixels, maximum 27
 };
 
 // pixel grid data structure
-typedef struct pixel_grid pixel_grid;
-struct pixel_grid
+typedef struct pixel\_grid pixel\_grid;
+struct pixel\_grid
 {
   int pixels;              // total number of pixels in the grid
-  int n_pix[\trois];            // number of pixel(s) on each axis
-  int n_xy;                // number of pixels in the plan xy
-  pixel * pixel_list;      // pointer to the pixels, to be allocated
+  int n\_pix[\trois];            // number of pixel(s) on each axis
+  int n\_xy;                // number of pixels in the plan xy
+  pixel * pixel\_list;      // pointer to the pixels, to be allocated
 };
 
 // bond distance data structure
@@ -54,14 +54,14 @@ struct distance
 
 // model description
 int atoms;                 // the total number of atom(s)
-float ** c_coord;          // list of Cartesian coordinates: c_coord[atoms][3]
+float ** c\_coord;          // list of Cartesian coordinates: c\_coord[atoms][3]
 float cutoff;              // the cutoff to define atomic bond(s)
-float cutoff_squared;      // squared value for the cutoff
+float cutoff\_squared;      // squared value for the cutoff
 
 // model box description
-float l_params[\trois];         // lattice a, b and c
-float cart_to_frac[\trois][\trois];  // Cartesian to fractional coordinates matrix
-float frac_to_cart[\trois][\trois];  // fractional to Cartesian coordinates matrix
+float l\_params[\trois];         // lattice a, b and c
+float cart\_to\_frac[\trois][\trois];  // Cartesian to fractional coordinates matrix
+float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates matrix
 \end{algorithm}
 
 \clearpage
@@ -69,80 +69,80 @@ float frac_to_cart[\trois][\trois];  // fractional to Cartesian coordinates matr
 \subsection{C code: set periodic boundary condition pixel shift}
 \label{algo-c-set-pshift}
 %// Adjust, if needed, shift to search for pixel neighbor(s) using PBC
-%// - pixel_grid * grid      : the pixel grid
-%// - int pixel_coord[\trois]     : the pixel coordinates in the grid
-%// - int pbc_shift[\trois][\trois][\trois] : the shift, correction, to be calculated
+%// - pixel\_grid * grid      : the pixel grid
+%// - int pixel\_coord[\trois]     : the pixel coordinates in the grid
+%// - int pbc\_shift[\trois][\trois][\trois] : the shift, correction, to be calculated
 \begin{algorithm}
-void set_pbc_shift (pixel_grid * grid, int pixel_coord[\trois], int pbc_shift[\trois][\trois][\trois])
+void set\_pbc\_shift (pixel\_grid * grid, int pixel\_coord[\trois], int pbc\_shift[\trois][\trois][\trois])
 {
-  int \vbtt{x\_pos}, \rbtt{y\_pos}, \obtt{z\_pos}; // loop iterators
-  for ( \vbtt{x\_pos} = \zero ; \vbtt{x\_pos} < \trois ; \vbtt{x\_pos} ++ )
+  int \vbtt{x\\_pos}, \rbtt{y\\_pos}, \obtt{z\\_pos}; // loop iterators
+  for ( \vbtt{x\\_pos} = \zero ; \vbtt{x\\_pos} < \trois ; \vbtt{x\\_pos} ++ )
   {
-    for ( \rbtt{y\_pos} = \zero ; \rbtt{y\_pos} < \trois ; \rbtt{y\_pos} ++ )
+    for ( \rbtt{y\\_pos} = \zero ; \rbtt{y\\_pos} < \trois ; \rbtt{y\\_pos} ++ )
     {
-      for ( \obtt{z\_pos} = \zero ; \obtt{z\_pos} < \trois ; \obtt{z\_pos} ++ )
+      for ( \obtt{z\\_pos} = \zero ; \obtt{z\\_pos} < \trois ; \obtt{z\\_pos} ++ )
       {
-        pbc_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\obtt{z\_pos}] = \zero;             // initialization without any shift
+        pbc\_shift[\vbtt{x\\_pos}][\rbtt{y\\_pos}][\obtt{z\\_pos}] = \zero;             // initialization without any shift
       }
     }
   }
-  if ( pixel_coord[\zero] == \zero )                            // pixel position on 'x' is min
+  if ( pixel\_coord[\zero] == \zero )                            // pixel position on 'x' is min
   {
-    for ( \rbtt{y\_pos} = \zero ; \rbtt{y\_pos} < \trois ; \rbtt{y\_pos} ++ )
+    for ( \rbtt{y\\_pos} = \zero ; \rbtt{y\\_pos} < \trois ; \rbtt{y\\_pos} ++ )
     {
-      for ( \obtt{z\_pos} = \zero ; \obtt{z\_pos} < \trois ; \obtt{z\_pos} ++ )
+      for ( \obtt{z\\_pos} = \zero ; \obtt{z\\_pos} < \trois ; \obtt{z\\_pos} ++ )
       {
-        pbc_shift[\zero][\rbtt{y\_pos}][\obtt{z\_pos}] = grid->n_pix[\zero];
+        pbc\_shift[\zero][\rbtt{y\\_pos}][\obtt{z\\_pos}] = grid->n\_pix[\zero];
       }
     }
   }
-  else if ( pixel_coord[\zero] == grid->n_pix[\zero] - \un )      // pixel position on 'x' is max
+  else if ( pixel\_coord[\zero] == grid->n\_pix[\zero] - \un )      // pixel position on 'x' is max
   {
-    for ( \rbtt{y\_pos} = \zero ; \rbtt{y\_pos} < \trois ; \rbtt{y\_pos} ++ )
+    for ( \rbtt{y\\_pos} = \zero ; \rbtt{y\\_pos} < \trois ; \rbtt{y\\_pos} ++ )
     {
-      for ( \obtt{z\_pos} = \zero ; \obtt{z\_pos} < \trois ; \obtt{z\_pos} ++ )
+      for ( \obtt{z\\_pos} = \zero ; \obtt{z\\_pos} < \trois ; \obtt{z\\_pos} ++ )
       {
-        pbc_shift[\deux][\rbtt{y\_pos}][\obtt{z\_pos}] = - grid->n_pix[\zero];
+        pbc\_shift[\deux][\rbtt{y\\_pos}][\obtt{z\\_pos}] = - grid->n\_pix[\zero];
       }
     }
   }
-  if ( pixel_coord[\un] == \zero )                            // pixel position on 'y' is min
+  if ( pixel\_coord[\un] == \zero )                            // pixel position on 'y' is min
   {
-    for ( \vbtt{x\_pos} = \zero ; \vbtt{x\_pos} < \trois ; \vbtt{x\_pos} ++ )
+    for ( \vbtt{x\\_pos} = \zero ; \vbtt{x\\_pos} < \trois ; \vbtt{x\\_pos} ++ )
     {
-      for ( \obtt{z\_pos} = \zero ; \obtt{z\_pos} < \trois ; \obtt{z\_pos} ++ )
+      for ( \obtt{z\\_pos} = \zero ; \obtt{z\\_pos} < \trois ; \obtt{z\\_pos} ++ )
       {
-        pbc_shift[\vbtt{x\_pos}][\zero][\obtt{z\_pos}] += grid->n_xy;
+        pbc\_shift[\vbtt{x\\_pos}][\zero][\obtt{z\\_pos}] += grid->n\_xy;
       }
     }
   }
-  else if ( pixel_coord[\un] == grid->n_pix[\un] - \un )      // pixel position on 'y' is max
+  else if ( pixel\_coord[\un] == grid->n\_pix[\un] - \un )      // pixel position on 'y' is max
   {
-    for ( \vbtt{x\_pos} = \zero ; \vbtt{x\_pos} < \trois ; \vbtt{x\_pos} ++ )
+    for ( \vbtt{x\\_pos} = \zero ; \vbtt{x\\_pos} < \trois ; \vbtt{x\\_pos} ++ )
     {
-      for ( \obtt{z\_pos} = \zero ; \obtt{z\_pos} < \trois ; \obtt{z\_pos} ++ )
+      for ( \obtt{z\\_pos} = \zero ; \obtt{z\\_pos} < \trois ; \obtt{z\\_pos} ++ )
       {
-        pbc_shift[\vbtt{x\_pos}][\deux][\obtt{z\_pos}] -= grid->n_xy;
+        pbc\_shift[\vbtt{x\\_pos}][\deux][\obtt{z\\_pos}] -= grid->n\_xy;
       }
     }
   }
-  if ( pixel_coord[\deux] == \zero )                            // pixel position on 'z' is min
+  if ( pixel\_coord[\deux] == \zero )                            // pixel position on 'z' is min
   {
-    for ( \vbtt{x\_pos} = \zero ; \vbtt{x\_pos} < \trois ; \vbtt{x\_pos} ++ )
+    for ( \vbtt{x\\_pos} = \zero ; \vbtt{x\\_pos} < \trois ; \vbtt{x\\_pos} ++ )
     {
-      for ( \rbtt{y\_pos} = \zero ; \rbtt{y\_pos} < \trois ; \rbtt{y\_pos} ++ )
+      for ( \rbtt{y\\_pos} = \zero ; \rbtt{y\\_pos} < \trois ; \rbtt{y\\_pos} ++ )
       {
-        pbc_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\zero] += grid->pixels;
+        pbc\_shift[\vbtt{x\\_pos}][\rbtt{y\\_pos}][\zero] += grid->pixels;
       }
     }
   }
-  else if ( pixel_coord[\deux] == grid->n_pix[\deux] - \un )      // pixel position on 'z' is max
+  else if ( pixel\_coord[\deux] == grid->n\_pix[\deux] - \un )      // pixel position on 'z' is max
   {
-    for ( \vbtt{x\_pos} = \zero ; \vbtt{x\_pos} < \trois ; \vbtt{x\_pos} ++ )
+    for ( \vbtt{x\\_pos} = \zero ; \vbtt{x\\_pos} < \trois ; \vbtt{x\\_pos} ++ )
     {
-      for ( \rbtt{y\_pos} = \zero ; \rbtt{y\_pos} < \trois ; \rbtt{y\_pos} ++ )
+      for ( \rbtt{y\\_pos} = \zero ; \rbtt{y\\_pos} < \trois ; \rbtt{y\\_pos} ++ )
       {
-        pbc_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\deux] -= grid->pixels;
+        pbc\_shift[\vbtt{x\\_pos}][\rbtt{y\\_pos}][\deux] -= grid->pixels;
       }
     }
   }
@@ -152,33 +152,33 @@ void set_pbc_shift (pixel_grid * grid, int pixel_coord[\trois], int pbc_shift[\t
 \clearpage
 
 \subsection{C code: add atom to pixel}
-\label{algo-c-add_atom_pixel}
+\label{algo-c-add\_atom\_pixel}
 \begin{algorithm}
-void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[\trois], int atom_id, float atom_coord[\trois])
+void add\_atom\_to\_pixel (pixel * the\_pixel, int pixel\_coord[\trois], int atom\_id, float atom\_coord[\trois])
 {
   int \dbtt{axis};
-  if (! the_pixel->patoms) 
+  if (! the\_pixel->patoms) 
   {
     // if the pixel do not contains any atom yet, then save its coordinates in the grid
     for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )
     {
-      the_pixel->p_xyz[\dbtt{axis}] = pixel_coord[\dbtt{axis}];
+      the\_pixel->p\_xyz[\dbtt{axis}] = pixel\_coord[\dbtt{axis}];
     }
-    // allocate the memory to store the first pixel_atom information
-    the_pixel->pix_atoms = malloc(sizeof*the_pixel->pix_atoms);
+    // allocate the memory to store the first pixel\_atom information
+    the\_pixel->pix\_atoms = malloc(sizeof*the\_pixel->pix\_atoms);
   }
   else
   {
-    // otherwise reallocate memory to store the new pixel_atom information
-    the_pixel->pix_atoms = realloc(the_pixel->pix_atoms, (the_pixel->patoms+\un)*sizeof*the_pixel->pix_atoms);
+    // otherwise reallocate memory to store the new pixel\_atom information
+    the\_pixel->pix\_atoms = realloc(the\_pixel->pix\_atoms, (the\_pixel->patoms+\un)*sizeof*the\_pixel->pix\_atoms);
   }
-  the_pixel->pix_atoms[the_pixel->patoms].atom_id = atom_id;
+  the\_pixel->pix\_atoms[the\_pixel->patoms].atom\_id = atom\_id;
   for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )
   {
-    the_pixel->pix_atoms[the_pixel->patoms].coord[\dbtt{axis}] = atom_coord[\dbtt{axis}];
+    the\_pixel->pix\_atoms[the\_pixel->patoms].coord[\dbtt{axis}] = atom\_coord[\dbtt{axis}];
   }
   // increment the number of atom(s) in the pixel
-  the_pixel->patoms ++;
+  the\_pixel->patoms ++;
 }
 \end{algorithm}
 
@@ -187,79 +187,79 @@ void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[\trois], int atom_id,
 \subsection{C code: preparation of the pixel grid}
 \label{algo-c-pc-grid}
 \begin{algorithm}
-pixel_grid * prepare_pixel_grid (bool use_pbc)
+pixel\_grid * prepare\_pixel\_grid (bool use\_pbc)
 {
-  pixel_grid * grid;        // pointer to the pixel grid to create
+  pixel\_grid * grid;        // pointer to the pixel grid to create
   int \dbtt{axis};                 // loop iterator axis id (0=x, 1=y, 2=z)
   int \cbtt{aid};                  // loop iterator atom number (0, atoms--1)
-  int pixel_num;            // pixel number in the grid
-  int pixel_pos[\trois];         // pixel coordinates in the grid
+  int pixel\_num;            // pixel number in the grid
+  int pixel\_pos[\trois];         // pixel coordinates in the grid
   float cmin[\trois], cmax[\trois];   // float coordinates min, max values
-  float f_coord[\trois];         // float fractional coordinates
+  float f\_coord[\trois];         // float fractional coordinates
 
   grid = malloc(sizeof*grid);
-  if ( ! use_pbc )                              // without periodic boundary conditions
+  if ( ! use\_pbc )                              // without periodic boundary conditions
   {
-    for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ ) cmin[\dbtt{axis}] = cmax[\dbtt{axis}] = c_coord[\zero][\dbtt{axis}];
+    for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ ) cmin[\dbtt{axis}] = cmax[\dbtt{axis}] = c\_coord[\zero][\dbtt{axis}];
     for ( \cbtt{aid} = \un ; \cbtt{aid} < atoms ; \cbtt{aid} ++ )      // For all atoms
     {
       for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )     // For x, y and z
       {
-        cmin[\dbtt{axis}] = min(cmin[\dbtt{axis}], c_coord[\cbtt{aid}][\dbtt{axis}]);
-        cmax[\dbtt{axis}] = max(cmax[\dbtt{axis}], c_coord[\cbtt{aid}][\dbtt{axis}]);
+        cmin[\dbtt{axis}] = min(cmin[\dbtt{axis}], c\_coord[\cbtt{aid}][\dbtt{axis}]);
+        cmax[\dbtt{axis}] = max(cmax[\dbtt{axis}], c\_coord[\cbtt{aid}][\dbtt{axis}]);
       }
     }
     for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )       // For x, y and z
     {
-      grid->n_pix[\dbtt{axis}] = (int)((cmax[\dbtt{axis}] - cmin[\dbtt{axis}]) / cutoff) + \un; // number of pixel(s) on axis '\dbtt{axis}'
+      grid->n\_pix[\dbtt{axis}] = (int)((cmax[\dbtt{axis}] - cmin[\dbtt{axis}]) / cutoff) + \un; // number of pixel(s) on axis '\dbtt{axis}'
     }
   }
   else  // using periodic boundary conditions
   {
     for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )       // For x, y and z
     {
-      grid->n_pix[\dbtt{axis}] = (int)(l_params[\dbtt{axis}] / cutoff) + \un; // number of pixel(s) on axis '\dbtt{axis}'
+      grid->n\_pix[\dbtt{axis}] = (int)(l\_params[\dbtt{axis}] / cutoff) + \un; // number of pixel(s) on axis '\dbtt{axis}'
     }
   }
   for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )         // For x, y and z
   {
     // correction if the number of pixel(s) on '\dbtt{axis}' is too small
-    grid->n_pix[\dbtt{axis}] = (grid->n_pix[\dbtt{axis}] < 4) ? \un : grid->n_pix[\dbtt{axis}];
+    grid->n\_pix[\dbtt{axis}] = (grid->n\_pix[\dbtt{axis}] < 4) ? \un : grid->n\_pix[\dbtt{axis}];
   }
-  grid->n_xy = grid->n_pix[\zero] * grid->n_pix[\un]; // number of pixels on the plan 'xy'
-  grid->pixels = grid->n_xy * grid->n_pix[\deux];   // total number of pixels in the grid
-  grid->pixel_list = malloc (grid->pixels*sizeof*grid->pixel_list);
-  for ( pixel_num = \zero ; pixel_num < grid->pixels ; pixel_num ++ )
+  grid->n\_xy = grid->n\_pix[\zero] * grid->n\_pix[\un]; // number of pixels on the plan 'xy'
+  grid->pixels = grid->n\_xy * grid->n\_pix[\deux];   // total number of pixels in the grid
+  grid->pixel\_list = malloc (grid->pixels*sizeof*grid->pixel\_list);
+  for ( pixel\_num = \zero ; pixel\_num < grid->pixels ; pixel\_num ++ )
   {
-    grid->pixel_list[pixel_num].pid = pixel_num;
-    grid->pixel_list[pixel_num].patoms = \zero;
-    grid->pixel_list[pixel_num].tested = FALSE;
+    grid->pixel\_list[pixel\_num].pid = pixel\_num;
+    grid->pixel\_list[pixel\_num].patoms = \zero;
+    grid->pixel\_list[pixel\_num].tested = FALSE;
   }
-  if ( ! use_pbc )                              // without periodic boundary conditions
+  if ( ! use\_pbc )                              // without periodic boundary conditions
   {
     for ( \cbtt{aid} = \zero ; \cbtt{aid} < atoms ; \cbtt{aid} ++ )      // for all atoms
     {
       for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )     // for x, y and z
       {
-        pixel_pos[\dbtt{axis}] = (int)((c_coord[\cbtt{aid}][\dbtt{axis}] - cmin[\dbtt{axis}])/cutoff);
+        pixel\_pos[\dbtt{axis}] = (int)((c\_coord[\cbtt{aid}][\dbtt{axis}] - cmin[\dbtt{axis}])/cutoff);
       }
-      pixel_num = pixel_pos[\zero] + pixel_pos[\un] * grid->n_pix[\zero] + pixel_pos[\deux] * grid->n_xy;
-      add_atom_to_pixel (grid, pixel_num, pixel_pos, \cbtt{aid}, c_coord[\cbtt{aid}]);
+      pixel\_num = pixel\_pos[\zero] + pixel\_pos[\un] * grid->n\_pix[\zero] + pixel\_pos[\deux] * grid->n\_xy;
+      add\_atom\_to\_pixel (grid, pixel\_num, pixel\_pos, \cbtt{aid}, c\_coord[\cbtt{aid}]);
     }
   }
   else                                          // using periodic boundary conditions
   {
     for ( \cbtt{aid} = \zero ; \cbtt{aid} < atoms ; \cbtt{aid} ++ )      // for all atoms
     {
-      // with 'matrix_multiplication' a user defined function to perform the operation
-      f_coord = matrix_multiplication (cart_to_frac, c_coord[\cbtt{aid}]);
+      // with 'matrix\_multiplication' a user defined function to perform the operation
+      f\_coord = matrix\_multiplication (cart\_to\_frac, c\_coord[\cbtt{aid}]);
       for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )     // for x, y and z
       {
-        f_coord[\dbtt{axis}] = f_coord[\dbtt{axis}] - floorf(f_coord[\dbtt{axis}]);
-        pixel_pos[\dbtt{axis}] = (int)((f_coord[\dbtt{axis}] * grid->n_pix[\dbtt{axis}]);
+        f\_coord[\dbtt{axis}] = f\_coord[\dbtt{axis}] - floorf(f\_coord[\dbtt{axis}]);
+        pixel\_pos[\dbtt{axis}] = (int)((f\_coord[\dbtt{axis}] * grid->n\_pix[\dbtt{axis}]);
       }
-      pixel_num = pixel_pos[\zero] + pixel_pos[\un] * grid->n_pix[\zero] + pixel_pos[\deux] * grid->n_xy;
-      add_atom_to_pixel (& grid->pixel_list[pixel_num], \cbtt{aid}, f_coord);
+      pixel\_num = pixel\_pos[\zero] + pixel\_pos[\un] * grid->n\_pix[\zero] + pixel\_pos[\deux] * grid->n\_xy;
+      add\_atom\_to\_pixel (& grid->pixel\_list[pixel\_num], \cbtt{aid}, f\_coord);
     }
   }
   return grid;
@@ -272,75 +272,75 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
 \label{algo-c-find-pn}
 \begin{algorithm}
 // finding neighbor pixels for pixel in the grid
-// - bool use_pbc          : flag to set if PBC are used or not
-// - pixel_grid * the_grid : pointer to the pixel grid
-// - pixel * the_pix       : pointer to the pixel with neighbors to be found
-void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
+// - bool use\_pbc          : flag to set if PBC are used or not
+// - pixel\_grid * the\_grid : pointer to the pixel grid
+// - pixel * the\_pix       : pointer to the pixel with neighbors to be found
+void find\_pixel\_neighbors (bool use\_pbc, pixel\_grid * the\_grid, pixel * the\_pix)
 {
   int \dbtt{axis};                       // loop iterator axis id (1=x , 2=y , 3= z)
   int \vbtt{xpos}, \rbtt{ypos}, \obtt{zpos};           // neighbor position on x, y and z
-  int l_start[\trois] = { \zero, \zero, \zero};    // loop iterators starting value
-  int l_end[\trois] = { \trois, \trois, \trois};      // loop iterators ending value
+  int l\_start[\trois] = { \zero, \zero, \zero};    // loop iterators starting value
+  int l\_end[\trois] = { \trois, \trois, \trois};      // loop iterators ending value
   int pmod[\trois] = {-\un, \zero, \un};       // position modifiers
   int \bftt{nnp};                        // number of neighbors for pixel
   int nid;                        // neighbor id for pixel
-  int pbc_shift[\trois][\trois][\trois];         // shift for pixel neighbor number due to PBC
+  int pbc\_shift[\trois][\trois][\trois];         // shift for pixel neighbor number due to PBC
   bool boundary = FALSE;          // is pixel on the boundary of the grid
-  bool keep_neighbor = TRUE;      // keep or not neighbor during analysis
+  bool keep\_neighbor = TRUE;      // keep or not neighbor during analysis
 
-  if ( use_pbc )
+  if ( use\_pbc )
   {
-    set_pbc_shift (the_grid, the_pix->p_xyz, pbc_shift);
+    set\_pbc\_shift (the\_grid, the\_pix->p\_xyz, pbc\_shift);
   }
   else
   {
     for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )
     {
-      if ( the_pix->p_xyz[\dbtt{axis}] == \zero \textbar\textbar the_pix->p_xyz[\dbtt{axis}] == the_grid->n_pix[\dbtt{axis}] - \un ) boundary = TRUE;
+      if ( the\_pix->p\_xyz[\dbtt{axis}] == \zero \textbar\textbar the\_pix->p\_xyz[\dbtt{axis}] == the\_grid->n\_pix[\dbtt{axis}] - \un ) boundary = TRUE;
     }
   }
   for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )
   {
-    if ( the_grid->n_pix[\dbtt{axis}] == \un )
+    if ( the\_grid->n\_pix[\dbtt{axis}] == \un )
     {
-      l_start[\dbtt{axis}] = \un;
-      l_end[\dbtt{axis}] = \deux;
+      l\_start[\dbtt{axis}] = \un;
+      l\_end[\dbtt{axis}] = \deux;
     }
   }
   \bftt{nnp} = \zero;
-  for ( \vbtt{xpos} = l_start[\zero] ; \vbtt{xpos} < l_end[\zero] ; \vbtt{xpos} ++ )
+  for ( \vbtt{xpos} = l\_start[\zero] ; \vbtt{xpos} < l\_end[\zero] ; \vbtt{xpos} ++ )
   {
-    for ( \rbtt{ypos} = l_start[\un] ; \rbtt{ypos} < l_end[\un] ; \rbtt{ypos} ++ )
+    for ( \rbtt{ypos} = l\_start[\un] ; \rbtt{ypos} < l\_end[\un] ; \rbtt{ypos} ++ )
     {
-      for ( \obtt{zpos} = l_start[\deux] ; \obtt{zpos} < l_end[\deux] ; \obtt{zpos} ++ )
+      for ( \obtt{zpos} = l\_start[\deux] ; \obtt{zpos} < l\_end[\deux] ; \obtt{zpos} ++ )
       {
-        keep_neighbor = TRUE;
-        if ( ! use_pbc && boundary )
+        keep\_neighbor = TRUE;
+        if ( ! use\_pbc && boundary )
         {
-          if (( the_pix->p_xyz[\zero] == \zero && \vbtt{xpos} == \zero ) \textbar\textbar ( the_pix->p_xyz[\zero] == the_grid->n_pix[\zero] && \vbtt{xpos} == \deux ))
+          if (( the\_pix->p\_xyz[\zero] == \zero && \vbtt{xpos} == \zero ) \textbar\textbar ( the\_pix->p\_xyz[\zero] == the\_grid->n\_pix[\zero] && \vbtt{xpos} == \deux ))
           {
-            keep_neighbor = FALSE;
+            keep\_neighbor = FALSE;
           }
-          else if (( the_pix->p_xyz[\un] == \zero && \rbtt{ypos} == \zero ) \textbar\textbar ( the_pix->p_xyz[\un] == the_grid->n_pix[\un] && \rbtt{ypos} == \deux ))
+          else if (( the\_pix->p\_xyz[\un] == \zero && \rbtt{ypos} == \zero ) \textbar\textbar ( the\_pix->p\_xyz[\un] == the\_grid->n\_pix[\un] && \rbtt{ypos} == \deux ))
           {
-            keep_neighbor = FALSE;
+            keep\_neighbor = FALSE;
           }
-          else if (( the_pix->p_xyz[\deux] == \zero && \obtt{zpos} == \zero ) \textbar\textbar ( the_pix->p_xyz[\deux] == the_grid->n_pix[\deux] && \obtt{zpos} == \deux ))
+          else if (( the\_pix->p\_xyz[\deux] == \zero && \obtt{zpos} == \zero ) \textbar\textbar ( the\_pix->p\_xyz[\deux] == the\_grid->n\_pix[\deux] && \obtt{zpos} == \deux ))
           {
-            keep_neighbor = FALSE;
+            keep\_neighbor = FALSE;
           }
         }
-        if ( keep_neighbor )
+        if ( keep\_neighbor )
         {
-          nid = the_pix->pid + pmod[\vbtt{xpos}] + pmod[\rbtt{ypos}] * the_grid->n_pix[\zero] + pmod[\obtt{zpos}] * the_grid->n_xy;
-          if ( use_pbc ) nid += pbc_shift[\vbtt{xpos}][\rbtt{ypos}][\obtt{zpos}];
-          the_pix->pixel_neighbors[\bftt{nnp}] = nid;
+          nid = the\_pix->pid + pmod[\vbtt{xpos}] + pmod[\rbtt{ypos}] * the\_grid->n\_pix[\zero] + pmod[\obtt{zpos}] * the\_grid->n\_xy;
+          if ( use\_pbc ) nid += pbc\_shift[\vbtt{xpos}][\rbtt{ypos}][\obtt{zpos}];
+          the\_pix->pixel\_neighbors[\bftt{nnp}] = nid;
           \bftt{nnp} ++ ;
         }
       }
     }
   }
-  the_pix->neighbors = \bftt{nnp};
+  the\_pix->neighbors = \bftt{nnp};
 }
 \end{algorithm}
 
@@ -349,28 +349,28 @@ void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
 \subsection{C code: inter-atomic distance calculation}
 \begin{algorithm}
 // evaluating the interatomic distance between 2 pixel atoms
-// - bool use_pbc      : flag to set if PBC are used or not
-// - pixel_atom * at_i : pointer to first pixel atom
-// - pixel_atom * at_j : pointer to second pixel atom
-distance evaluate_distance (bool use_pbc, pixel_atom * at_i, pixel_atom * at_j)
+// - bool use\_pbc      : flag to set if PBC are used or not
+// - pixel\_atom * at\_i : pointer to first pixel atom
+// - pixel\_atom * at\_j : pointer to second pixel atom
+distance evaluate\_distance (bool use\_pbc, pixel\_atom * at\_i, pixel\_atom * at\_j)
 {
   int \dbtt{axis};          // axis loop iterator
   float u, v;        // float parameters
   distance dist;     // distance data to store calculation results
   for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )
   {
-    dist.Rij[\dbtt{axis}] = at_i->coord[\dbtt{axis}] - at_j->coord[\dbtt{axis}];
+    dist.Rij[\dbtt{axis}] = at\_i->coord[\dbtt{axis}] - at\_j->coord[\dbtt{axis}];
   }
-  if ( use_pbc )
+  if ( use\_pbc )
   {
-    // then the pixel_atom's coordinates are in corrected fractional format
+    // then the pixel\_atom's coordinates are in corrected fractional format
     for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )
     {
       dist.Rij[\dbtt{axis}] = dist.Rij[\dbtt{axis}] - roundf(dist.Rij[\dbtt{axis}]);
     }
     // transform back to Cartesian coordinates
-    // with 'matrix_multiplication' a user defined function to perform the operation
-    dist.Rij = matrix_multiplication (frac_to_cart, dist.Rij);
+    // with 'matrix\_multiplication' a user defined function to perform the operation
+    dist.Rij = matrix\_multiplication (frac\_to\_cart, dist.Rij);
   }
   dist.length = \zero.\zero;
   for ( \dbtt{axis} = \zero ; \dbtt{axis} < \trois ; \dbtt{axis} ++ )
@@ -390,57 +390,57 @@ distance evaluate_distance (bool use_pbc, pixel_atom * at_i, pixel_atom * at_j)
 \label{algo-c-pc-pixel}
 \begin{algorithm}
 // searching for first neighbor atoms using the grid pixelation/partitioning method
-// - bool use_pbc : flag to set if PBC are used or not
-void pixel_search_for_neighbors (bool use_pbc)
+// - bool use\_pbc : flag to set if PBC are used or not
+void pixel\_search\_for\_neighbors (bool use\_pbc)
 {
-  pixel_grid * all_pixels;   // pointer to the pixel grid for to analyze
+  pixel\_grid * all\_pixels;   // pointer to the pixel grid for to analyze
   int \vbtt{pix}, \rbtt{pjx};              // integer pixel ID numbers
   int \dbtt{aid}, \cbtt{bid};              // integer loop atom numbers
   int pid;
-  int l_start, l_end;         // integer loop modifier
-  pixel * pix_i, * pix_j;     // pointers on pixel data structure
-  pixel_atom * at_i, * at_j;  // pointers on pixel_atom data structure
+  int l\_start, l\_end;         // integer loop modifier
+  pixel * pix\_i, * pix\_j;     // pointers on pixel data structure
+  pixel\_atom * at\_i, * at\_j;  // pointers on pixel\_atom data structure
   distance Dij;               // distance data structure
 
-  all_pixels = prepare_pixel_grid (use_pbc);
-  // note that the pixel grid 'all_pixels' must be prepared before the following
+  all\_pixels = prepare\_pixel\_grid (use\_pbc);
+  // note that the pixel grid 'all\_pixels' must be prepared before the following
   // for all pixels in the grid
-  for ( \vbtt{pix} = \zero ; \vbtt{pix} < all_pixels->pixels ; \vbtt{pix} ++ )
+  for ( \vbtt{pix} = \zero ; \vbtt{pix} < all\_pixels->pixels ; \vbtt{pix} ++ )
   {
-    // setting 'pix_i' as pointer to pixel number 'pix'
-    pix_i = & all_pixels->pixel_list[\vbtt{pix}];
-    // if pixel 'pix_i' contains atom(s)
-    if ( pix_i->patoms )
+    // setting 'pix\_i' as pointer to pixel number 'pix'
+    pix\_i = & all\_pixels->pixel\_list[\vbtt{pix}];
+    // if pixel 'pix\_i' contains atom(s)
+    if ( pix\_i->patoms )
     {
-      // search for neighbbor pixels of 'pix_i'
-      find_pixel_neighbors ( use_pbc, all_pixels, pix_i );
-      // testing all 'pix_i' neighbor pixels
-      for ( pid = \zero ; pid < pix_i->neighbors ; pid ++ )
+      // search for neighbbor pixels of 'pix\_i'
+      find\_pixel\_neighbors ( use\_pbc, all\_pixels, pix\_i );
+      // testing all 'pix\_i' neighbor pixels
+      for ( pid = \zero ; pid < pix\_i->neighbors ; pid ++ )
       {
-        \rbtt{pjx} = pix_i->pixel_neighbors[pid];
-        // setting 'pix_j' as pointer to pixel number 'pjx'
-        pix_j = & all_pixels->pixel_list[\rbtt{pjx}];
-        // checking pixel 'pix_j' if it:
+        \rbtt{pjx} = pix\_i->pixel\_neighbors[pid];
+        // setting 'pix\_j' as pointer to pixel number 'pjx'
+        pix\_j = & all\_pixels->pixel\_list[\rbtt{pjx}];
+        // checking pixel 'pix\_j' if it:
         // - contains atom(s)
         // - was not tested, otherwise the analysis would have been performed already
-        if ( pix_j->patoms && ! pix_j->tested )
+        if ( pix\_j->patoms && ! pix\_j->tested )
         {
-          // if 'pix_i' and 'pix_j' are the same, only test pair of different atoms
-          l_end = (\rbtt{pjx} != \vbtt{pix}) ? \zero : \un;
+          // if 'pix\_i' and 'pix\_j' are the same, only test pair of different atoms
+          l\_end = (\rbtt{pjx} != \vbtt{pix}) ? \zero : \un;
           // for all atom(s) in 'pix'
-          for ( \dbtt{aid} = \zero ; \dbtt{aid} < pix_i->patoms - l_end ; \dbtt{aid} ++ )
+          for ( \dbtt{aid} = \zero ; \dbtt{aid} < pix\_i->patoms - l\_end ; \dbtt{aid} ++ )
           {
             // set pointer to the first atom to test
-            at_i = & pix_i->pix_atoms[\dbtt{aid}];
+            at\_i = & pix\_i->pix\_atoms[\dbtt{aid}];
             lstart = (\rbtt{pjx} != \vbtt{pix}) ? \zero : \dbtt{aid} + \un;
-            // for all atom(s) in 'pix_j'
-            for ( \cbtt{bid} = l_start ; \cbtt{bid} < pix_j->patoms ; \cbtt{bid} ++ )
+            // for all atom(s) in 'pix\_j'
+            for ( \cbtt{bid} = l\_start ; \cbtt{bid} < pix\_j->patoms ; \cbtt{bid} ++ )
             {
               // set pointer to the second atom to test
-              at_j = & pix_j->pix_atoms[\cbtt{bid}];
+              at\_j = & pix\_j->pix\_atoms[\cbtt{bid}];
               // evaluate interatomic distance
-              Dij = evaluate_distance (use_pbc, at_i, at_j);
-              if ( Dij.length < cutoff_squared )
+              Dij = evaluate\_distance (use\_pbc, at\_i, at\_j);
+              if ( Dij.length < cutoff\_squared )
               {
                 // this is a first neighbor bond !
               }
@@ -449,7 +449,7 @@ void pixel_search_for_neighbors (bool use_pbc)
         }
       }
       // store that pixel 'pix' was tested
-      pix_i->tested = TRUE;
+      pix\_i->tested = TRUE;
     }
   }
 }
