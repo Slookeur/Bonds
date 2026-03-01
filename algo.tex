@@ -90,14 +90,15 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
 \Procedure{pbc\_shift}{\xdir, \ydir, \zdir, \xydir, \xyzdir, pixel[\trois], shift[\trois][\trois][\trois]}
   \State
   \State Input:
-  \State   - \xdir\ is the number of pixels in the x direction
-  \State   - \ydir\ is the number of pixels in the y direction
-  \State   - \zdir\ is the number of pixels in the z direction
-  \State  - \xydir\ = \xdir\ $\times$ \ydir
-  \State  - \xyzdir\ = \xydir\ $\times$ \zdir
-  \State  - pixel[\trois] is the pixel coordinates on x, z and z
+  \State  \qquad - \xdir\ is the number of pixels in the x direction
+  \State  \qquad - \ydir\ is the number of pixels in the y direction
+  \State  \qquad - \zdir\ is the number of pixels in the z direction
+  \State  \qquad - \xydir\ = \xdir\ $\times$ \ydir
+  \State `\qquad - \xyzdir\ = \xydir\ $\times$ \zdir
+  \State  \qquad - pixel[\trois] is the pixel coordinates on x, z and z
+  \Sate
   \State Output:
-  \State - shift[\trois][\trois][\trois] is the shift due tot PBC
+  \State  \qquad - shift[\trois][\trois][\trois] is the shift due tot PBC
   \State
   \For{\vbtt{x} = \un, $\dots$, \trois}
     \For{\rbtt{y} = \un, $\dots$, \trois}
