@@ -15,8 +15,8 @@ function clean {
   sed 's/&/\\&/g' tmp_b > tmp_a
   sed 's/#/\\#/g' tmp_a > tmp_b
 
-  sed 's/\\begin{algorithm}/\\begin{algorithm}\n\\begin{algorithmic}/g' tmp_b > tmp_a
-  sed 's/\\end{algorithm}/\\end{algorithmic}\n\\end{algorithm}/g' tmp_a > tmp_b
+  sed 's/\\begin{algorithm}/\\begin{algorithm}\n\\begin{algorithmic}\\Procedure{}/g' tmp_b > tmp_a
+  sed 's/\\end{algorithm}/\\EndProcedure\n\\end{algorithmic}\n\\end{algorithm}/g' tmp_a > tmp_b
 
   #sed 's/|\\zero|/0/g' tmp_b > tmp_a
   #sed 's/|\\un|/1/g' tmp_a > tmp_b
