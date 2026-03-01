@@ -89,15 +89,15 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
 {\footnotesize{
 \Procedure{pbc\_shift}{\xdir, \ydir, \zdir, \xydir, \xyzdir, pixel[\trois], shift[\trois][\trois][\trois]}
   \State
-  \Sate Input:
-  \Sate   - \xdir\ is the number of pixels in the x direction
-  \Sate   - \ydir\ is the number of pixels in the y direction
-  \Sate   - \zdir\ is the number of pixels in the z direction
+  \State Input:
+  \State   - \xdir\ is the number of pixels in the x direction
+  \State   - \ydir\ is the number of pixels in the y direction
+  \State   - \zdir\ is the number of pixels in the z direction
   \State  - \xydir\ = \xdir\ $\times$ \ydir
   \State  - \xyzdir\ = \xydir\ $\times$ \zdir
   \State  - pixel[\trois] is the pixel coordinates on x, z and z
   \State Output:
-  \State  - shift[\trois][\trois][\trois] is the shift due tot PBC
+  \State - shift[\trois][\trois][\trois] is the shift due tot PBC
   \State
   \For{\vbtt{x} = \un, $\dots$, \trois}
     \For{\rbtt{y} = \un, $\dots$, \trois}
