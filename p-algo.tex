@@ -4,7 +4,8 @@
 \label{algo-p-pc-data}
 
 \begin{algorithm}
-\begin{algorithmic}\Procedure{}
+\begin{algorithmic}
+\Procedure{}
 \# Global data structures and variables used in the next code sections
 import numpy as np
 
@@ -61,7 +62,8 @@ frac\_to\_cart = np.zeros((\trois, \trois))                                     
 \subsection{Python code: set pixel periodic boundary condition shift}
 
 \begin{algorithm}
-\begin{algorithmic}\Procedure{}
+\begin{algorithmic}
+\Procedure{}
 \# adjust, if needed, shift to search for pixel neighbor(s) using PBC
 \# - grid pixel\_grid          : the pixel grid
 \# - int pixel\_coord[\trois]       : the pixel coordinates in the grid
@@ -111,7 +113,8 @@ def set\_pbc\_shift(pixel\_grid : PixelGrid, pixel\_coord : np.ndarray, pbc\_shi
 \subsection{Python code: add atom to pixel}
 \label{algo-c-add\_atom\_pixel}
 \begin{algorithm}
-\begin{algorithmic}\Procedure{}
+\begin{algorithmic}
+\Procedure{}
 def add\_atom\_to\_pixel(the\_pixel: Pixel, pixel\_coord: np.ndarray, atom\_id: int, atom\_coord: np.ndarray):
   if not the\_pixel.patoms:
     \# if the pixel do not contains any atom yet, then save its coordinates in the grid
@@ -133,7 +136,8 @@ def add\_atom\_to\_pixel(the\_pixel: Pixel, pixel\_coord: np.ndarray, atom\_id: 
 \subsection{Python code: preparation of the pixel grid}
 
 \begin{algorithm}
-\begin{algorithmic}\Procedure{}
+\begin{algorithmic}
+\Procedure{}
 \# preparation of the pixel grid
 \# - bool use\_pbc : flag to set if PBC are used or not
 def prepare\_pixel\_grid(use\_pbc : bool):
@@ -192,7 +196,8 @@ def prepare\_pixel\_grid(use\_pbc : bool):
 \subsection{Python code: finding pixel neighbors}
 
 \begin{algorithm}
-\begin{algorithmic}\Procedure{}
+\begin{algorithmic}
+\Procedure{}
 \# Finding neighbor pixels for pixel in the grid
 \# - bool use\_pbc    : flag to set if PBC are used or not
 \# - grid * the\_grid : pointer to the pixel grid
@@ -257,7 +262,8 @@ def find\_pixel\_neighbors(use\_pbc : bool, the\_grid : PixelGrid, the\_pix : Pi
 \subsection{Python code: inter-atomic distance calculation}
 
 \begin{algorithm}
-\begin{algorithmic}\Procedure{}
+\begin{algorithmic}
+\Procedure{}
 \# evaluating the interatomic distance between 2 pixel atoms
 \# - bool use\_pbc      : flag to set if PBC are used or not
 \# - pixel\_atom * at\_i : pointer to first pixel atom
@@ -296,7 +302,8 @@ def evaluate\_distance(use\_pbc : bool, at\_i : PixelAtom, at\_j : PixelAtom):
 \label{algo-p-pc-pixel}
 
 \begin{algorithm}
-\begin{algorithmic}\Procedure{}
+\begin{algorithmic}
+\Procedure{}
 def pixel\_search\_for\_neighbors(use\_pbc : bool):
   \# pointer to the pixel grid for analysis
   all\_pixels = prepare\_pixel\_grid(use\_pbc)

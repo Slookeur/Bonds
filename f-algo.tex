@@ -6,7 +6,8 @@
 \label{algo-f-pc-data}
 
 \begin{algorithm}
-\begin{algorithmic}\Procedure{}
+\begin{algorithmic}
+\Procedure{}
 ! global data structures and variables used in the next code sections
 MODULE parameters
   
@@ -66,7 +67,8 @@ END MODULE parameters
 \subsection{FORTRAN90 code: set pixel periodic boundary condition shift}
 \label{algo-f-set-pshift}
 \begin{algorithm}
-\begin{algorithmic}\Procedure{}
+\begin{algorithmic}
+\Procedure{}
 SUBROUTINE set\_pbc\_shift (grid, pixel\_coord, pbc\_shift)
   
   USE parameters
@@ -106,7 +108,8 @@ END SUBROUTINE set\_pbc\_shift
 \subsection{FORTRAN90 code: add atom to pixel}
 \label{algo-c-add\_atom\_pixel}
 \begin{algorithm}
-\begin{algorithmic}\Procedure{}
+\begin{algorithmic}
+\Procedure{}
 SUBROUTINE add\_atom\_to\_pixel (the\_pixel, pixel\_coord, atom\_id, atom\_coord)
 
   USE parameters
@@ -147,7 +150,8 @@ END SUBROUTINE
 \label{algo-f-pc-grid}
 
 \begin{algorithm}
-\begin{algorithmic}\Procedure{}
+\begin{algorithmic}
+\Procedure{}
 ! preparation of the pixel grid
 SUBROUTINE prepare\_pixel\_grid (use\_pbc, grid)
   
@@ -230,7 +234,8 @@ END SUBROUTINE prepare\_pixel\_grid
 \subsection{FORTRAN90 code: finding pixel neighbors}
 \label{algo-f-find-pn}
 \begin{algorithm}
-\begin{algorithmic}\Procedure{}
+\begin{algorithmic}
+\Procedure{}
 SUBROUTINE find\_pixel\_neighbors (use\_pbc, the\_grid, the\_pix)
   
   USE parameters
@@ -310,7 +315,8 @@ END SUBROUTINE find\_pixel\_neighbors
 \subsection{FORTRAN90 code: inter-atomic distance calculation}
 
 \begin{algorithm}
-\begin{algorithmic}\Procedure{}
+\begin{algorithmic}
+\Procedure{}
 ! evaluating the interatomic distance between 2 pixel atoms
 SUBROUTINE evaluate\_distance (use\_pbc, at\_i, at\_j, dist)
   
@@ -353,7 +359,8 @@ END SUBROUTINE evaluate\_distance
 \label{algo-f-pc-pixel}
 
 \begin{algorithm}
-\begin{algorithmic}\Procedure{}
+\begin{algorithmic}
+\Procedure{}
 SUBROUTINE pixel\_search\_for\_neighbors (use\_pbc)
 
   USE parameters
