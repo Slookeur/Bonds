@@ -186,30 +186,30 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
       l_end[axis] = 2
 
   nnp = 0  # number of neighbors
-  for |\vbtt{x_pos}| in range(l_start[0], l_end[0]):
-    for |\rbtt{y_pos}| in range(l_start[1], l_end[1]):
-      for |\obtt{z_pos}| in range(l_start[2], l_end[2]):
+  for x_pos in range(l_start[0], l_end[0]):
+    for y_pos in range(l_start[1], l_end[1]):
+      for z_pos in range(l_start[2], l_end[2]):
         keep_neighbor = True
 
         if not use_pbc and boundary:
-          if the_pix.p_xyz[0] == 0 and |\vbtt{x_pos}| == 0:
+          if the_pix.p_xyz[0] == 0 and x_pos == 0:
             keep_neighbor = False
-          elif the_pix.p_xyz[0] == the_grid.n_pix[0] and |\vbtt{x_pos}| == 2:
+          elif the_pix.p_xyz[0] == the_grid.n_pix[0] and x_pos == 2:
             keep_neighbor = False
-          elif the_pix.p_xyz[1] == 0 and |\rbtt{y_pos}| == 0:
+          elif the_pix.p_xyz[1] == 0 and y_pos == 0:
             keep_neighbor = False
-          elif the_pix.p_xyz[1] == the_grid.n_pix[1] and |\rbtt{y_pos}| == 2:
+          elif the_pix.p_xyz[1] == the_grid.n_pix[1] and y_pos == 2:
             keep_neighbor = False
-          elif the_pix.p_xyz[2] == 0 and |\obtt{z_pos}| == 0:
+          elif the_pix.p_xyz[2] == 0 and z_pos == 0:
             keep_neighbor = False
-          elif the_pix.p_xyz[2] == the_grid.n_pix[2] and |\obtt{z_pos}| == 2:
+          elif the_pix.p_xyz[2] == the_grid.n_pix[2] and z_pos == 2:
             keep_neighbor = False
 
         if keep_neighbor:
           # calculate the neighbor id
-          nid = the_pix.pid + pmod[|\vbtt{x_pos}|] + pmod[|\rbtt{y_pos}|] * the_grid.n_pix[0] + pmod[|\obtt{z_pos}|] * the_grid.n_xy
+          nid = the_pix.pid + pmod[x_pos] + pmod[y_pos] * the_grid.n_pix[0] + pmod[z_pos] * the_grid.n_xy
           if use_pbc:
-            nid += pbc_shift[|\vbtt{x_pos}|][|\rbtt{y_pos}|][|\obtt{z_pos}|]
+            nid += pbc_shift[x_pos][y_pos][z_pos]
           the_pix.pixel_neighbors[nnp] = nid
           nnp += 1
 
