@@ -87,13 +87,13 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
   \If{pixel\_coord[\zero] = \zero}
     \For{\rbtt{y\_pos} = 1, $\dots$, \trois}
       \For{\obtt{z\_pos} = 1, $\dots$, \trois}
-        pbc\_shift[\zero][\rbtt{y\_pos}][\obtt{z\_pos}] = grid.n\_pix[\zero]
+        \State pbc\_shift[\zero][\rbtt{y\_pos}][\obtt{z\_pos}] = grid.n\_pix[\zero]
       \EndFor
     \EndFor
   \ElsIf{pixel\_coord[\zero] = grid.n\_pix[\zero]-1}
     \For{\rbtt{y\_pos} = 1, $\dots$, \trois}
       \For{\obtt{z\_pos} = 1, $\dots$, \trois}
-        pbc\_shift[\zero][\rbtt{y\_pos}][\obtt{z\_pos}] = - grid.n\_pix[\zero]
+        \State pbc\_shift[\zero][\rbtt{y\_pos}][\obtt{z\_pos}] = - grid.n\_pix[\zero]
       \EndFor
     \EndFor
   \EndIf
@@ -101,13 +101,13 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
   \If{pixel\_coord[\un] = \zero}
     \For{\vbtt{x\_pos} = 1, $\dots$, \trois}
       \For{\obtt{z\_pos} = 1, $\dots$, \trois}
-        pbc\_shift[\vbtt{x\_pos}][\zero][\obtt{z\_pos}] += grid.n\_xy
+        \State pbc\_shift[\vbtt{x\_pos}][\zero][\obtt{z\_pos}] += grid.n\_xy
       \EndFor
     \EndFor
   \ElsIf{pixel\_coord[\un] = grid.n\_pix[\un]-1}
     \For{\vbtt{x\_pos} = 1, $\dots$, \trois}
       \For{\obtt{z\_pos} = 1, $\dots$, \trois}
-        pbc\_shift[\vbtt{x\_pos}][\zero][\obtt{z\_pos}] -= grid.n\_xy
+        \State pbc\_shift[\vbtt{x\_pos}][\zero][\obtt{z\_pos}] -= grid.n\_xy
       \EndFor
     \EndFor
   \EndIf
@@ -115,13 +115,13 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
   \If{pixel\_coord[\deux] = \zero}
     \For{\vbtt{x\_pos} = 1, $\dots$, \trois}
       \For{\rbtt{y\_pos} = 1, $\dots$, \trois}
-        pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\zero] += grid.pixels
+        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\zero] += grid.pixels
       \EndFor
     \EndFor
   \ElsIf{pixel\_coord[\deux] = grid.n\_pix[\deux]-1}
     \For{\vbtt{x\_pos} = 1, $\dots$, \trois}
       \For{\rbtt{z\_pos} = 1, $\dots$, \trois}
-        pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\deux] -= grid.pixels
+        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\deux] -= grid.pixels
       \EndFor
     \EndFor
   \EndIf
