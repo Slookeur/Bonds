@@ -1,12 +1,12 @@
-\section{Commented C code}
+\section{Algorithms and Pseudocodes}
 
-\subsection{C code: data structures and global variables}
-\label{algo-c-pc-data}
+\subsection{Data structures and global variables}
+\label{algo-pc-data}
 
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{}
-// global data structures and variables used in the next code sections
+\Procedure{Gobal data structures}
+
 
 \#define TRUE \un
 \#define FALSE \zero
@@ -70,89 +70,61 @@ float frac\_to\_cart[\trois][\trois];  // fractional to Cartesian coordinates ma
 
 \clearpage
 
-\subsection{C code: set periodic boundary condition pixel shift}
-\label{algo-c-set-pshift}
-%// Adjust, if needed, shift to search for pixel neighbor(s) using PBC
-%// - pixel\_grid * grid      : the pixel grid
-%// - int pixel\_coord[\trois]     : the pixel coordinates in the grid
-%// - int pbc\_shift[\trois][\trois][\trois] : the shift, correction, to be calculated
+\subsection{Set periodic boundary condition pixel shift}
+\label{algo-set-pshift}
+
 \begin{algorithm}
-\begin{algorithmic}
-\Procedure{}
-void set\_pbc\_shift (pixel\_grid * grid, int pixel\_coord[\trois], int pbc\_shift[\trois][\trois][\trois])
-{
-  int \vbtt{x\_pos}, \rbtt{y\_pos}, \obtt{z\_pos}; // loop iterators
-  for ( \vbtt{x\_pos} = \zero ; \vbtt{x\_pos} < \trois ; \vbtt{x\_pos} ++ )
-  {
-    for ( \rbtt{y\_pos} = \zero ; \rbtt{y\_pos} < \trois ; \rbtt{y\_pos} ++ )
-    {
-      for ( \obtt{z\_pos} = \zero ; \obtt{z\_pos} < \trois ; \obtt{z\_pos} ++ )
-      {
-        pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\obtt{z\_pos}] = \zero;             // initialization without any shift
-      }
-    }
-  }
-  if ( pixel\_coord[\zero] == \zero )                            // pixel position on 'x' is min
-  {
-    for ( \rbtt{y\_pos} = \zero ; \rbtt{y\_pos} < \trois ; \rbtt{y\_pos} ++ )
-    {
-      for ( \obtt{z\_pos} = \zero ; \obtt{z\_pos} < \trois ; \obtt{z\_pos} ++ )
-      {
-        pbc\_shift[\zero][\rbtt{y\_pos}][\obtt{z\_pos}] = grid->n\_pix[\zero];
-      }
-    }
-  }
-  else if ( pixel\_coord[\zero] == grid->n\_pix[\zero] - \un )      // pixel position on 'x' is max
-  {
-    for ( \rbtt{y\_pos} = \zero ; \rbtt{y\_pos} < \trois ; \rbtt{y\_pos} ++ )
-    {
-      for ( \obtt{z\_pos} = \zero ; \obtt{z\_pos} < \trois ; \obtt{z\_pos} ++ )
-      {
-        pbc\_shift[\deux][\rbtt{y\_pos}][\obtt{z\_pos}] = - grid->n\_pix[\zero];
-      }
-    }
-  }
-  if ( pixel\_coord[\un] == \zero )                            // pixel position on 'y' is min
-  {
-    for ( \vbtt{x\_pos} = \zero ; \vbtt{x\_pos} < \trois ; \vbtt{x\_pos} ++ )
-    {
-      for ( \obtt{z\_pos} = \zero ; \obtt{z\_pos} < \trois ; \obtt{z\_pos} ++ )
-      {
-        pbc\_shift[\vbtt{x\_pos}][\zero][\obtt{z\_pos}] += grid->n\_xy;
-      }
-    }
-  }
-  else if ( pixel\_coord[\un] == grid->n\_pix[\un] - \un )      // pixel position on 'y' is max
-  {
-    for ( \vbtt{x\_pos} = \zero ; \vbtt{x\_pos} < \trois ; \vbtt{x\_pos} ++ )
-    {
-      for ( \obtt{z\_pos} = \zero ; \obtt{z\_pos} < \trois ; \obtt{z\_pos} ++ )
-      {
-        pbc\_shift[\vbtt{x\_pos}][\deux][\obtt{z\_pos}] -= grid->n\_xy;
-      }
-    }
-  }
-  if ( pixel\_coord[\deux] == \zero )                            // pixel position on 'z' is min
-  {
-    for ( \vbtt{x\_pos} = \zero ; \vbtt{x\_pos} < \trois ; \vbtt{x\_pos} ++ )
-    {
-      for ( \rbtt{y\_pos} = \zero ; \rbtt{y\_pos} < \trois ; \rbtt{y\_pos} ++ )
-      {
-        pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\zero] += grid->pixels;
-      }
-    }
-  }
-  else if ( pixel\_coord[\deux] == grid->n\_pix[\deux] - \un )      // pixel position on 'z' is max
-  {
-    for ( \vbtt{x\_pos} = \zero ; \vbtt{x\_pos} < \trois ; \vbtt{x\_pos} ++ )
-    {
-      for ( \rbtt{y\_pos} = \zero ; \rbtt{y\_pos} < \trois ; \rbtt{y\_pos} ++ )
-      {
-        pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\deux] -= grid->pixels;
-      }
-    }
-  }
-}
+\begin{algorithmic}[1]
+\Procedure{Adjust PBC shift}{pixel\_grid, pixel\_coord[3], pbc\_shift[3][3][3]}
+  \State \For{\vbtt{x\_pos} = 1, $\dots$, \trois}
+    \State \For{\rbtt{y\_pos} = 1, $\dots$, \trois}
+      \State \For{\obtt{z\_pos} = 1, $\dots$, \trois}
+        \State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\obtt{z\_pos}] = \zero
+      \State \EndFor
+    \State \EndFor
+  \State \EndFor
+  
+  \State \If{pixel\_coord[\zero] = \zero}
+    \State \For{\rbtt{y\_pos} = 1, $\dots$, \trois}
+      \State \For{\obtt{z\_pos} = 1, $\dots$, \trois}
+	\State pbc\_shift[\zero][\rbtt{y\_pos}][\obtt{z\_pos}] = grid.n\_pix[\zero]
+      \State \EndFor
+    \State \EndFor
+  \State \ElsIf{pixel\_coord[\zero] = grid.n\_pix[\zero]-1}
+    \State \For{\rbtt{y\_pos} = 1, $\dots$, \trois}
+      \State \For{\obtt{z\_pos} = 1, $\dots$, \trois}
+	\State pbc\_shift[\zero][\rbtt{y\_pos}][\obtt{z\_pos}] = - grid.n\_pix[\zero]
+      \State \EndFor
+    \State \EndFor
+  \State \EndIf
+
+  \State \If{pixel\_coord[\un] = \zero}
+    \State \For{\vbtt{x\_pos} = 1, $\dots$, \trois}
+      \State \For{\obtt{z\_pos} = 1, $\dots$, \trois}
+	\State pbc\_shift[\vbtt{x\_pos}][\zero][\obtt{z\_pos}] += grid.n\_xy
+      \State \EndFor
+    \State \EndFor
+  \State \ElsIf{pixel\_coord[\un] = grid.n\_pix[\un]-1}
+    \State \For{\vbtt{x\_pos} = 1, $\dots$, \trois}
+      \State \For{\obtt{z\_pos} = 1, $\dots$, \trois}
+	\State pbc\_shift[\vbtt{x\_pos}][\zero][\obtt{z\_pos}] -= grid.n\_xy
+      \State \EndFor
+    \State \EndFor
+  \State \EndIf
+
+  \State \If{pixel\_coord[\deux] = \zero}
+    \State \For{\vbtt{x\_pos} = 1, $\dots$, \trois}
+      \State \For{\rbtt{y\_pos} = 1, $\dots$, \trois}
+	\State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\zero] += grid.pixels
+      \State \EndFor
+    \State \EndFor
+  \State \ElsIf{pixel\_coord[\deux] = grid.n\_pix[\deux]-1}
+    \State \For{\vbtt{x\_pos} = 1, $\dots$, \trois}
+      \State \For{\rbtt{z\_pos} = 1, $\dots$, \trois}
+	\State pbc\_shift[\vbtt{x\_pos}][\rbtt{y\_pos}][\deux] -= grid.pixels
+      \State \EndFor
+    \State \EndFor
+  \State \EndIf
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
