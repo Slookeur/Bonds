@@ -268,12 +268,14 @@ void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
 
   if ( use_pbc )
   {
+    // set PBC correction based on grid and pixel data
     set_pbc_shift (the_grid, the_pix->p_xyz, pbc_shift);
   }
   else
   {
     for ( axis = 0 ; axis < 3 ; axis ++ )
     {
+      // if min or max on 'axis' then 'the_pix' is on the edge of the box
       if ( the_pix->p_xyz[axis] == 0 || the_pix->p_xyz[axis] == the_grid->n_pix[axis] - 1 ) boundary = TRUE;
     }
   }
@@ -281,6 +283,7 @@ void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
   {
     if ( the_grid->n_pix[axis] == 1 )
     {
+      // in the grid there is a single pixel in the 'axis' direction
       l_start[axis] = 1;
       l_end[axis] = 2;
     }
@@ -310,7 +313,9 @@ void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
         }
         if ( keep_neighbor )
         {
+          // evaluating neighbor pixel number in the grid
           nid = the_pix->pid + pmod[x_pos] + pmod[y_pos] * the_grid->n_pix[0] + pmod[z_pos] * the_grid->n_xy;
+	  // corrections if required in the case where PBC are applied
           if ( use_pbc ) nid += pbc_shift[x_pos][y_pos][z_pos];
           the_pix->pixel_neighbors[nnp] = nid;
           nnp ++ ;
@@ -318,6 +323,7 @@ void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
       }
     }
   }
+  // total number of neighbors for pixel 'the_pix'
   the_pix->neighbors = nnp;
 }
 

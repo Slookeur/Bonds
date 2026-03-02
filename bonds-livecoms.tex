@@ -509,7 +509,7 @@ The methodoly described in this article is the one implemented in the \atomes\ s
 \begin{checklist}{Searching for first neighbor atoms}
 \textbf{Non-periodic systems}
 \begin{itemize}
-\item Choose a cutoff radius ${\textrm{R}_{cut}}$ to determine first neighor atoms
+\item Choose a cutoff radius ${\textrm{R}_{cut}}$ to determine first neighor atoms, compute and save ${\textrm{R}_{cut}}^2$
 \item Find the maximum distances, $D_{max}(x)$, $D_{max}(y)$ and $D_{max}(z)$ that separate 2 atoms on $x$, $y$ and $z$
 \item Determine the number of pixels, $n_{p}(axis)$, on $x$, $y$ and $z$ using $n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\textrm{R}_{cut}} \right\rceil$
 \item Create a pixel grid for a virtual box with dimensions $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$ on $x$, $y$ and $z$ axis respectively.
@@ -519,25 +519,46 @@ The methodoly described in this article is the one implemented in the \atomes\ s
 \item Pixel ID number in the grid: $P_{id}(at) = p_{x} + n_{p}(x) \times p_{y} + \left[n_{p}(x) \times n_{p}(y)\right] \times p_{z}$
 \end{itemize}
 \item Associate each pixel with it surrouding neighbors in the grid
-\item Search for bond candidates between the atoms of a pixel as well as the atoms of its surrouding pixel neighbors
-\item Evaluate distances using the atom's Cartesian coordinates
+\item For all pixels $pix$ in the grid
+\begin{itemize}
+\item Search for neighbors between the atoms of pixel $pix$ as well as the atoms of its surrouding pixel neighbors $pjx$
+\begin{itemize}
+\item For 2 atoms $a$ in $pix$ and $b$ in $pjx$
+\begin{itemize}
+\item Evaluate $r_{ab}$ on $x$, $y$ and $z$ using atoms $a$ and $b$ Cartesian coordinates
+\item Compute and return ${D_{ab}}^2$ 
+\item Compare ${D_{ab}}^2$ to ${\textrm{R}_{cut}}^2$ to determine if $a$ and $b$ are first neighbors
+\end{itemize}
+\end{itemize}
+\end{itemize}
 \end{itemize}
 \textbf{Periodic systems}
 \begin{itemize}
-\item Choose a cutoff radius ${\textrm{R}_{cut}}$ to determine first neighor atoms
+\item Choose a cutoff radius ${\textrm{R}_{cut}}$ to determine first neighor atoms, compute and save ${\textrm{R}_{cut}}^2$
 \item Use the lattice parameters as maximum interatomic distances on $x$, $y$ and $z$: $D_{max}(x) = \boxA$, $D_{max}(y) = \boxB$ and $D_{max}(z) = \boxC$
 \item Determine the number of pixels, $n_{p}(axis)$, on $x$, $y$ and $z$ using $n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\textrm{R}_{cut}} \right\rceil$
 \item Create a pixel grid with dimensions $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$ on $x$, $y$ and $z$ axis respectively.
-\item Convert all atom Cartesian coordinates to fractional coordinates $f$
-\item Compute the corrected fractional coordinates $f_c$ to ensure that all are in the unit cell
+\item Convert all atom Cartesian coordinates to fractional coordinates $f$ using $\Tf$
+\item Compute the corrected fractional coordinates $f_c$ to ensure that all are in the unit cell $f_{c,axis} = f_{axis} - \left\lfloor f_{axis} \right\rfloor$
 \item Using its correct fractional coordinates, $f_{c,axis}$, associate each atom $at$ with a pixel position in the grid
 \begin{itemize}
 \item Pixel position on each $axis$: $p_{axis} = \left\lfloor f_{c,axis} \times n_{p}(axis) \right\rfloor$
 \item Pixel ID number in the grid: $P_{id}(at) = p_{x} + n_{p}(x) \times p_{y} + \left[n_{p}(x) \times n_{p}(y)\right] \times p_{z}$
 \end{itemize}
 \item Associate each pixel with it surrouding neighbors in the grid, if needed apply PBC transformation(s)
-\item Search for bond candidates between the atoms of a pixel as well as the atoms of its surrouding pixel neighbors
-\item Evaluate distances using the atom's corrected fractional coordinates followed by a matrix transformation to Cartesian coordinates
+\item For all pixels $pix$ in the grid
+\begin{itemize}
+\item Search for neighbors between the atoms of pixel $pix$ as well as the atoms of its surrouding pixel neighbors $pjx$
+\begin{itemize}
+\item For 2 atoms $a$ in $pix$ and $b$ in $pjx$
+\begin{itemize}
+\item Evaluate $f_{ab}$ on $x$, $y$ and $z$ using the atom $a$ and $b$ corrected fractional coordinates $f_c$
+\item Transform back to Cartesian coordinates using $\Tc$
+\item Compute and return ${D_{ab}}^2$
+\item Compare ${D_{ab}}^2$ to ${\textrm{R}_{cut}}^2$ to determine if $a$ and $b$ are first neighbors
+\end{itemize}
+\end{itemize}
+\end{itemize}
 \end{itemize}
 \end{checklist}
 

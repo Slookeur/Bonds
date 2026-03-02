@@ -172,16 +172,19 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
   pbc_shift = np.zeros((3, 3, 3), dtype=int)  # shift for pixel neighbor number due to PBC
 
   # check if PBC are used
-  if use_pbc:
+  if use_pbc: 
+    # set PBC correction based on grid and pixel data
     set_pbc_shift(the_grid, the_pix.p_xyz, pbc_shift)
   else:
     for axis in range(3):
       if the_pix.p_xyz[axis] == 0 or the_pix.p_xyz[axis] == the_grid.n_pix[axis] - 1:
+        # if min or max on 'axis' then 'the_pix' is on the edge of the box
         boundary = True
 
   # adjust the loop start and end based on the grid dimensions
   for axis in range(3):
     if the_grid.n_pix[axis] == 1:
+      # in the grid there is a single pixel in the 'axis' direction
       l_start[axis] = 1
       l_end[axis] = 2
 
@@ -206,13 +209,15 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
             keep_neighbor = False
 
         if keep_neighbor:
-          # calculate the neighbor id
+          # evaluating neighbor pixel number in the grid
           nid = the_pix.pid + pmod[x_pos] + pmod[y_pos] * the_grid.n_pix[0] + pmod[z_pos] * the_grid.n_xy
           if use_pbc:
-            nid += pbc_shift[x_pos][y_pos][z_pos]
+	    # corrections if required in the case where PBC are applied
+	    nid += pbc_shift[x_pos][y_pos][z_pos]
           the_pix.pixel_neighbors[nnp] = nid
           nnp += 1
 
+  # total number of neighbors for pixel 'the_pix'
   the_pix.neighbors = nnp
 
 

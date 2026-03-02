@@ -225,6 +225,7 @@ SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
   endif
   do axis = 1 , 3
     if ( the_grid%n_pix(axis) .eq. 1 ) then
+      ! in the grid there is a single pixel in the 'axis' direction
       l_start(axis) = 2
       l_end(axis) = 2
     endif
@@ -253,7 +254,7 @@ SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
           ! evaluating neighbor pixel number in the grid
           nid = the_pix%pid + pmod(x_pos) + pmod(y_pos) * the_grid%n_pix(1) + pmod(z_pos) * the_grid%n_xy
           if ( use_pbc ) then
-            ! correcting the value if PBC are used
+	    ! corrections if required in the case where PBC are applied
             nid = nid + pbc_shift(x_pos, y_pos, z_pos)
           endif
           the_pix%pixel_neighbors(nnp) = nid
@@ -262,6 +263,7 @@ SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
       enddo
     enddo
   enddo
+  ! total number of neighbors for pixel 'the_pix'
   the_pix%neighbors = nnp
   
 END SUBROUTINE find_pixel_neighbors
