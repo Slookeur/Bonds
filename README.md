@@ -38,8 +38,7 @@ To build the PDF file of the manuscript:
 
 
 > [!WARNING]
-> Issues in version 1.0:
-> - The ` \affil[1]{ ` instruction, at line **136** in the main TeX file `bonds-lievcoms.tex`, is always producing an error, and it is required to comment this line to build the PDF.
+> Issue(s) in version 1.0:
 > - In the PDF file `bonds-lievcoms.pdf`, on page 6 of 25, now way to print all figures in the same column and then continue the discussion, for some reason(s) the third figure ("Corner of the pixel grid") is always inserted on second column.
 
 ## Sample codes
