@@ -2,10 +2,10 @@
 
 ![License][license]
 
-This repository contains the [LaTeX][latex] sources for my manuscript intitled "Efficient evaluation of interatomic distances in large atomic scale models". 
+This repository contains the [LaTeX][latex] sources for my manuscript intitled "Efficient first neighbor analysis in large atomic scale models". 
 It is prepared for publication in the [Living Journal of Computational Molecular Science][livecom]. 
 
-It also contains the latest PDF version: [Efficient evaluation of interatomic distances in large atomic scale models][bonds]
+It also contains the latest PDF version: [Efficient first neighbor analysis in large atomic scale models][bonds]
 
 ## Build instructions
 
