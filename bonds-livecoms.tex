@@ -6,15 +6,15 @@
 % The 'bestpractices' option for indicates that this is a best practices guide.
 % Omit the bestpractices option to remove the marking as a LiveCoMS paper.
 % Please note that these options may affect formatting.
-\usepackage[utf8]{inputenc}
-\usepackage{pslatex}
+%\usepackage[utf8]{inputenc}
+%\usepackage{pslatex}
 
 \usepackage{lipsum} % Required to insert dummy text
 \usepackage[version=4]{mhchem}
 \usepackage{siunitx}
 \DeclareSIUnit\Molar{M}
-%\usepackage[italic]{mathastext}
-\graphicspath{{img/}}
+\usepackage[italic]{mathastext}
+\graphicspath{{omega/}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% IMPORTANT USER CONFIGURATION
@@ -34,33 +34,6 @@
 \usepackage{blkarray}
 
 \newenvironment{ttenv}{\ttfamily}{\par}
-
-\newsavebox{\cobox}
-\def\script{
-  \noindent \\[0.25cm] \\
-  \begin{lrbox}
-  \cobox
-  \begin{minipage}[l]{16.5cm}
-  \begin{ttenv}}
-\def\endscript{
-  \end{ttenv}
-  \end{minipage}
-  \end{lrbox}
-  \colorbox{lg}{\usebox{\cobox}}
-  \vspace{0.25cm}\par\noindent}
-\newsavebox{\coboxi}
-\def\scripti{
-  \noindent \\[0.25cm] \\
-  \begin{lrbox}
-  \coboxi
-  \begin{minipage}[l]{14.966cm}
-  \begin{alltt}}
-\def\endscripti{
-  \end{alltt}
-  \end{minipage}
-  \end{lrbox}
-  \colorbox{lg}{\usebox{\coboxi}}
-  \vspace{0.25cm}\par\noindent}
 
 %Coloration synthaxique
 \newcommand{\magenta}[1]{\textcolor{magenta}{#1}}
@@ -84,9 +57,7 @@
 \newcommand{\vbtt}[1]{{\bf{\texttt{\violet{#1}}}}}
 \newcommand{\cbtt}[1]{{\bf{\texttt{\cyan{#1}}}}}
 
-\newcommand{\isaacs}{I.S.A.A.C.S.}
 \newcommand{\atomes}{{\bf{atomes}}}
-\newcommand{\atomesweb}{https://atomes.ipcms.fr}
 
 \newcommand{\zero}{\mbtt{0}}
 \newcommand{\un}{\mbtt{1}}
@@ -179,6 +150,7 @@ Examples codes are provided in C, FORTRAN90 and Python.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Introduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 \label{intro}
+
 Every student, every researcher in computational material science, has already spent time calculating interatomic distances. 
 This problem is even likely to be the first one computational material scientists will spend some time over during their studies. 
 As simple as the evaluation of a distance in 3D space could seem to be, the complexity of the problem increases considerably 
@@ -365,7 +337,9 @@ With:
 First neighbors list is calculated as follow:
 \begin{itemize}
 \item[1.] The pixel position ($p_x$,~$p_y$,~$p_z$) for every atom ($r_x$, $r_y$, $r_z$) in the model is to be calculated so that each atom can be assigned a pixel number in the grid.
+\vspace{0.125cm}
 \item[2.] Accordingly a list of atom containing pixels is created, the list of atom(s) in each pixel being stored. 
+\vspace{0.125cm}
 \item[3.] First neighbor(s) for an atom will then be search for in the pixel this atom belong to and in its surrounding pixel neighbors only, all other pixel(s) being safely ignored. \\ 
 The list of pixel neighbors is constructed using the mathematical relationships between each pixel index in the grid, 
 two cases must considered:
@@ -413,6 +387,7 @@ Note that this kind of approach only makes sense if the number of pixels in the 
 Non-cubic symmetries make it more complicated to offer a general methodology to deal with periodic systems:  
 \begin{itemize}
 \item[1.] Evaluate the number of pixel(s) on each axis, $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$, using equations \ref{e_npix} and \ref{e_dmax}. 
+\vspace{0.125cm}
 \item[2.] Convert atomic Cartesian coordinates to fractional coordinates using $\Tf$. \\
 Using the transformation to fractional coordinates is the easiest way to compute the distance between atoms in the model.  
 The problem requires to consider the periodicity of the system, and, in the case of non-cubic symmetry transformations, could be tricky when using Cartesian coordinates. 
@@ -421,22 +396,32 @@ Working with fractional coordinates is much easier since in that case correction
 \item Convert Cartesian coordinates to fractional coordinates ($f_{x}$, $f_{y}$, $f_{z}$) using Eq.~\ref{c2f}. 
 \item Compute corrected fractional coordinates ($f_{c,x}$, $f_{c,y}$, $f_{c,z}$) inside the model box:
 \begin{equation}
-f_{c,axis} = f_{axis} - \left\lfloor f_{axis} \right\rfloor \qquad \textrm{with}\qquad 0 \le f_{c,axis} < 1
+f_{c,axis} = f_{axis} - \left\lfloor f_{axis} \right\rfloor
+\end{equation}
+With:
+\begin{equation}
+0 \le f_{c,axis} < 1
 \end{equation}
 \end{itemize}
+\vspace{0.125cm}
 \item[3.] Pixel positions ($p_x$, $p_y$, $p_z$) are determined using the atom's corrected fractional coordinates ($f_{c,x}$, $f_{c,y}$, $f_{c,z}$):
 \begin{equation}
-p_{axis} = \left\lfloor f_{c,axis} \times n_{p}(axis) \right\rfloor \qquad \textrm{with} \qquad p_{axis} \in [0, n_{p}(axis)-1]
+p_{axis} = \left\lfloor f_{c,axis} \times n_{p}(axis) \right\rfloor
 \end{equation}
+With:
+\begin{equation}
+p_{axis} \in [0, n_{p}(axis)-1]
+\end{equation}
+\vspace{0.125cm}
 \item[4.] Determine each pixel neighbors: 
 \begin{itemize}
 \item Pixel inside the pixel grid:
 \begin{center}\includegraphics[width=4cm]{img/pixel-27-2.eps} \\[0.25cm]
 Self + 26 neighbors, no PBC transformation required. 
 \end{center}
-\clearpage
+\newpage
 \item Pixel on the boundary of the pixel grid :\\
-$p_{axis} = 0$ or $p_{axis} =  n_{p}(axis)-1$ \\ 
+$p_{axis} = 0$ or $p_{axis} =  n_{p}(axis)-1$ 
 \begin{center}
 Face of the pixel grid: \\[0.25cm] 
 \begin{blockarray}{ccc}\includegraphics[width=\pwdi]{img/pixel-18-2.eps} & \raisebox{\rsv}{+} & \includegraphics[width=\pwdi]{img/pixel-18-9.eps} \end{blockarray} \\
@@ -448,29 +433,48 @@ Corner of the pixel grid: \\[0.25cm]
 \begin{blockarray}{ccc}\includegraphics[width=\pwdj]{img/pixel-8-2.eps} & \raisebox{\rsv}{+} & \includegraphics[width=\pwdi]{img/pixel-8-19.eps} \end{blockarray} \\
 Self + 7 + 19 neighbors using PBC \\[0.5cm]
 \end{center}
-For a pixel with number $p_{id}$ with pixel coordinates ($p_x$, $p_y$, $p_z$) inside the pixel grid, pixel neighbors are determined as illustrated in figure~\ref{pixelmap}. 
-For pixel on the boundary of the grid, then adjustments are required to find the neighbors via PBC. 
 \end{itemize}
-\clearpage
-\item[5.] Compute the interatomic distance $D_{ab}$ between 2 atoms $a$ and $b$ using corrected fractional coordinates:
+\noindent For a pixel with number $p_{id}$ with pixel coordinates ($p_x$, $p_y$, $p_z$) inside the pixel grid, pixel neighbors are determined as illustrated in figure~\ref{pixelmap}. 
+For a pixel on the boundary of the grid, as the 3 cases described above, that means if $p_{axis} = 0$ or $p_{axis} = n_{p}(axis) - 1$, 
+then it is possible to determine its PBC pixel neighbors by applying a shift to the pixel neighbors number calculated as illustrated in fig.~\ref{pixelmap}. \\
+In the in the 3 directions of space: 
+\begin{align}\nonumber
+{\text{if }} p_{x} & = & 0 & \quad {\text{shift all}} & p_{x}-1 & \quad {\text{pixels by}} & n_{p}(x) \\ \nonumber
+{\text{if }} p_{x} & = & n_{p}(x) - 1 & \quad {\text{shift all}} & p_{x}+1 & \quad {\text{pixels by}} & -n_{p}(x) \\ \nonumber
+{\text{if }} p_{y} & = & 0 & \quad {\text{shift all}} & p_{y}-1 & \quad {\text{pixels by}} & n_{p}(xy) \\ \nonumber
+{\text{if }} p_{y} & = & n_{p}(y) - 1 & \quad {\text{shift all}} & p_{y}+1 & \quad {\text{pixels by}} & -n_{p}(xy) \\ \nonumber
+{\text{if }} p_{z} & = & 0 & \quad {\text{shift all}} & p_{z}-1 & \quad {\text{pixels by}} & n_{p}(xyz) \\ \nonumber
+{\text{if }} p_{z} & = & n_{p}(z) - 1 & \quad {\text{shift all}} & p_{z}+1 & \quad {\text{pixels by}} & -n_{p}(xyz) \nonumber
+\end{align}
+With: 
+\begin{equation}
+n_{p}(xy) = n_{p}(x) \times n_{p}(y)
+\end{equation}
+And: 
+\begin{equation}
+n_{p}(xyy) = n_{p}(x) \times n_{p}(y) \times n_{p}(z)
+\end{equation}
+\vspace{0.125cm}
+\item[5.] When searching for first neighbor atoms between atoms $i$ and $j$ of the same pixel or one of its surrounding pixel neighbor, 
+compute the interatomic distance $D_{ij}$ between $i$ and $j$ using their corrected fractional coordinates:
 \begin{eqnarray}
-f_{c,axis}(ab) & = & f_{c,axis}(a) - f_{c,axis}(b) \\[0.125cm]
-f_{axis}(ab) & = & f_{c,axis(ab)} - \left\lfloor f_{c,axis(ab)} \right\rceil \\[0.125cm]
-\vec{r}(ab) & = & \Tc \times \vec{f}(ab) \\[0.125cm]
-\quad {\textrm{with}} \quad \vec{r}(ab) & = & \left( \begin{blockarray}{c}
-r_x(ab) \\
-r_y(ab) \\
-r_z(ab)
+f_{c,axis}(ij) & = & f_{c,axis}(i) - f_{c,axis}(j) \\[0.125cm]
+f_{axis}(ij) & = & f_{c,axis(ij)} - \left\lfloor f_{c,axis(ij)} \right\rceil \\[0.125cm]
+\vec{r}(ij) & = & \Tc \times \vec{f}(ij) \\[0.125cm]
+\quad {\text{with}} \quad \vec{r}(ij) & = & \left( \begin{blockarray}{c}
+r_x(ij) \\
+r_y(ij) \\
+r_z(ij)
 \end{blockarray} \right) \\[0.125cm]
-\quad {\textrm{and}} \quad \vec{f}(ab) & = & \left( \begin{blockarray}{c}
-f_{x}(ab) \\
-f_{y}(ab) \\
-f_{z}(ab)
+\quad {\text{and}} \quad \vec{f}(ij) & = & \left( \begin{blockarray}{c}
+f_{x}(ij) \\
+f_{y}(ij) \\
+f_{z}(ij)
 \end{blockarray} \right) \\[0.125cm]
-D(ab) & = & \lvert \vec{r}(ab) \rvert
+D(ij) & = & \lvert \vec{r}(ij) \rvert
 \end{eqnarray}
 As mentioned in the previous section this approach only makes sense when the number of pixels in the grid is high enough so that all pixels are not neighbors. 
-In the case where PBC are applied this means that the number of pixels on one dimension, $x$, $y$, or $z$ should be higher than 3. 
+In the case where PBC are applied this means that the number of pixels on one dimension, $x$, $y$, or $z$ should be higher than 3. \\[0.25cm]
 \end{itemize}
 Commented codes that illustrate the entire work procedure are provided in: 
 \begin{itemize}
@@ -501,7 +505,7 @@ The general methodology behind efficient first neighbor(s) analysis in any kind 
 It was illustrated that the understanding of lattice mathematics can simplify the evaluation of interatomic bond distances 
 independently of the periodicity of the system, and that the particular idea of the pixelation, or partitioning, of the model box, 
 is a prerequisite to any modern implementation of this analysis. \\
-The methodoly described in this article is the one implemented in the \atomes\ software \cite{CMSatomes}. 
+The methodology described in this article is the one implemented in the \atomes\ software \cite{CMSatomes}. 
 % Although the methodology presented in this paper is not new per say, it was never properly introduced in any research article to date, or at least not to the author's knowledge. 
 
 \section*{Checklist}
@@ -512,7 +516,7 @@ The methodoly described in this article is the one implemented in the \atomes\ s
 \begin{checklist}{Searching for first neighbor atoms}
 \textbf{Non-periodic systems}
 \begin{itemize}
-\item Choose a cutoff radius ${\textrm{R}_{cut}}$ to determine first neighor atoms, compute and save ${\textrm{R}_{cut}}^2$
+\item Choose a cutoff radius ${\textrm{R}_{cut}}$ to determine first neighbor atoms, compute and save ${\textrm{R}_{cut}}^2$
 \item Find the maximum distances, $D_{max}(x)$, $D_{max}(y)$ and $D_{max}(z)$ that separate 2 atoms on $x$, $y$ and $z$
 \item Determine the number of pixels, $n_{p}(axis)$, on $x$, $y$ and $z$ using $n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\textrm{R}_{cut}} \right\rceil$
 \item Create a pixel grid for a virtual box with dimensions $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$ on $x$, $y$ and $z$ axis respectively.
@@ -521,10 +525,10 @@ The methodoly described in this article is the one implemented in the \atomes\ s
 \item Pixel position on each $axis$: $p_{axis} = \left\lfloor \frac{r_{axis} - min_{axis}}{\textrm{R}_{cut}} \right\rfloor$
 \item Pixel ID number in the grid: $P_{id}(at) = p_{x} + n_{p}(x) \times p_{y} + \left[n_{p}(x) \times n_{p}(y)\right] \times p_{z}$
 \end{itemize}
-\item Associate each pixel with it surrouding neighbors in the grid
+\item Associate each pixel with it surrounding neighbors in the grid
 \item For all pixels $pix$ in the grid
 \begin{itemize}
-\item Search for neighbors between the atoms of pixel $pix$ as well as the atoms of its surrouding pixel neighbors $pjx$
+\item Search for neighbors between the atoms of pixel $pix$ as well as the atoms of its surrounding pixel neighbors $pjx$
 \begin{itemize}
 \item For 2 atoms $a$ in $pix$ and $b$ in $pjx$
 \begin{itemize}
@@ -537,7 +541,7 @@ The methodoly described in this article is the one implemented in the \atomes\ s
 \end{itemize}
 \textbf{Periodic systems}
 \begin{itemize}
-\item Choose a cutoff radius ${\textrm{R}_{cut}}$ to determine first neighor atoms, compute and save ${\textrm{R}_{cut}}^2$
+\item Choose a cutoff radius ${\textrm{R}_{cut}}$ to determine first neighbor atoms, compute and save ${\textrm{R}_{cut}}^2$
 \item Use the lattice parameters as maximum interatomic distances on $x$, $y$ and $z$: $D_{max}(x) = \boxA$, $D_{max}(y) = \boxB$ and $D_{max}(z) = \boxC$
 \item Determine the number of pixels, $n_{p}(axis)$, on $x$, $y$ and $z$ using $n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\textrm{R}_{cut}} \right\rceil$
 \item Create a pixel grid with dimensions $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$ on $x$, $y$ and $z$ axis respectively.
@@ -548,10 +552,10 @@ The methodoly described in this article is the one implemented in the \atomes\ s
 \item Pixel position on each $axis$: $p_{axis} = \left\lfloor f_{c,axis} \times n_{p}(axis) \right\rfloor$
 \item Pixel ID number in the grid: $P_{id}(at) = p_{x} + n_{p}(x) \times p_{y} + \left[n_{p}(x) \times n_{p}(y)\right] \times p_{z}$
 \end{itemize}
-\item Associate each pixel with it surrouding neighbors in the grid, if needed apply PBC transformation(s)
+\item Associate each pixel with it surrounding neighbors in the grid, if needed apply PBC transformation(s)
 \item For all pixels $pix$ in the grid
 \begin{itemize}
-\item Search for neighbors between the atoms of pixel $pix$ as well as the atoms of its surrouding pixel neighbors $pjx$
+\item Search for neighbors between the atoms of pixel $pix$ as well as the atoms of its surrounding pixel neighbors $pjx$
 \begin{itemize}
 \item For 2 atoms $a$ in $pix$ and $b$ in $pjx$
 \begin{itemize}

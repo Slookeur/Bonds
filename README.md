@@ -37,10 +37,6 @@ To build the PDF file of the manuscript:
 > It also requires all needed dependencies, in particular the [`livecoms`][livecoms_class] document class.
 
 
-> [!WARNING]
-> Issue(s) in version 1.0:
-> - In the PDF file `bonds-lievcoms.pdf`, on page 6 of 25, now way to print all figures in the same column and then continue the discussion, for some reason(s) the third figure ("Corner of the pixel grid") is always inserted on second column.
-
 ## Sample codes
 
  Sample code in C, FORTRAN90 and Python are provided in the folder [`codes`][codes]
