@@ -67,11 +67,12 @@
 
 \newcommand{\ddst}{false}
 
-\newcommand{\boxA}{\textrm{A}}
-\newcommand{\boxB}{\textrm{B}}
-\newcommand{\boxC}{\textrm{C}}
-\newcommand{\Tc}{{\bf{\textrm{T}_c}}}
-\newcommand{\Tf}{{\bf{\textrm{T}_f}}}
+\newcommand{\boxA}{\text{A}}
+\newcommand{\boxB}{\text{B}}
+\newcommand{\boxC}{\text{C}}
+\newcommand{\Tc}{{\text{\bf{T}}_{\bf{c}}}}
+\newcommand{\Tf}{{\text{\bf{T}}_{\bf{f}}}}
+\newcommand{\Rc}{{\text{R}_{cut}}}
 \newcommand{\pwdi}{3.5cm}
 \newcommand{\pwdj}{2.5375cm}
 \newcommand{\rsv}{1.75cm}
@@ -100,7 +101,7 @@
 }
 \lstset{style=mystyle,escapechar=\|}
 
-\title{Efficient first neighbor analysis in large atomic scale models [Artivle v\versionnumber]}
+\title{Efficient first neighbor analysis in large atomic scale models [Article v\versionnumber]}
 
 % Do I really need the number ?
 \author[1*\authfn{1}]{Sébastien Le Roux}
@@ -273,9 +274,9 @@ Where the transformation matrix $\Tc$ is defined as:
 \noindent The idea of pixelation, or partitioning, of the model box illustrated in this section is mandatory to deal efficiently with 
 searching for neighbor atoms in large atomic scale models. 
 Indeed the intuitive way to implement the procedure would be to test every pair $i-j$ of atoms in the model: compute the interatomic 
-distance D$_{ij}$ between $i$ ($\alpha$) and $j$ ($\beta$), and then compared this distance to a cutoff radius R$_{cut}(\alpha,\beta)$, 
+distance D$_{ij}$ between $i$ ($\alpha$) and $j$ ($\beta$), and then compared this distance to a cutoff radius $\Rc(\alpha,\beta)$, 
 that could appropriately be determined when looking at the radial distribution function $g_{\alpha\beta}(r)$. 
-Then if D$_{ij}$ is smaller or equal to R$_{cut}(\alpha,\beta)$ then atoms $i$ and $j$ are first neighbors, otherwise they are not. 
+Then if D$_{ij}$ is smaller or equal to $\Rc(\alpha,\beta)$ then atoms $i$ and $j$ are first neighbors, otherwise they are not. 
 For a program which purpose is to render the atomic scale model in 3D space, the result of the analysis would be then to draw, or not, a bond between atoms $i$ and $j$. \\
 As intuitive and logical as this approach could seem to be, it requires to perform the testing for every pair of atoms in the model. 
 Which, as long as the size of the system remains within the thousand or few thousands of atoms, could work in a seemingly efficient manner. 
@@ -291,7 +292,7 @@ This is done by dividing, or partitioning, the model box in smaller parts, or pi
 \end{figure*}
 \\ Atomic coordinates will allow to associate an atom to a particular pixel. 
 Then for this particular atom neighbors candidates will only be search for in that same pixel and its immediate surrounding pixel neighbors. 
-The pixel dimension $a$ = R$_{cut}$, with R$_{cut}$ is the cutoff radius used to search for first neighbors atoms. \\ 
+The pixel dimension $a = \Rc$, with $\Rc$ is the cutoff radius used to search for first neighbors atoms. \\ 
 This approach will limit the area of interest to the smallest possible size. 
 Using this methodology the time order for the entire analysis becomes proportional to $N_p \times \frac{N_c \times (N_c - 1)}{2} $, 
 with $N_p$ is the total number of pixels in the grid, and $N_c$ is the average number of atom(s) in the pixel and its 26 surrounding neighbor pixels: $N_c <<< N_p << N$. \\ 
@@ -302,9 +303,9 @@ The idea behind this approach is illustrated in figure~\ref{pixelise}.
 The number of pixels on each axis, $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$, are calculated using:
 \begin{equation}
 \label{e_npix}
-n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\textrm{R}_{cut}} \right\rceil 
+n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\Rc} \right\rceil 
 \end{equation}
-Where $D_{max}(axis)$ is the maximum interatomic distance separating two atoms on $axis$, and R$_{cut}$ is the cutoff distance that separates neighbor atoms. \\
+Where $D_{max}(axis)$ is the maximum interatomic distance separating two atoms on $axis$, and $\Rc$ is the cutoff distance that separates neighbor atoms. \\
 Providing a model box, with parameters A, B, and C, encompassing the entire model could prove useful here, allowing the simplifications: 
 \begin{equation}
 \label{e_dmax}
@@ -319,7 +320,7 @@ pixels = n_{p}(x) \times n_{p}(y) \times n_{p}(z)
 \end{equation}
 For an atom $at$ with Cartesian coordinates ($r_x$, $r_y$, $r_z$) in the model, corresponding pixel indices in the pixel grid ($p_x$,~$p_y$,~$p_z$) can be calculated using:
 \begin{equation}
-p_{axis} = \left\lfloor \frac{r_{axis} - min_{axis}}{\textrm{R}_{cut}} \right\rfloor
+p_{axis} = \left\lfloor \frac{r_{axis} - min_{axis}}{\Rc} \right\rfloor
 \end{equation}
 With:
 \begin{equation}
@@ -473,6 +474,8 @@ f_{z}(ij)
 \end{blockarray} \right) \\[0.125cm]
 D(ij) & = & \lvert \vec{r}(ij) \rvert
 \end{eqnarray}
+Note that some further calculation time can be spared if $D(ij)^2$ only is calculated so that no squared root calculation is performed to obtain $D(ij)$. 
+Therefore in that case $D(ij)^2$ must be compared to $\Rc^2$. \\
 As mentioned in the previous section this approach only makes sense when the number of pixels in the grid is high enough so that all pixels are not neighbors. 
 In the case where PBC are applied this means that the number of pixels on one dimension, $x$, $y$, or $z$ should be higher than 3. \\[0.25cm]
 \end{itemize}
@@ -483,7 +486,7 @@ Commented codes that illustrate the entire work procedure are provided in:
 \item Python codes: \ref{p-pc-data} through \ref{p-pc-pixel}. \\
 Note that this Python code is provided to illustrate the entire implementation in Python, but for that particular programming language
 several Python libraries already exist and can be used as fronted to simplify the complete coding (ex: \href{https://ase-lib.org/}{ASE}, \href{https://thynnine.github.io/pysic/}{Pysic}, \href{https://www.mdanalysis.org/}{MDAnalysis}), 
-however in that case the pixelation approach is rarely coded in pure Python language (\href{https://thynnine.github.io/pysic/}{Pysic} using Fortran, \href{https://www.mdanalysis.org/}{MDAnalysis} using C).
+however in that case the pixelation approach is rarely coded in pure Python language (\href{https://thynnine.github.io/pysic/}{Pysic} using FORTRAN, \href{https://www.mdanalysis.org/}{MDAnalysis} using C).
 \end{itemize}
 
 \section{Further optimizations}
@@ -495,7 +498,7 @@ Several scenario, or approaches, can be envisioned depending on the size of the 
 \item Multiples (MPI or OpenMP): configurations can be distributed over the CPU and/or the CPU cores. 
 \item Multiples (MPI and OpenMP): with hybrid parallelization configurations can be distributed over the CPU, and atomic coordinates or pixels can be distributed over the CPU cores. 
 \end{itemize}
-Ideally the code would provide the option to switch to one or the other approach based on the number of configurations and or atoms in the system. \\ 
+Ideally the code would provide the option to switch between one and the other approach based on the number of configurations and or atoms in the system. \\ 
 Note that this is the case of the \atomes\ software \cite{CMSatomes} that implements an adaptive OpenMP programming distributing 
 either the atomic coordinates or the MD steps on the CPU cores. 
 
@@ -516,53 +519,53 @@ The methodology described in this article is the one implemented in the \atomes\
 \begin{checklist}{Searching for first neighbor atoms}
 \textbf{Non-periodic systems}
 \begin{itemize}
-\item Choose a cutoff radius ${\textrm{R}_{cut}}$ to determine first neighbor atoms, compute and save ${\textrm{R}_{cut}}^2$
+\item Choose a cutoff radius $\Rc$ to determine first neighbor atoms, compute and save $\Rc^2$
 \item Find the maximum distances, $D_{max}(x)$, $D_{max}(y)$ and $D_{max}(z)$ that separate 2 atoms on $x$, $y$ and $z$
-\item Determine the number of pixels, $n_{p}(axis)$, on $x$, $y$ and $z$ using $n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\textrm{R}_{cut}} \right\rceil$
+\item Determine the number of pixels, $n_{p}(axis)$, on $x$, $y$ and $z$ using $n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\Rc} \right\rceil$
 \item Create a pixel grid for a virtual box with dimensions $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$ on $x$, $y$ and $z$ axis respectively.
-\item Using its Cartesian coordinates, $r_{axis}$, associate each atom $at$ with a pixel position in the grid
+\item Using its Cartesian coordinates, $r(at)$, associate each atom $at$ with a pixel position in the grid
 \begin{itemize}
-\item Pixel position on each $axis$: $p_{axis} = \left\lfloor \frac{r_{axis} - min_{axis}}{\textrm{R}_{cut}} \right\rfloor$
+\item Pixel position on each $axis$: $p_{axis} = \left\lfloor \frac{r_{axis}(at) - min_{axis}}{\Rc} \right\rfloor$
 \item Pixel ID number in the grid: $P_{id}(at) = p_{x} + n_{p}(x) \times p_{y} + \left[n_{p}(x) \times n_{p}(y)\right] \times p_{z}$
 \end{itemize}
 \item Associate each pixel with it surrounding neighbors in the grid
-\item For all pixels $pix$ in the grid
+\item For all pixels in the grid
 \begin{itemize}
 \item Search for neighbors between the atoms of pixel $pix$ as well as the atoms of its surrounding pixel neighbors $pjx$
 \begin{itemize}
-\item For 2 atoms $a$ in $pix$ and $b$ in $pjx$
+\item For 2 atoms $i$ in pixel $pix$ and $j$ in pixel $pjx$
 \begin{itemize}
-\item Evaluate $r_{ab}$ on $x$, $y$ and $z$ using atoms $a$ and $b$ Cartesian coordinates
-\item Compute and return ${D_{ab}}^2$ 
-\item Compare ${D_{ab}}^2$ to ${\textrm{R}_{cut}}^2$ to determine if $a$ and $b$ are first neighbors
+\item Evaluate $r_{ij}$ on $x$, $y$ and $z$ using atoms $i$ and $j$ Cartesian coordinates
+\item Compute and return ${D_{ij}}^2$ 
+\item Compare ${D_{ij}}^2$ to $\Rc^2$ to determine if $i$ and $j$ are first neighbors
 \end{itemize}
 \end{itemize}
 \end{itemize}
 \end{itemize}
 \textbf{Periodic systems}
 \begin{itemize}
-\item Choose a cutoff radius ${\textrm{R}_{cut}}$ to determine first neighbor atoms, compute and save ${\textrm{R}_{cut}}^2$
+\item Choose a cutoff radius $\Rc$ to determine first neighbor atoms, compute and save $\Rc^2$
 \item Use the lattice parameters as maximum interatomic distances on $x$, $y$ and $z$: $D_{max}(x) = \boxA$, $D_{max}(y) = \boxB$ and $D_{max}(z) = \boxC$
-\item Determine the number of pixels, $n_{p}(axis)$, on $x$, $y$ and $z$ using $n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\textrm{R}_{cut}} \right\rceil$
+\item Determine the number of pixels, $n_{p}(axis)$, on $x$, $y$ and $z$ using $n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\Rc} \right\rceil$
 \item Create a pixel grid with dimensions $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$ on $x$, $y$ and $z$ axis respectively.
 \item Convert all atom Cartesian coordinates to fractional coordinates $f$ using $\Tf$
-\item Compute the corrected fractional coordinates $f_c$ to ensure that all are in the unit cell $f_{c,axis} = f_{axis} - \left\lfloor f_{axis} \right\rfloor$
-\item Using its correct fractional coordinates, $f_{c,axis}$, associate each atom $at$ with a pixel position in the grid
+\item Compute the corrected fractional coordinates $f_c$ to ensure that all atoms are in the unit cell $f_{c} = f - \left\lfloor\ f \right\rfloor$
+\item Using its correct fractional coordinates, $f_{c}(at)$, associate each atom $at$ with a pixel position in the grid
 \begin{itemize}
-\item Pixel position on each $axis$: $p_{axis} = \left\lfloor f_{c,axis} \times n_{p}(axis) \right\rfloor$
+\item Pixel position on each $axis$: $p_{axis} = \left\lfloor f_{c,axis}(at) \times n_{p}(axis) \right\rfloor$
 \item Pixel ID number in the grid: $P_{id}(at) = p_{x} + n_{p}(x) \times p_{y} + \left[n_{p}(x) \times n_{p}(y)\right] \times p_{z}$
 \end{itemize}
 \item Associate each pixel with it surrounding neighbors in the grid, if needed apply PBC transformation(s)
-\item For all pixels $pix$ in the grid
+\item For all pixels in the grid
 \begin{itemize}
 \item Search for neighbors between the atoms of pixel $pix$ as well as the atoms of its surrounding pixel neighbors $pjx$
 \begin{itemize}
-\item For 2 atoms $a$ in $pix$ and $b$ in $pjx$
+\item For 2 atoms $i$ in pixel $pix$ and $j$ in pixel $pjx$
 \begin{itemize}
-\item Evaluate $f_{ab}$ on $x$, $y$ and $z$ using the atom $a$ and $b$ corrected fractional coordinates $f_c$
+\item Evaluate $f_{ij}$ on $x$, $y$ and $z$ using the atom $i$ and $j$ corrected fractional coordinates $f_c$
 \item Transform back to Cartesian coordinates using $\Tc$
-\item Compute and return ${D_{ab}}^2$
-\item Compare ${D_{ab}}^2$ to ${\textrm{R}_{cut}}^2$ to determine if $a$ and $b$ are first neighbors
+\item Compute and return ${D_{ij}}^2$
+\item Compare ${D_{ij}}^2$ to $\Rc^2$ to determine if $i$ and $j$ are first neighbors
 \end{itemize}
 \end{itemize}
 \end{itemize}
