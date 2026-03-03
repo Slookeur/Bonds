@@ -73,6 +73,7 @@
 \newcommand{\Tc}{{\text{\bf{T}}_{\bf{c}}}}
 \newcommand{\Tf}{{\text{\bf{T}}_{\bf{f}}}}
 \newcommand{\Rc}{{\text{R}_{cut}}}
+\newcommand{\Dij}{{\text{D}_{ij}}}
 \newcommand{\pwdi}{3.5cm}
 \newcommand{\pwdj}{2.5375cm}
 \newcommand{\rsv}{1.75cm}
@@ -274,9 +275,9 @@ Where the transformation matrix $\Tc$ is defined as:
 \noindent The idea of pixelation, or partitioning, of the model box illustrated in this section is mandatory to deal efficiently with 
 searching for neighbor atoms in large atomic scale models. 
 Indeed the intuitive way to implement the procedure would be to test every pair $i-j$ of atoms in the model: compute the interatomic 
-distance D$_{ij}$ between $i$ ($\alpha$) and $j$ ($\beta$), and then compared this distance to a cutoff radius $\Rc(\alpha,\beta)$, 
+distance $\Dij$ between $i$ ($\alpha$) and $j$ ($\beta$), and then compared this distance to a cutoff radius $\Rc(\alpha,\beta)$, 
 that could appropriately be determined when looking at the radial distribution function $g_{\alpha\beta}(r)$. 
-Then if D$_{ij}$ is smaller or equal to $\Rc(\alpha,\beta)$ then atoms $i$ and $j$ are first neighbors, otherwise they are not. 
+Then if $\Dij$ is smaller or equal to $\Rc(\alpha,\beta)$ then atoms $i$ and $j$ are first neighbors, otherwise they are not. 
 For a program which purpose is to render the atomic scale model in 3D space, the result of the analysis would be then to draw, or not, a bond between atoms $i$ and $j$. \\
 As intuitive and logical as this approach could seem to be, it requires to perform the testing for every pair of atoms in the model. 
 Which, as long as the size of the system remains within the thousand or few thousands of atoms, could work in a seemingly efficient manner. 
@@ -397,7 +398,7 @@ Working with fractional coordinates is much easier since in that case correction
 \item Convert Cartesian coordinates to fractional coordinates ($f_{x}$, $f_{y}$, $f_{z}$) using Eq.~\ref{c2f}. 
 \item Compute corrected fractional coordinates ($f_{c,x}$, $f_{c,y}$, $f_{c,z}$) inside the model box:
 \begin{equation}
-f_{c,axis} = f_{axis} - \left\lfloor f_{axis} \right\rfloor
+f_{c,axis} = f_{axis} - \left\lfloor\ f_{axis}\ \right\rfloor
 \end{equation}
 With:
 \begin{equation}
@@ -407,7 +408,7 @@ With:
 \vspace{0.125cm}
 \item[3.] Pixel positions ($p_x$, $p_y$, $p_z$) are determined using the atom's corrected fractional coordinates ($f_{c,x}$, $f_{c,y}$, $f_{c,z}$):
 \begin{equation}
-p_{axis} = \left\lfloor f_{c,axis} \times n_{p}(axis) \right\rfloor
+p_{axis} = \left\lfloor\ f_{c,axis} \times n_{p}(axis)\ \right\rfloor
 \end{equation}
 With:
 \begin{equation}
@@ -457,25 +458,25 @@ n_{p}(xyy) = n_{p}(x) \times n_{p}(y) \times n_{p}(z)
 \end{equation}
 \vspace{0.125cm}
 \item[5.] When searching for first neighbor atoms between atoms $i$ and $j$ of the same pixel or one of its surrounding pixel neighbor, 
-compute the interatomic distance $D_{ij}$ between $i$ and $j$ using their corrected fractional coordinates:
+compute the interatomic distance $\Dij$ between $i$ and $j$ using their corrected fractional coordinates:
 \begin{eqnarray}
-f_{c,axis}(ij) & = & f_{c,axis}(i) - f_{c,axis}(j) \\[0.125cm]
-f_{axis}(ij) & = & f_{c,axis(ij)} - \left\lfloor f_{c,axis(ij)} \right\rceil \\[0.125cm]
-\vec{r}(ij) & = & \Tc \times \vec{f}(ij) \\[0.125cm]
-\quad {\text{with}} \quad \vec{r}(ij) & = & \left( \begin{blockarray}{c}
-r_x(ij) \\
-r_y(ij) \\
-r_z(ij)
+f_{ij}(axis) & = & f_{c,axis}(i) - f_{c,axis}(j) \\[0.125cm]
+f_{c,ij}(axis) & = & f_{ij}(axis) - \left\lfloor\ f_{ij}(axis)\ \right\rceil \\[0.125cm]
+\vec{r_{ij}} & = & \Tc \times \vec{f_{c,ij}} \\[0.125cm]
+\quad {\text{with}} \quad \vec{r_{ij}} & = & \left( \begin{blockarray}{c}
+r_{ij}(x) \\
+r_{ij}(y) \\
+r_{ij}(z) 
 \end{blockarray} \right) \\[0.125cm]
-\quad {\text{and}} \quad \vec{f}(ij) & = & \left( \begin{blockarray}{c}
-f_{x}(ij) \\
-f_{y}(ij) \\
-f_{z}(ij)
+\quad {\text{and}} \quad \vec{f_{c,ij}} & = & \left( \begin{blockarray}{c}
+f_{c,ij}(x) \\
+f_{c,ij}(y) \\
+f_{c,ij}(z) 
 \end{blockarray} \right) \\[0.125cm]
-D(ij) & = & \lvert \vec{r}(ij) \rvert
+\Dij & = & \lvert \vec{r_{ij}} \rvert
 \end{eqnarray}
-Note that some further calculation time can be spared if $D(ij)^2$ only is calculated so that no squared root calculation is performed to obtain $D(ij)$. 
-Therefore in that case $D(ij)^2$ must be compared to $\Rc^2$. \\
+Note that some further calculation time can be spared if $\Dij^2$ only is calculated so that no squared root calculation is performed to obtain $\Dij$. 
+Therefore in that case $\Dij^2$ must be compared to $\Rc^2$. \\
 As mentioned in the previous section this approach only makes sense when the number of pixels in the grid is high enough so that all pixels are not neighbors. 
 In the case where PBC are applied this means that the number of pixels on one dimension, $x$, $y$, or $z$ should be higher than 3. \\[0.25cm]
 \end{itemize}
@@ -525,7 +526,7 @@ The methodology described in this article is the one implemented in the \atomes\
 \item Create a pixel grid for a virtual box with dimensions $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$ on $x$, $y$ and $z$ axis respectively.
 \item Using its Cartesian coordinates, $r(at)$, associate each atom $at$ with a pixel position in the grid
 \begin{itemize}
-\item Pixel position on each $axis$: $p_{axis} = \left\lfloor \frac{r_{axis}(at) - min_{axis}}{\Rc} \right\rfloor$
+\item Pixel position on each $axis$: $p_{axis} = \left\lfloor \frac{r_{at}(axis) - min_{axis}}{\Rc} \right\rfloor$
 \item Pixel ID number in the grid: $P_{id}(at) = p_{x} + n_{p}(x) \times p_{y} + \left[n_{p}(x) \times n_{p}(y)\right] \times p_{z}$
 \end{itemize}
 \item Associate each pixel with it surrounding neighbors in the grid
@@ -536,8 +537,8 @@ The methodology described in this article is the one implemented in the \atomes\
 \item For 2 atoms $i$ in pixel $pix$ and $j$ in pixel $pjx$
 \begin{itemize}
 \item Evaluate $r_{ij}$ on $x$, $y$ and $z$ using atoms $i$ and $j$ Cartesian coordinates
-\item Compute and return ${D_{ij}}^2$ 
-\item Compare ${D_{ij}}^2$ to $\Rc^2$ to determine if $i$ and $j$ are first neighbors
+\item Compute and return $\Dij^2$ 
+\item Compare $\Dij^2$ to $\Rc^2$ to determine if $i$ and $j$ are first neighbors
 \end{itemize}
 \end{itemize}
 \end{itemize}
@@ -563,9 +564,10 @@ The methodology described in this article is the one implemented in the \atomes\
 \item For 2 atoms $i$ in pixel $pix$ and $j$ in pixel $pjx$
 \begin{itemize}
 \item Evaluate $f_{ij}$ on $x$, $y$ and $z$ using the atom $i$ and $j$ corrected fractional coordinates $f_c$
-\item Transform back to Cartesian coordinates using $\Tc$
-\item Compute and return ${D_{ij}}^2$
-\item Compare ${D_{ij}}^2$ to $\Rc^2$ to determine if $i$ and $j$ are first neighbors
+\item Correct $f_{ij}$ to $f_{c,ij}$ for potential PBC correction(s) : $f_{c,ij} = f_{ij} - \left\lfloor\ f_{ij}\ \right\rceil$
+\item Transform back $f_{c,ij}$ to Cartesian coordinates $r_{ij}$ using $\Tc$
+\item Compute and return $\Dij^2$
+\item Compare $\Dij^2$ to $\Rc^2$ to determine if $i$ and $j$ are first neighbors
 \end{itemize}
 \end{itemize}
 \end{itemize}
