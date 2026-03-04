@@ -84,7 +84,7 @@ void set_pbc_shift (pixel_grid * grid, int pixel_coord[|\trois|], int pbc_shift[
     {
       for ( |\obtt{z\_pos}| = |\zero| ; |\obtt{z\_pos}| < |\trois| ; |\obtt{z\_pos}| ++ )
       {
-        pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\obtt{z\_pos}|] = |\zero|;               // initialization without any shift
+        pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\obtt{z\_pos}|] = |\zero|;             // initialization without any shift
       }
     }
   }
@@ -368,7 +368,7 @@ void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
     {
       // if min or max on 'axis' then 'the_pix' is on the edge of the box
-      if ( the_pix->p_xyz[|\dbtt{axis}|] == |\zero| |\textbar\textbar| the_pix->p_xyz[|\dbtt{axis}|] == the_grid->n_pix[|\dbtt{axis}|] - |\un| ) boundary = TRUE;
+      if ( the_pix->p_xyz[|\dbtt{axis}|] == |\zero| |\textbar\textbar| the_pix->p_xyz[|\dbtt{axis}|] == the_grid->n_pix[|\dbtt{axis}|]-|\un| ) boundary = TRUE;
     }
   }
   for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )

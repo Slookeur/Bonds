@@ -74,7 +74,7 @@ void set_pbc_shift (pixel_grid * grid, int pixel_coord[3], int pbc_shift[3][3][3
     {
       for ( z_pos = 0 ; z_pos < 3 ; z_pos ++ )
       {
-        pbc_shift[x_pos][y_pos][z_pos] = 0;               // initialization without any shift
+        pbc_shift[x_pos][y_pos][z_pos] = 0;             // initialization without any shift
       }
     }
   }
@@ -338,7 +338,7 @@ void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
     for ( axis = 0 ; axis < 3 ; axis ++ )
     {
       // if min or max on 'axis' then 'the_pix' is on the edge of the box
-      if ( the_pix->p_xyz[axis] == 0 || the_pix->p_xyz[axis] == the_grid->n_pix[axis] - 1 ) boundary = TRUE;
+      if ( the_pix->p_xyz[axis] == 0 || the_pix->p_xyz[axis] == the_grid->n_pix[axis]-1 ) boundary = TRUE;
     }
   }
   for ( axis = 0 ; axis < 3 ; axis ++ )

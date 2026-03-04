@@ -78,19 +78,19 @@ SUBROUTINE set_pbc_shift (grid, pixel_coord, pbc_shift)
 
   if ( pixel_coord(|\un|) .eq. |\zero| ) then                               ! pixel position on 'x' is min
     pbc_shift(|\un|,:,:) = grid%n_pix(|\un|)
-  else if ( pixel_coord(|\un|) .eq. grid%n_pix(|\un|-|\un|) ) then              ! pixel position on 'x' is max
+  else if ( pixel_coord(|\un|) .eq. grid%n_pix(|\un|)-|\un| ) then             ! pixel position on 'x' is max
     pbc_shift(|\trois|,:,:) = - grid%n_pix(|\un|)
   endif
   
   if ( pixel_coord(|\deux|) .eq. |\zero| ) then                               ! pixel position on 'y' is min
     pbc_shift(:,|\un|,:) = pbc_shift(:,|\un|,:) + grid%n_xy
-  else if ( pixel_coord(|\deux|) .eq. grid%n_pix(|\deux|-|\un|) ) then              ! pixel position on 'y' is max
+  else if ( pixel_coord(|\deux|) .eq. grid%n_pix(|\deux|)-|\un| ) then             ! pixel position on 'y' is max
     pbc_shift(:,|\trois|,:) = pbc_shift(:,|\trois|,:) - grid%n_xy
   endif
   
   if ( pixel_coord(|\trois|) .eq. |\zero| ) then                               ! pixel position on 'z' is min
     pbc_shift(:,:,|\un|) = pbc_shift(:,:,|\un|) + grid%pixels
-  else if ( pixel_coord(|\trois|) .eq. grid%n_pix(|\trois|-|\un|) ) then              ! pixel position on 'z' is max
+  else if ( pixel_coord(|\trois|) .eq. grid%n_pix(|\trois|)-|\un| ) then             ! pixel position on 'z' is max
     pbc_shift(:,:,|\trois|) = pbc_shift(:,:,|\trois|) - grid%pixels
   endif
   
@@ -316,7 +316,7 @@ SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
     call set_pbc_shift (the_grid, the_pix%p_xyz, pbc_shift)
   else
     do |\dbtt{axis}| = |\un| , |\trois|
-      if ( the_pix%p_xyz(|\dbtt{axis}|) .eq. |\zero| .or. the_pix%p_xyz(|\dbtt{axis}|) .eq. the_grid%n_pix(|\dbtt{axis}|)-|\un| ) then
+      if ( the_pix%p_xyz(|\dbtt{axis}|) .eq. |\zero| .or. the_pix%p_xyz(|\dbtt{axis}|) .eq. the_grid%n_pix(|\dbtt{axis}|) - |\un| ) then
         boundary = .true.
       endif
     enddo
