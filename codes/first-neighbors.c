@@ -1,5 +1,6 @@
 
 
+#include <math.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -197,12 +198,12 @@ float adjust_pixels (bool use_pbc, pixel_grid * grid, float cmin[3], float cmax[
   // if the number density if < 0.01 atom / Angstrom^3
   if (rhonum < 0.01)
   {
-    rhopix = atomes;
+    rhopix = atoms;
     for ( axis = 0 ; axis < 3 ; axis ++ )      // For x, y and z
     {
       rhopix /= grid->n_pix[axis];
     }
-    mpsize = (targetdp/rhopix)**(1.0/3.0);
+    mpsize = pow (targetdp/rhopix, 1.0/3.0);
     if (mpsize > 1.0)
     {
       // we modify only the pixel size if the cutoff increases
@@ -267,7 +268,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
       grid->n_pix[axis] = (int)((cmax[axis] - cmin[axis])/pixel_size); // number of pixel(s) on 'axis'
     }
   }
-  pixel_size = adjut_grid_pixels (use_pbc, grid, cmin, cmax, pixel_size);
+  pixel_size = adjust_pixels (use_pbc, grid, cmin, cmax, pixel_size);
 
   grid->n_xy = grid->n_pix[0] * grid->n_pix[1]; // number of pixels on the plan 'xy'
   grid->pixels = grid->n_xy * grid->n_pix[2];   // total number of pixels in the grid
@@ -287,10 +288,10 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
       for ( axis = 0 ; axis < 3 ; axis ++ )     // for x, y and z
       {
         f_coord[axis] = f_coord[axis] - floorf(f_coord[axis]);
-        pixel_pos[axis] = (int)((f_coord[axis] * grid->n_pix[axis]);
+        pixel_pos[axis] = (int)(f_coord[axis] * grid->n_pix[axis]);
       }
       pixel_num = pixel_pos[0] + pixel_pos[1] * grid->n_pix[0] + pixel_pos[2] * grid->n_xy;
-      add_atom_to_pixel (& grid->pixel_list[pixel_num], aid, f_coord);
+      add_atom_to_pixel (& grid->pixel_list[pixel_num], pixel_pos, aid, f_coord);
     }
   }
   else                                          // without periodic boundary conditions
@@ -299,10 +300,10 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     {
       for ( axis = 0 ; axis < 3 ; axis ++ )     // for x, y and z
       {
-        pixel_pos[axis = (grid->n_pix[axis] == 1) ? 0 : (int)((c_coord[aid][axis] - cmin[axis])/pixel_size);
+        pixel_pos[axis] = (grid->n_pix[axis] == 1) ? 0 : (int)((c_coord[aid][axis] - cmin[axis])/pixel_size);
       }
       pixel_num = pixel_pos[0] + pixel_pos[1] * grid->n_pix[0] + pixel_pos[2] * grid->n_xy;
-      add_atom_to_pixel (grid, pixel_num, pixel_pos, aid, c_coord[aid]);
+      add_atom_to_pixel (& grid->pixel_list[pixel_num], pixel_pos, pixel_pos, aid, c_coord[aid]);
     }
   }
   return grid;
@@ -469,7 +470,7 @@ void pixel_search_for_neighbors (bool use_pbc)
           {
             // set pointer to the first atom to test
             at_i = & pix_i->pix_atoms[aid];
-            lstart = (pjx != pix) ? 0 : aid + 1;
+            l_start = (pjx != pix) ? 0 : aid + 1;
             // for all atom(s) in 'pix_j'
             for ( bid = l_start ; bid < pix_j->patoms ; bid ++ )
             {

@@ -149,7 +149,7 @@ SUBROUTINE adjust_pixel_numbers (use_pbc, grid, cmin, cmax, pixel_size)
   ! if the number density if < 0.01 atom / Angstrom^3
   if (rhonum .lt. 0.01) then
   
-    rhopix = atomes
+    rhopix = atoms
     do axis = 1 , 3                    ! for x, y and z
       rhopix = rhopix / grid%n_pix(axis)
     enddo
@@ -162,7 +162,7 @@ SUBROUTINE adjust_pixel_numbers (use_pbc, grid, cmin, cmax, pixel_size)
         if ( use_pbc ) then
           grid%n_pix(axis) = INT(l_params(axis) / pixel_size)
         else
-          grid%n_pix(axis) = INT((cmax(axis) - cmin(axis)) / pixel_size) 
+	  grid%n_pix(axis) = INT((cmax(axis) - cmin(axis)) / pixel_size) 
         endif
       endif
     endif
@@ -215,7 +215,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
     enddo
     do axis = 1 , 3                                    ! for x, y and z
       ! number of pixel(s) on 'axis'
-      grid%n_pix(axis) = INT(cmax(axis) - cmin(axis)/pixel_size)
+      grid%n_pix(axis) = INT((cmax(axis) - cmin(axis))/pixel_size)
     enddo
   endif
   

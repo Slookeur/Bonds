@@ -109,7 +109,7 @@ def add_atom_to_pixel(the_pixel: Pixel, pixel_coord: np.ndarray, atom_id: int, a
 def adjust_pixels (use_pbc : bool, grid : PixelGrid, cmin : np.ndarray, cmax : np.ndarray, pixel_size :  )
 
   targetdp = 1.85  # target atom density per pixel
-  rhonum = atomes
+  rhonum = atoms
   if use_pbc:
     rhonum = rhonum / volume
   else:
@@ -128,7 +128,7 @@ def adjust_pixels (use_pbc : bool, grid : PixelGrid, cmin : np.ndarray, cmax : n
       pixel_size = pixel_size * mpsize
       for axis in range(3):                          # for x, y and z
         if use_pbc: 
-	  grid.n_pix[axis] = int ( l_params [axis] / pixel_size )
+          grid.n_pix[axis] = int ( l_params [axis] / pixel_size )
 	else
           grid.n_pix[axis] = int (( cmax [axis] - cmin [axis]) / pixel_size )
 
@@ -136,7 +136,7 @@ def adjust_pixels (use_pbc : bool, grid : PixelGrid, cmin : np.ndarray, cmax : n
     # correction if the number of pixels on 'axis' is too small
     grid.n_pix[axis] = 1 if grid.n_pix[axis] < 3 else grid.n_pix[axis]
 
-  retrun pixel_size
+  return pixel_size
 
 
 
@@ -164,7 +164,7 @@ def prepare_pixel_grid(use_pbc : bool):
       # number of pixels on 'axis'
       grid.n_pix[axis] = int((cmax[axis] - cmin[axis]) / pixel_size)
   
-  pixel_size = adjust_pixel_numbers (use_pbc, grid, cmin, cmax, pixel_size)
+  pixel_size = adjust_pixels (use_pbc, grid, cmin, cmax, pixel_size)
 
   grid.n_xy = grid.n_pix[0] * grid.n_pix[1]          # number of pixels on the plan 'xy'
   grid.pixels = grid.n_xy * grid.n_pix[2]            # total number of pixels in the grid

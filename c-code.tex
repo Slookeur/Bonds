@@ -5,6 +5,7 @@
 
 \begin{lstlisting}[language=C]
 // global data structures and variables used in the next code sections
+#include <math.h>
 
 #define TRUE |\un|
 #define FALSE |\zero|
@@ -217,12 +218,12 @@ float adjust_pixels (bool use_pbc, pixel_grid * grid, float cmin[|\trois|], floa
   // if the number density if < 0.01 atom / |\blue{\AA}|^3
   if (rhonum < |\mbtt{0.01}|)
   {
-    rhopix = atomes;
+    rhopix = atoms;
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )      // For x, y and z
     {
       rhopix /= grid->n_pix[|\dbtt{axis}|];
     }
-    mpsize = (targetdp/rhopix)**(|\mbtt{1.0}|/|\mbtt{3.0}|);
+    mpsize = pow (targetdp/rhopix, |\mbtt{1.0}|/|\mbtt{3.0}|);
     if (mpsize > |\mbtt{1.0}|)
     {
       // we modify only the pixel size if the cutoff increases
@@ -292,7 +293,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
       grid->n_pix[|\dbtt{axis}|] = (int)((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|])/pixel_size); // number of pixel(s) on 'axis'
     }
   }
-  pixel_size = adjut_grid_pixels (use_pbc, grid, cmin, cmax, pixel_size);
+  pixel_size = adjust_pixels (use_pbc, grid, cmin, cmax, pixel_size);
 
   grid->n_xy = grid->n_pix[|\zero|] * grid->n_pix[|\un|]; // number of pixels on the plan 'xy'
   grid->pixels = grid->n_xy * grid->n_pix[|\deux|];   // total number of pixels in the grid
@@ -312,10 +313,10 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
       for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )     // for x, y and z
       {
         f_coord[|\dbtt{axis}|] = f_coord[|\dbtt{axis}|] - floorf(f_coord[|\dbtt{axis}|]);
-        pixel_pos[|\dbtt{axis}|] = (int)((f_coord[|\dbtt{axis}|] * grid->n_pix[|\dbtt{axis}|]);
+        pixel_pos[|\dbtt{axis}|] = (int)(f_coord[|\dbtt{axis}|] * grid->n_pix[|\dbtt{axis}|]);
       }
       pixel_num = pixel_pos[|\zero|] + pixel_pos[|\un|] * grid->n_pix[|\zero|] + pixel_pos[|\deux|] * grid->n_xy;
-      add_atom_to_pixel (& grid->pixel_list[pixel_num], |\cbtt{aid}|, f_coord);
+      add_atom_to_pixel (& grid->pixel_list[pixel_num], pixel_pos, |\cbtt{aid}|, f_coord);
     }
   }
   else                                          // without periodic boundary conditions
@@ -324,10 +325,10 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     {
       for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )     // for x, y and z
       {
-        pixel_pos[|\dbtt{axis}| = (grid->n_pix[|\dbtt{axis}|] == |\un|) ? |\zero| : (int)((c_coord[|\cbtt{aid}|][|\dbtt{axis}|] - cmin[|\dbtt{axis}|])/pixel_size);
+        pixel_pos[|\dbtt{axis}|] = (grid->n_pix[|\dbtt{axis}|] == |\un|) ? |\zero| : (int)((c_coord[|\cbtt{aid}|][|\dbtt{axis}|] - cmin[|\dbtt{axis}|])/pixel_size);
       }
       pixel_num = pixel_pos[|\zero|] + pixel_pos[|\un|] * grid->n_pix[|\zero|] + pixel_pos[|\deux|] * grid->n_xy;
-      add_atom_to_pixel (grid, pixel_num, pixel_pos, |\cbtt{aid}|, c_coord[|\cbtt{aid}|]);
+      add_atom_to_pixel (& grid->pixel_list[pixel_num], pixel_pos, pixel_pos, |\cbtt{aid}|, c_coord[|\cbtt{aid}|]);
     }
   }
   return grid;
@@ -508,7 +509,7 @@ void pixel_search_for_neighbors (bool use_pbc)
           {
             // set pointer to the first atom to test
             at_i = & pix_i->pix_atoms[|\dbtt{aid}|];
-            lstart = (|\rbtt{pjx}| != |\vbtt{pix}|) ? |\zero| : |\dbtt{aid}| + |\un|;
+            l_start = (|\rbtt{pjx}| != |\vbtt{pix}|) ? |\zero| : |\dbtt{aid}| + |\un|;
             // for all atom(s) in 'pix_j'
             for ( |\cbtt{bid}| = l_start ; |\cbtt{bid}| < pix_j->patoms ; |\cbtt{bid}| ++ )
             {

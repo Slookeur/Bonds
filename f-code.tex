@@ -170,7 +170,7 @@ SUBROUTINE adjust_pixel_numbers (use_pbc, grid, cmin, cmax, pixel_size)
   ! if the number density if < 0.01 atom / |\blue{\AA}|^3
   if (rhonum .lt. |\mbtt{0.01}|) then
   
-    rhopix = atomes
+    rhopix = atoms
     do |\dbtt{axis}| = |\un| , |\trois|                    ! for x, y and z
       rhopix = rhopix / grid%n_pix(|\dbtt{axis}|)
     enddo
@@ -183,7 +183,7 @@ SUBROUTINE adjust_pixel_numbers (use_pbc, grid, cmin, cmax, pixel_size)
         if ( use_pbc ) then
           grid%n_pix(|\dbtt{axis}|) = INT(l_params(|\dbtt{axis}|) / pixel_size)
         else
-          grid%n_pix(|\dbtt{axis}|) = INT((cmax(|\dbtt{axis}|) - cmin(|\dbtt{axis}|)) / pixel_size) 
+	  grid%n_pix(|\dbtt{axis}|) = INT((cmax(|\dbtt{axis}|) - cmin(|\dbtt{axis}|)) / pixel_size) 
         endif
       endif
     endif
@@ -241,7 +241,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
     enddo
     do |\dbtt{axis}| = |\un| , |\trois|                                    ! for x, y and z
       ! number of pixel(s) on 'axis'
-      grid%n_pix(|\dbtt{axis}|) = INT(cmax(|\dbtt{axis}|) - cmin(|\dbtt{axis}|)/pixel_size)
+      grid%n_pix(|\dbtt{axis}|) = INT((cmax(|\dbtt{axis}|) - cmin(|\dbtt{axis}|))/pixel_size)
     enddo
   endif
   
