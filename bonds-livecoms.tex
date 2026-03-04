@@ -73,6 +73,7 @@
 \newcommand{\Tc}{{\text{\bf{T}}_{\bf{c}}}}
 \newcommand{\Tf}{{\text{\bf{T}}_{\bf{f}}}}
 \newcommand{\Rc}{{\text{R}_{cut}}}
+\newcommand{\Pc}{{\text{P}_{cut}}}
 \newcommand{\Dij}{{\text{D}_{ij}}}
 \newcommand{\pwdi}{3.5cm}
 \newcommand{\pwdj}{2.5375cm}
@@ -293,7 +294,8 @@ This is done by dividing, or partitioning, the model box in smaller parts, or pi
 \end{figure*}
 \\ Atomic coordinates will allow to associate an atom to a particular pixel. 
 Then for this particular atom neighbors candidates will only be search for in that same pixel and its immediate surrounding pixel neighbors. 
-The pixel dimension $a = \Rc$, with $\Rc$ is the cutoff radius used to search for first neighbors atoms. \\ 
+The pixel dimension $\Pc$ should be close but sligtly superior to $\Rc$ the cutoff radius used to search for first neighbors atoms, ex: $\Pc = \Rc + 0.5$. \\
+\\ 
 This approach will limit the area of interest to the smallest possible size. 
 Using this methodology the time order for the entire analysis becomes proportional to $N_p \times \frac{N_c \times (N_c - 1)}{2} $, 
 with $N_p$ is the total number of pixels in the grid, and $N_c$ is the average number of atom(s) in the pixel and its 26 surrounding neighbor pixels: $N_c <<< N_p << N$. \\ 
@@ -304,9 +306,9 @@ The idea behind this approach is illustrated in figure~\ref{pixelise}.
 The number of pixels on each axis, $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$, are calculated using:
 \begin{equation}
 \label{e_npix}
-n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\Rc} \right\rceil 
+n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\Pc} \right\rceil 
 \end{equation}
-Where $D_{max}(axis)$ is the maximum interatomic distance separating two atoms on $axis$, and $\Rc$ is the cutoff distance that separates neighbor atoms. \\
+Where $D_{max}(axis)$ is the maximum interatomic distance separating two atoms on $axis$, and $\Pc \simeq \Rc$ is the pixel dimension, close to the cutoff distance that separates neighbor atoms. \\
 Providing a model box, with parameters A, B, and C, encompassing the entire model could prove useful here, allowing the simplifications: 
 \begin{equation}
 \label{e_dmax}
@@ -321,7 +323,7 @@ pixels = n_{p}(x) \times n_{p}(y) \times n_{p}(z)
 \end{equation}
 For an atom $at$ with Cartesian coordinates ($r_x$, $r_y$, $r_z$) in the model, corresponding pixel indices in the pixel grid ($p_x$,~$p_y$,~$p_z$) can be calculated using:
 \begin{equation}
-p_{axis} = \left\lfloor \frac{r_{axis} - min_{axis}}{\Rc} \right\rfloor
+p_{axis} = \left\lfloor \frac{r_{axis} - min_{axis}}{\Pc} \right\rfloor
 \end{equation}
 With:
 \begin{equation}
@@ -480,6 +482,22 @@ Therefore in that case $\Dij^2$ must be compared to $\Rc^2$. \\
 As mentioned in the previous section this approach only makes sense when the number of pixels in the grid is high enough so that all pixels are not neighbors. 
 In the case where PBC are applied this means that the number of pixels on one dimension, $x$, $y$, or $z$ should be higher than 3. \\[0.25cm]
 \end{itemize}
+
+\section{Limitations}
+
+Overall the pixelation, or partioning, of the model box approach is extremely efficient. 
+However some issues might arise when dealing with a very large system containing very few atoms, which could happen if: 
+\begin{itemize}
+\item No periodicity is involved but the model is very large and describes a single, or few, isolated molecule(s) that are far apart.
+\item The description of the model relies on a very large box, usually with a simple cubic periodicity, that contains a single or few isolated molecule. 
+\end{itemize}
+In such rare cases the number density, in atoms / \AA$^3$, can be very low  (< 0.01  atom / \AA$^3$), 
+but the number of pixels to describe the entire system to build the entire pixel grid can be too high for the memory allocation(s) required to perform the analysis. 
+To overcome this issue the size of the pixel $\Pc$ can be increased, to a value significantly higher than the cutoff radius $\Rc$, so that the density of atom(s) per pixel can be adjusted 
+to match a proper target value to ensure that the analysis will be successfull, for instance between 1.5 and 2 atoms per pixel. 
+
+\section{Example codes}
+
 Commented codes that illustrate the entire work procedure are provided in: 
 \begin{itemize}
 \item C codes: \ref{c-pc-data} through \ref{c-pc-pixel}.
@@ -520,13 +538,13 @@ The methodology described in this article is the one implemented in the \atomes\
 \begin{checklist}{Searching for first neighbor atoms}
 \textbf{Non-periodic systems}
 \begin{itemize}
-\item Choose a cutoff radius $\Rc$ to determine first neighbor atoms, compute and save $\Rc^2$
+\item Choose a cutoff radius $\Rc$ to determine first neighbor atoms, and the associated pixel dimension $\Pc$
 \item Find the maximum distances, $D_{max}(x)$, $D_{max}(y)$ and $D_{max}(z)$ that separate 2 atoms on $x$, $y$ and $z$
-\item Determine the number of pixels, $n_{p}(axis)$, on $x$, $y$ and $z$ using $n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\Rc} \right\rceil$
+\item Determine the number of pixels, $n_{p}(axis)$, on $x$, $y$ and $z$ using $n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\Pc} \right\rceil$
 \item Create a pixel grid for a virtual box with dimensions $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$ on $x$, $y$ and $z$ axis respectively.
 \item Using its Cartesian coordinates, $r(at)$, associate each atom $at$ with a pixel position in the grid
 \begin{itemize}
-\item Pixel position on each $axis$: $p_{axis} = \left\lfloor \frac{r_{at}(axis) - min_{axis}}{\Rc} \right\rfloor$
+\item Pixel position on each $axis$: $p_{axis} = \left\lfloor \frac{r_{at}(axis) - min_{axis}}{\Pc} \right\rfloor$
 \item Pixel ID number in the grid: $P_{id}(at) = p_{x} + n_{p}(x) \times p_{y} + \left[n_{p}(x) \times n_{p}(y)\right] \times p_{z}$
 \end{itemize}
 \item Associate each pixel with it surrounding neighbors in the grid
@@ -545,7 +563,7 @@ The methodology described in this article is the one implemented in the \atomes\
 \end{itemize}
 \textbf{Periodic systems}
 \begin{itemize}
-\item Choose a cutoff radius $\Rc$ to determine first neighbor atoms, compute and save $\Rc^2$
+\item Choose a cutoff radius $\Rc$ to determine first neighbor atoms, and the associated pixel dimension $\Pc$
 \item Use the lattice parameters as maximum interatomic distances on $x$, $y$ and $z$: $D_{max}(x) = \boxA$, $D_{max}(y) = \boxB$ and $D_{max}(z) = \boxC$
 \item Determine the number of pixels, $n_{p}(axis)$, on $x$, $y$ and $z$ using $n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\Rc} \right\rceil$
 \item Create a pixel grid with dimensions $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$ on $x$, $y$ and $z$ axis respectively.

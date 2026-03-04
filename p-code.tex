@@ -130,11 +130,12 @@ def prepare_pixel_grid(use_pbc : bool):
   cmin = [float(|\textquotesingle|inf|\textquotesingle|)] * |\trois|                          # initialize to infinity
   cmax = [-float(|\textquotesingle|inf|\textquotesingle|)] * |\trois|                         # initialize to negative infinity
   pixel_pos = np.zeros(3, dtype=int)
-  
+  pixel_size = cutoff + 0.5;                         # set a pixel size slightly higher than the cutoff
+
   if use_pbc:                                        # using periodic boundary conditions
     for |\dbtt{axis}| in range(|\trois|):                            # for x, y and z
       # number of pixels on 'axis'
-      grid.n_pix[|\dbtt{axis}|] = int(l_params[|\dbtt{axis}|] / cutoff) + |\un|
+      grid.n_pix[|\dbtt{axis}|] = int(l_params[|\dbtt{axis}|] / pixel_size)
   else:                                              # without periodic boundary conditions
     for |\dbtt{axis}| in range(|\trois|):
       cmin[|\dbtt{axis}|] = cmax[|\dbtt{axis}|] = c_coord[|\zero|][|\dbtt{axis}|]
@@ -144,7 +145,7 @@ def prepare_pixel_grid(use_pbc : bool):
         cmax[|\dbtt{axis}|] = max(cmax[|\dbtt{axis}|], c_coord[|\cbtt{aid}|][|\dbtt{axis}|])
     for |\dbtt{axis}| in range(|\trois|):                            # for x, y and z
       # number of pixels on 'axis'
-      grid.n_pix[|\dbtt{axis}|] = int((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / cutoff) + |\un|
+      grid.n_pix[|\dbtt{axis}|] = int((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / cutoff)
   
   for |\dbtt{axis}| in range(|\trois|):                              # for x, y and z
     # correction if the number of pixels on 'axis' is too small
@@ -167,7 +168,7 @@ def prepare_pixel_grid(use_pbc : bool):
   else:                                              # without periodic boundary conditions
     for |\cbtt{aid}| in range(atoms):                         # for all atoms
       for |\dbtt{axis}| in range(|\trois|):                          # for x, y and z
-        pixel_pos[|\dbtt{axis}|] = int((c_coord[|\cbtt{aid}|][|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / cutoff)
+        pixel_pos[|\dbtt{axis}|] = int((c_coord[|\cbtt{aid}|][|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / pixel_size)
       pixel_num = pixel_pos[|\zero|] + pixel_pos[|\un|] * grid.n_pix[|\zero|] + pixel_pos[|\deux|] * grid.n_xy
       add_atom_to_pixel(grid.pixel_list[pixel_num], pixel_pos, |\cbtt{aid}|, c_coord[|\cbtt{aid}|])
  

@@ -50,7 +50,8 @@ MODULE parameters
   REAL                                              :: cutoff             ! the cutoff to define first neighbors
   REAL                                              :: cutoff_squared     ! squared value of the cutoff to define first neighbors
   
-  ! model box description
+  ! model box description, if PBC are applied
+  REAL                                              :: volume             ! the lattice volume
   REAL, DIMENSION(|\trois|)                                :: l_params           ! lattice a, b and c
   REAL, DIMENSION(|\trois|,|\trois|)                              :: cart_to_frac       ! Cartesian to fractional coordinates matrix
   REAL, DIMENSION(|\trois|,|\trois|)                              :: frac_to_cart       ! fractional to Cartesian coordinates matrix
@@ -131,7 +132,71 @@ SUBROUTINE add_atom_to_pixel (the_pixel, pixel_coord, atom_id, atom_coord)
     the_pixel%pix_atoms(the_pixel%patoms)%coord(|\dbtt{axis}|) = atom_coord(|\dbtt{axis}|)
   enddo
 
-END SUBROUTINE
+END SUBROUTINE add_atom_to_pixel
+\end{lstlisting}
+
+\clearpage
+
+\subsection{FORTRAN90 code: adjusting the number of pixel in the grid}
+\label{f-adjust-pixel-grid}
+
+\begin{lstlisting}[language={[90]FORTRAN}]
+SUBROUTINE adjust_pixel_numbers (use_pbc, grid, cmin, cmax, pixel_size)
+
+  USE parameters
+  IMPLICIT NONE
+  
+  LOGICAL, INTENT(IN)              :: use_pbc          ! flag to set if PBC are used or not
+  TYPE (pixel_grid), INTENT(INOUT) :: grid             ! the pixel grid to prepare
+  REAL, DIMENSION(|\trois|), INTENT(IN)   :: cmin, cmax       ! real precision coordinates min, max
+  REAL, INTENT(INOUT)              :: pixel_size       ! the initial pixel size
+  REAL                             :: targetdp=|\mbtt{1.85}|    ! target atom density per pixel
+  REAL                             :: rhonum           ! number density
+  REAL                             :: rhopix           ! number density by pixel
+  REAL                             :: mpsize           ! modifier of the pixel size
+  INTEGER                          :: |\dbtt{axis}|             ! loop iterator axis id (1=x, 2=y, 3=z)
+
+  rhonum = atoms
+  if (use_pbc) then
+    rhonum = rhonum / volume
+  else
+    // Approximation using a cubic box
+    do |\dbtt{axis}| = |\un| , |\trois|                    ! for x, y and z
+      rhonum = rhonum / (cmax(|\dbtt{axis}|) - cmin(|\dbtt{axis}|))
+    enddo
+  endif
+
+  // if the number density if < 0.01 atom / |\AA$^3$|
+  if (rhonum .lt. |\mbtt{0.01}|) then
+  
+    rhopix = atomes
+    do |\dbtt{axis}| = |\un| , |\trois|                    ! for x, y and z
+      rhopix = rhopix / grid%n_pix(|\dbtt{axis}|)
+    enddo
+    mpsize = (targetdp/rhopix)**(|\mbtt{1.0}|/|\mbtt{3.0}|)
+    if (mpsize .gt. |\mbtt{1.0}|) then
+      ! we modify only the pixel size if the cutoff increases
+      ! otherwise we would increase the number of pixels
+      pixel_size = pixel_size*mpsize
+      do |\dbtt{axis}|= |\un| , |\trois|                    ! for x, y and z
+        if ( use_pbc ) then
+          grid%n_pix(|\dbtt{axis}|) = INT(l_params(|\dbtt{axis}|) / pixel_size)
+	else
+          grid%n_pix(|\dbtt{axis}|) = INT((cmax(|\dbtt{axis}|) - cmin(|\dbtt{axis}|)) / pixel_size) 
+        endif
+      endif
+    endif
+
+  endif
+
+  do |\dbtt{axis}| = |\un| , |\trois|                                      ! for x, y and z
+    ! correction if the number of pixel(s) on 'axis' is too small
+    if ( grid%n_pix(|\dbtt{axis}|) .lt. |\trois| ) then
+      grid%n_pix(|\dbtt{axis}|) = |\un|
+    endif
+  enddo
+
+END SUBROUTINE adjust_pixel_numbers
 \end{lstlisting}
 
 \clearpage
@@ -154,11 +219,13 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   INTEGER, DIMENSION(|\trois|)            :: pixel_pos        ! pixel coordinates in the grid
   REAL, DIMENSION(|\trois|)               :: cmin, cmax       ! real precision coordinates min, max
   REAL, DIMENSION(|\trois|)               :: f_coord          ! real precision fractional coordinates
-  
+  REAL                             :: pixel_size       ! the size of the pixel
+
+  pixel_size = cutoff + 0.5                            ! set a pixel size slightly higher than the cutoff
   if ( use_pbc ) then                                  ! using periodic boundary conditions
       do |\dbtt{axis}| = |\un| , |\trois|                                    ! for x, y and z
       ! number of pixel(s) on 'axis'
-      grid%n_pix(|\dbtt{axis}|) = INT(l_params(|\dbtt{axis}|) / cutoff) + |\un|
+      grid%n_pix(|\dbtt{axis}|) = INT(l_params(|\dbtt{axis}|) / pixel_size)
     enddo
   else                                                 ! without periodic boundary conditions
     do |\dbtt{axis}| = |\un| , |\trois|
@@ -173,16 +240,12 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
     enddo
     do |\dbtt{axis}| = |\un| , |\trois|                                    ! for x, y and z
       ! number of pixel(s) on 'axis'
-      grid%n_pix(|\dbtt{axis}|) = INT((cmax(|\dbtt{axis}|) - cmin(|\dbtt{axis}|)) / cutoff) + |\un|
+      grid%n_pix(|\dbtt{axis}|) = INT(cmax(|\dbtt{axis}|) - cmin(|\dbtt{axis}|)/pixel_size)
     enddo
   endif
-  do |\dbtt{axis}| = |\un| , |\trois|                                      ! for x, y and z
-    ! correction if the number of pixel(s) on 'axis' is too small
-    if ( grid%n_pix(|\dbtt{axis}|) .lt. |\quatre| ) then
-      grid%n_pix(|\dbtt{axis}|) = |\un|
-    endif
-  enddo
   
+  call adjust_pixel_numbers (use_pbc, grid, cmi, cmax, pixel_size)
+    
   grid%n_xy = grid%n_pix(|\un|) * grid%n_pix(|\deux|)            ! number of pixels on the plan 'xy'
   grid%pixels = grid%n_xy * grid%n_pix(|\trois|)              ! total number of pixels in the grid
 
@@ -205,7 +268,11 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   else                                                 ! without periodic boundary conditions
     do |\cbtt{aid}| = |\un| , atoms                                 ! for all atoms
       do |\dbtt{axis}| = |\un| , |\trois|                                  ! for x, y and z
-        pixel_pos(|\dbtt{axis}|) = INT( (c_coord(|\cbtt{aid}|,|\dbtt{axis}|) - cmin(|\dbtt{axis}|) )/ cutoff)
+	if (grid%n_pix(|\dbtt{axis}|) .eq. |\un|) then
+          pixel_pos(|\dbtt{axis}|) = 0
+	else
+          pixel_pos(|\dbtt{axis}|) = INT((c_coord(|\cbtt{aid}|,|\dbtt{axis}|) - cmin(|\dbtt{axis}|))/pixel_size)
+	endif
       enddo
       pixel_num = pixel_pos(|\un|) + pixel_pos(|\deux|) * grid%n_pix(|\un|) + pixel_pos(|\trois|) * grid%n_xy + |\un|
       call add_atom_to_pixel (grid%pixel_list(pixel_num), pixel_pos, |\cbtt{aid}|, c_coord(|\cbtt{aid}|,:))

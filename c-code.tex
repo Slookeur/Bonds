@@ -58,7 +58,8 @@ float ** c_coord;          // list of Cartesian coordinates: c_coord[atoms][3]
 float cutoff;              // the cutoff to define atomic bond(s)
 float cutoff_squared;      // squared value for the cutoff
 
-// model box description
+// model box description, if PBC are applied
+float volume;              // the lattice volume
 float l_params[|\trois|];         // lattice a, b and c
 float cart_to_frac[|\trois|][|\trois|];  // Cartesian to fractional coordinates matrix
 float frac_to_cart[|\trois|][|\trois|];  // fractional to Cartesian coordinates matrix
@@ -185,6 +186,65 @@ void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[|\trois|], int atom_i
 
 \clearpage
 
+\subsection{C code: adjusting the number of pixel in the grid}
+\label{c-adjust-pixel-grid}
+
+\begin{lstlisting}[language=C]
+float adjust_pixels (bool use_pbc, pixel_grid * grid, float cmin[|\trois|], float cmax[|\trois|], float pixel_size)
+{
+  
+  int |\dbtt{axis}|;                       // loop iterator axis id (1=x , 2=y , 3= z)
+  float targetdp = |\mbtt{1.85}|    // target atom density per pixel
+  float rhonum;             // number density
+  float rhopix;             // number density by pixel
+  float mpsize;             // modifier of the pixel size
+ 
+  rhonum = atoms;
+  if ( use_pbc )                                // using periodic boundary conditions
+  {
+    rhonum = rhonum / volume;
+  }
+  else
+  {
+    for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
+    {
+      rhonum /= (cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]);
+    }
+  }
+  
+  // if the number density if < 0.01 atom / |\AA$^3$|
+  if (rhonum < |\mbtt{0.01}|)
+  {
+    rhopix = atomes;
+    for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
+    {
+      rhopix /= grid->n_pix[|\dbtt{axis}|];
+    }
+    mpsize = (targetdp/rhopix)**(|\mbtt{1.0}|/|\mbtt{3.0}|);
+    if (mpsize > |\mbtt{1.0}|)
+    {
+      // we modify only the pixel size if the cutoff increases
+      // otherwise we would increase the number of pixels
+      pixel_size = pixel_size*mpsize;
+      for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
+      {
+        if ( use_pbc )
+	{
+          grid->n_pix[|\dbtt{axis}|] = (int)(l_params[|\dbtt{axis}|] / pixel_size);
+        }
+        else
+	{
+          grid->n_pix[|\dbtt{axis}|] = (int)((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / pixel_size);
+        }
+      }
+   }
+ }
+ return pixel_size;
+}
+\end{lstlisting}
+
+\clearpage
+
 \subsection{C code: preparation of the pixel grid}
 \label{c-pc-grid}
 
@@ -198,13 +258,15 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   int pixel_pos[|\trois|];         // pixel coordinates in the grid
   float cmin[|\trois|], cmax[|\trois|];   // float coordinates min, max values
   float f_coord[|\trois|];         // float fractional coordinates
+  float pixel_size;         // the size of the pixel
 
   grid = malloc(sizeof*grid);
+  pixel_size = cutoff + 0.5;                    // set a pixel size slightly higher than the cutoff
   if ( use_pbc )                                // using periodic boundary conditions
   {
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )       // For x, y and z
     {
-      grid->n_pix[|\dbtt{axis}|] = (int)(l_params[|\dbtt{axis}|] / cutoff) + |\un|; // number of pixel(s) on 'axis'
+      grid->n_pix[|\dbtt{axis}|] = (int)(l_params[|\dbtt{axis}|] / pixel_size); // number of pixel(s) on 'axis'
     }
   }
   else                                          // without periodic boundary conditions
@@ -220,9 +282,10 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     }
     for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )       // For x, y and z
     {
-      grid->n_pix[|\dbtt{axis}|] = (int)((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / cutoff) + |\un|; // number of pixel(s) on 'axis'
+      grid->n_pix[|\dbtt{axis}|] = (int)((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|])/pixel_size); // number of pixel(s) on 'axis'
     }
   }
+  pixel_size = adjut_grid_pixels (use_pbc, grid, cmin, cmax, pixel_size);
   for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )         // For x, y and z
   {
     // correction if the number of pixel(s) on 'axis' is too small
@@ -258,7 +321,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     {
       for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )     // for x, y and z
       {
-        pixel_pos[|\dbtt{axis}|] = (int)((c_coord[|\cbtt{aid}|][|\dbtt{axis}|] - cmin[|\dbtt{axis}|])/cutoff);
+        pixel_pos[|\dbtt{axis}|] = (int)((c_coord[|\cbtt{aid}|][|\dbtt{axis}|] - cmin[|\dbtt{axis}|])/pixel_size);
       }
       pixel_num = pixel_pos[|\zero|] + pixel_pos[|\un|] * grid->n_pix[|\zero|] + pixel_pos[|\deux|] * grid->n_xy;
       add_atom_to_pixel (grid, pixel_num, pixel_pos, |\cbtt{aid}|, c_coord[|\cbtt{aid}|]);
