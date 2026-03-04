@@ -100,8 +100,6 @@ def set_pbc_shift(pixel_grid : PixelGrid, pixel_coord : np.ndarray, pbc_shift : 
         pbc_shift[|\vbtt{x\_pos}|][|\rbtt{y\_pos}|][|\deux|] -= pixel_grid.pixels
 \end{lstlisting}
 
-\clearpage
-
 \subsection{Python code: add atom to pixel}
 \label{c-add-atom-pixel}
 
@@ -208,7 +206,7 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
     if the_grid.n_pix[|\dbtt{axis}|] == |\un|:
       # in the grid there is a single pixel in the 'axis' direction
       l_start[|\dbtt{axis}|] = |\un|
-      l_end[|\dbtt{axis}|] = |\deux|
+      l_end[|\dbtt{axis}|] = |\un|
 
   |\bftt{nnp}| = |\zero|  # number of neighbors
   for |\vbtt{x\_pos}| in range(l_start[|\zero|], l_end[|\zero|]):
