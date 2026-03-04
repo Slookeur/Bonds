@@ -58,8 +58,8 @@ frac_to_cart = np.zeros((|\trois|, |\trois|))                                   
 \subsection{Python code: set pixel periodic boundary condition shift}
 
 \begin{lstlisting}[language=Python]
-# adjust, if needed, shift to search for pixel neighbor(s) using PBC
-# - grid pixel_grid          : the pixel grid
+# adjust, if needed, the shift to search for pixel neighbor(s) using PBC
+# - PixelGrid pixel_grid     : the pixel grid
 # - int pixel_coord[|\trois|]       : the pixel coordinates in the grid
 # - int pbc_shift[|\trois|][|\trois|][|\trois|]   : the shift, correction, to be calculated
 def set_pbc_shift(pixel_grid : PixelGrid, pixel_coord : np.ndarray, pbc_shift : np.ndarray):
@@ -180,9 +180,9 @@ def prepare_pixel_grid(use_pbc : bool):
 
 \begin{lstlisting}[language=Python]
 # Finding neighbor pixels for pixel in the grid
-# - bool use_pbc    : flag to set if PBC are used or not
-# - grid * the_grid : pointer to the pixel grid
-# - pixel * the_pix : pointer to the pixel with neighbors to be found
+# - bool use_pbc         : flag to set if PBC are used or not
+# - PixelGrid * the_grid : pointer to the pixel grid
+# - Pixel * the_pix      : pointer to the pixel with neighbors to be found
 def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
   boundary = False                            # is pixel on the boundary of the grid
   keep_neighbor = True                        # keep or not neighbor during analysis
@@ -247,9 +247,6 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
 
 \begin{lstlisting}[language=Python]
 # evaluating the interatomic distance between 2 pixel atoms
-# - bool use_pbc      : flag to set if PBC are used or not
-# - pixel_atom * at_i : pointer to first pixel atom
-# - pixel_atom * at_j : pointer to second pixel atom
 def evaluate_distance(use_pbc : bool, at_i : PixelAtom, at_j : PixelAtom):
   dist = Distance()   # placeholder for the distance data structure
   Rij = np.zeros(|\trois|)  # initialize the distance vector
@@ -258,7 +255,7 @@ def evaluate_distance(use_pbc : bool, at_i : PixelAtom, at_j : PixelAtom):
     Rij[|\dbtt{axis}|] = at_i.coord[|\dbtt{axis}|] - at_j.coord[|\dbtt{axis}|]
 
   if use_pbc:
-    # then the pixel_atom's coordinates are in corrected fractional format
+    # then the PixelAtom's coordinates are in corrected fractional format
     for |\dbtt{axis}| in range(|\trois|):
       Rij[axis] = Rij[axis] - round(Rij[axis])
     
