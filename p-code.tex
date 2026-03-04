@@ -125,7 +125,7 @@ def add_atom_to_pixel(the_pixel: Pixel, pixel_coord: np.ndarray, atom_id: int, a
 \begin{lstlisting}[language=Python]
 def adjust_pixel_numbers (use_pbc : bool, grid : PixelGrid, cmin : np.ndarray, cmax : np.ndarray, pixel_size : float):
 
-  targetdp = 1.85  # target atom density per pixel
+  targetdp = |\mbtt{1.85}|  # target atom density per pixel
   rhonum = atoms
   if use_pbc:
     rhonum = rhonum / volume
@@ -138,8 +138,8 @@ def adjust_pixel_numbers (use_pbc : bool, grid : PixelGrid, cmin : np.ndarray, c
     for |\dbtt{axis}| in range(|\trois|):                            # for x, y and z
       rhopix = rhopix / grid.n_pix[|\dbtt{axis}|]
  
-    mpsize = (targetdp / rhopix ) **(1.0/3.0)
-    if mpsize > 1.0:
+    mpsize = (targetdp / rhopix ) **(|\mbtt{1.0}|/|\mbtt{3.0}|)
+    if mpsize > |\mbtt{1.0}|:
       # we modify only the pixel size if the cutoff increases
       # otherwise we would increase the number of pixels
       pixel_size = pixel_size * mpsize
