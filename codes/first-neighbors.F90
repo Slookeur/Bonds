@@ -271,7 +271,7 @@ SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
   TYPE (pixel_grid), INTENT(INOUT)     :: the_grid                ! pointer to the pixel grid
   TYPE (pixel), POINTER, INTENT(INOUT) :: the_pix                 ! pointer to the pixel
   INTEGER                              :: axis                    ! loop iterator axis id (1=x, 2=y, 3=z)
-  INTEGER                              :: x_pos, y_pos, z_pos    ! neighbor position on x, y and z
+  INTEGER                              :: x_pos, y_pos, z_pos     ! neighbor position on x, y and z
   INTEGER, DIMENSION(3)                :: l_start = (/1, 1, 1/)   ! loop iterators starting value
   INTEGER, DIMENSION(3)                :: l_end = (/3, 3, 3/)     ! loop iterators ending value
   INTEGER, DIMENSION(3)                :: pmod = (/-1, 0, 1/)     ! position modifiers
