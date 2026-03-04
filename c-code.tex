@@ -186,7 +186,7 @@ void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[|\trois|], int atom_i
 
 \clearpage
 
-\subsection{C code: adjusting the number of pixel in the grid}
+\subsection{C code: adjusting the number of pixels in the grid}
 \label{c-adjust-pixel-grid}
 
 \begin{lstlisting}[language=C]
@@ -194,29 +194,31 @@ float adjust_pixels (bool use_pbc, pixel_grid * grid, float cmin[|\trois|], floa
 {
   
   int |\dbtt{axis}|;                       // loop iterator axis id (1=x , 2=y , 3= z)
-  float targetdp = |\mbtt{1.85}|    // target atom density per pixel
-  float rhonum;             // number density
-  float rhopix;             // number density by pixel
-  float mpsize;             // modifier of the pixel size
+  float targetdp = |\mbtt{1.85}|;          // target atom density per pixel
+  float rhonum;                   // number density
+  float rhopix;                   // number density by pixel
+  float mpsize;                   // modifier of the pixel size
  
   rhonum = atoms;
-  if ( use_pbc )                                // using periodic boundary conditions
+  if ( use_pbc )
   {
+    // if PBC are used then use the exact volume
     rhonum = rhonum / volume;
   }
   else
   {
-    for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
+    // otherwise approximate a cubic box
+    for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )      // For x, y and z
     {
       rhonum /= (cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]);
     }
   }
   
-  // if the number density if < 0.01 atom / |\AA$^3$|
+  // if the number density if < 0.01 atom / |\blue{\AA$^3$}|
   if (rhonum < |\mbtt{0.01}|)
   {
     rhopix = atomes;
-    for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
+    for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )      // For x, y and z
     {
       rhopix /= grid->n_pix[|\dbtt{axis}|];
     }
@@ -229,15 +231,20 @@ float adjust_pixels (bool use_pbc, pixel_grid * grid, float cmin[|\trois|], floa
       for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )
       {
         if ( use_pbc )
-	{
+        {
           grid->n_pix[|\dbtt{axis}|] = (int)(l_params[|\dbtt{axis}|] / pixel_size);
         }
         else
-	{
+        {
           grid->n_pix[|\dbtt{axis}|] = (int)((cmax[|\dbtt{axis}|] - cmin[|\dbtt{axis}|]) / pixel_size);
         }
       }
    }
+ }
+ for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )         // For x, y and z
+ {
+   // correction if the number of pixel(s) on 'axis' is too small
+   grid->n_pix[|\dbtt{axis}|] = (grid->n_pix[|\dbtt{axis}|] < |\trois|) ? |\un| : grid->n_pix[|\dbtt{axis}|];
  }
  return pixel_size;
 }
@@ -286,11 +293,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     }
   }
   pixel_size = adjut_grid_pixels (use_pbc, grid, cmin, cmax, pixel_size);
-  for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )         // For x, y and z
-  {
-    // correction if the number of pixel(s) on 'axis' is too small
-    grid->n_pix[|\dbtt{axis}|] = (grid->n_pix[|\dbtt{axis}|] < |\quatre|) ? |\un| : grid->n_pix[|\dbtt{axis}|];
-  }
+
   grid->n_xy = grid->n_pix[|\zero|] * grid->n_pix[|\un|]; // number of pixels on the plan 'xy'
   grid->pixels = grid->n_xy * grid->n_pix[|\deux|];   // total number of pixels in the grid
   grid->pixel_list = malloc (grid->pixels*sizeof*grid->pixel_list);
@@ -321,7 +324,14 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     {
       for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )     // for x, y and z
       {
-        pixel_pos[|\dbtt{axis}|] = (int)((c_coord[|\cbtt{aid}|][|\dbtt{axis}|] - cmin[|\dbtt{axis}|])/pixel_size);
+        if (grid->n_pix[|\dbtt{axis}|] == 1)
+        {
+          pixel_pos[|\dbtt{axis}|] = |\zero|;
+        }
+        else
+        {
+          pixel_pos[|\dbtt{axis}|] = (int)((c_coord[|\cbtt{aid}|][|\dbtt{axis}|] - cmin[|\dbtt{axis}|])/pixel_size);
+        }
       }
       pixel_num = pixel_pos[|\zero|] + pixel_pos[|\un|] * grid->n_pix[|\zero|] + pixel_pos[|\deux|] * grid->n_xy;
       add_atom_to_pixel (grid, pixel_num, pixel_pos, |\cbtt{aid}|, c_coord[|\cbtt{aid}|]);
@@ -466,9 +476,9 @@ distance evaluate_distance (bool use_pbc, pixel_atom * at_i, pixel_atom * at_j)
 // - bool use_pbc : flag to set if PBC are used or not
 void pixel_search_for_neighbors (bool use_pbc)
 {
-  pixel_grid * all_pixels;   // pointer to the pixel grid for to analyze
-  int |\vbtt{pix}|, |\rbtt{pjx}|;              // integer pixel ID numbers
-  int |\dbtt{aid}|, |\cbtt{bid}|;              // integer loop atom numbers
+  pixel_grid * all_pixels;    // pointer to the pixel grid for to analyze
+  int |\vbtt{pix}|, |\rbtt{pjx}|;               // integer pixel ID numbers
+  int |\dbtt{aid}|, |\cbtt{bid}|;               // integer loop atom numbers
   int pid;
   int l_start, l_end;         // integer loop modifier
   pixel * pix_i, * pix_j;     // pointers on pixel data structure

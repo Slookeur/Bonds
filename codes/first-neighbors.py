@@ -49,8 +49,8 @@ cart_to_frac = np.zeros((3, 3))                                               # 
 frac_to_cart = np.zeros((3, 3))                                               # fractional to Cartesian coordinates matrix
 
 
-# adjust, if needed, shift to search for pixel neighbor(s) using PBC
-# - grid pixel_grid          : the pixel grid
+# adjust, if needed, the shift to search for pixel neighbor(s) using PBC
+# - PixelGrid pixel_grid     : the pixel grid
 # - int pixel_coord[3]       : the pixel coordinates in the grid
 # - int pbc_shift[3][3][3]   : the shift, correction, to be calculated
 def set_pbc_shift(pixel_grid : PixelGrid, pixel_coord : np.ndarray, pbc_shift : np.ndarray):
@@ -91,7 +91,6 @@ def set_pbc_shift(pixel_grid : PixelGrid, pixel_coord : np.ndarray, pbc_shift : 
         pbc_shift[x_pos][y_pos][2] -= pixel_grid.pixels
 
 
-
 def add_atom_to_pixel(the_pixel: Pixel, pixel_coord: np.ndarray, atom_id: int, atom_coord: np.ndarray):
   if not the_pixel.patoms:
     # if the pixel do not contains any atom yet, then save its coordinates in the grid
@@ -114,11 +113,12 @@ def prepare_pixel_grid(use_pbc : bool):
   cmin = [float('inf')] * 3                          # initialize to infinity
   cmax = [-float('inf')] * 3                         # initialize to negative infinity
   pixel_pos = np.zeros(3, dtype=int)
-  
+  pixel_size = cutoff + 0.5;                         # set a pixel size slightly higher than the cutoff
+
   if use_pbc:                                        # using periodic boundary conditions
     for axis in range(3):                            # for x, y and z
       # number of pixels on 'axis'
-      grid.n_pix[axis] = int(l_params[axis] / cutoff) + 1
+      grid.n_pix[axis] = int(l_params[axis] / pixel_size)
   else:                                              # without periodic boundary conditions
     for axis in range(3):
       cmin[axis] = cmax[axis] = c_coord[0][axis]
@@ -128,7 +128,7 @@ def prepare_pixel_grid(use_pbc : bool):
         cmax[axis] = max(cmax[axis], c_coord[aid][axis])
     for axis in range(3):                            # for x, y and z
       # number of pixels on 'axis'
-      grid.n_pix[axis] = int((cmax[axis] - cmin[axis]) / cutoff) + 1
+      grid.n_pix[axis] = int((cmax[axis] - cmin[axis]) / cutoff)
   
   for axis in range(3):                              # for x, y and z
     # correction if the number of pixels on 'axis' is too small
@@ -151,7 +151,7 @@ def prepare_pixel_grid(use_pbc : bool):
   else:                                              # without periodic boundary conditions
     for aid in range(atoms):                         # for all atoms
       for axis in range(3):                          # for x, y and z
-        pixel_pos[axis] = int((c_coord[aid][axis] - cmin[axis]) / cutoff)
+        pixel_pos[axis] = int((c_coord[aid][axis] - cmin[axis]) / pixel_size)
       pixel_num = pixel_pos[0] + pixel_pos[1] * grid.n_pix[0] + pixel_pos[2] * grid.n_xy
       add_atom_to_pixel(grid.pixel_list[pixel_num], pixel_pos, aid, c_coord[aid])
  
@@ -160,9 +160,9 @@ def prepare_pixel_grid(use_pbc : bool):
 
 
 # Finding neighbor pixels for pixel in the grid
-# - bool use_pbc    : flag to set if PBC are used or not
-# - grid * the_grid : pointer to the pixel grid
-# - pixel * the_pix : pointer to the pixel with neighbors to be found
+# - bool use_pbc         : flag to set if PBC are used or not
+# - PixelGrid * the_grid : pointer to the pixel grid
+# - Pixel * the_pix      : pointer to the pixel with neighbors to be found
 def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
   boundary = False                            # is pixel on the boundary of the grid
   keep_neighbor = True                        # keep or not neighbor during analysis
@@ -186,7 +186,7 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
     if the_grid.n_pix[axis] == 1:
       # in the grid there is a single pixel in the 'axis' direction
       l_start[axis] = 1
-      l_end[axis] = 2
+      l_end[axis] = 1
 
   nnp = 0  # number of neighbors
   for x_pos in range(l_start[0], l_end[0]):
@@ -223,9 +223,6 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
 
 
 # evaluating the interatomic distance between 2 pixel atoms
-# - bool use_pbc      : flag to set if PBC are used or not
-# - pixel_atom * at_i : pointer to first pixel atom
-# - pixel_atom * at_j : pointer to second pixel atom
 def evaluate_distance(use_pbc : bool, at_i : PixelAtom, at_j : PixelAtom):
   dist = Distance()   # placeholder for the distance data structure
   Rij = np.zeros(3)  # initialize the distance vector
@@ -234,7 +231,7 @@ def evaluate_distance(use_pbc : bool, at_i : PixelAtom, at_j : PixelAtom):
     Rij[axis] = at_i.coord[axis] - at_j.coord[axis]
 
   if use_pbc:
-    # then the pixel_atom's coordinates are in corrected fractional format
+    # then the PixelAtom's coordinates are in corrected fractional format
     for axis in range(3):
       Rij[axis] = Rij[axis] - round(Rij[axis])
     

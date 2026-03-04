@@ -44,7 +44,8 @@ MODULE parameters
   REAL                                              :: cutoff             ! the cutoff to define first neighbors
   REAL                                              :: cutoff_squared     ! squared value of the cutoff to define first neighbors
   
-  ! model box description
+  ! model box description, if PBC are applied
+  REAL                                              :: volume             ! the lattice volume
   REAL, DIMENSION(3)                                :: l_params           ! lattice a, b and c
   REAL, DIMENSION(3,3)                              :: cart_to_frac       ! Cartesian to fractional coordinates matrix
   REAL, DIMENSION(3,3)                              :: frac_to_cart       ! fractional to Cartesian coordinates matrix
@@ -115,7 +116,67 @@ SUBROUTINE add_atom_to_pixel (the_pixel, pixel_coord, atom_id, atom_coord)
     the_pixel%pix_atoms(the_pixel%patoms)%coord(axis) = atom_coord(axis)
   enddo
 
-END SUBROUTINE
+END SUBROUTINE add_atom_to_pixel
+
+
+
+SUBROUTINE adjust_pixel_numbers (use_pbc, grid, cmin, cmax, pixel_size)
+
+  USE parameters
+  IMPLICIT NONE
+  
+  LOGICAL, INTENT(IN)              :: use_pbc          ! flag to set if PBC are used or not
+  TYPE (pixel_grid), INTENT(INOUT) :: grid             ! the pixel grid to prepare
+  REAL, DIMENSION(3), INTENT(IN)   :: cmin, cmax       ! real precision coordinates min, max
+  REAL, INTENT(INOUT)              :: pixel_size       ! the initial pixel size
+  REAL                             :: targetdp=1.85    ! target atom density per pixel
+  REAL                             :: rhonum           ! number density
+  REAL                             :: rhopix           ! number density by pixel
+  REAL                             :: mpsize           ! modifier of the pixel size
+  INTEGER                          :: axis             ! loop iterator axis id (1=x, 2=y, 3=z)
+
+  rhonum = atoms
+  if (use_pbc) then
+    ! if PBC are used then use the exact volume
+    rhonum = rhonum / volume
+  else
+    ! otherwise approximate a cubic box
+    do axis = 1 , 3                    ! for x, y and z
+      rhonum = rhonum / (cmax(axis) - cmin(axis))
+    enddo
+  endif
+
+  ! if the number density if < 0.01 atom / Angstrom^3
+  if (rhonum .lt. 0.01) then
+  
+    rhopix = atomes
+    do axis = 1 , 3                    ! for x, y and z
+      rhopix = rhopix / grid%n_pix(axis)
+    enddo
+    mpsize = (targetdp/rhopix)**(1.0/3.0)
+    if (mpsize .gt. 1.0) then
+      ! we modify only the pixel size if the cutoff increases
+      ! otherwise we would increase the number of pixels
+      pixel_size = pixel_size*mpsize
+      do axis= 1 , 3                   ! for x, y and z
+        if ( use_pbc ) then
+          grid%n_pix(axis) = INT(l_params(axis) / pixel_size)
+        else
+          grid%n_pix(axis) = INT((cmax(axis) - cmin(axis)) / pixel_size) 
+        endif
+      endif
+    endif
+
+  endif
+
+  do axis = 1 , 3                      ! for x, y and z
+    ! correction if the number of pixel(s) on 'axis' is too small
+    if ( grid%n_pix(axis) .lt. 3 ) then
+      grid%n_pix(axis) = 1
+    endif
+  enddo
+
+END SUBROUTINE adjust_pixel_numbers
 
 
 
@@ -133,11 +194,13 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   INTEGER, DIMENSION(3)            :: pixel_pos        ! pixel coordinates in the grid
   REAL, DIMENSION(3)               :: cmin, cmax       ! real precision coordinates min, max
   REAL, DIMENSION(3)               :: f_coord          ! real precision fractional coordinates
-  
+  REAL                             :: pixel_size       ! the size of the pixel
+
+  pixel_size = cutoff + 0.5                            ! set a pixel size slightly higher than the cutoff
   if ( use_pbc ) then                                  ! using periodic boundary conditions
       do axis = 1 , 3                                    ! for x, y and z
       ! number of pixel(s) on 'axis'
-      grid%n_pix(axis) = INT(l_params(axis) / cutoff) + 1
+      grid%n_pix(axis) = INT(l_params(axis) / pixel_size)
     enddo
   else                                                 ! without periodic boundary conditions
     do axis = 1 , 3
@@ -152,16 +215,12 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
     enddo
     do axis = 1 , 3                                    ! for x, y and z
       ! number of pixel(s) on 'axis'
-      grid%n_pix(axis) = INT((cmax(axis) - cmin(axis)) / cutoff) + 1
+      grid%n_pix(axis) = INT(cmax(axis) - cmin(axis)/pixel_size)
     enddo
   endif
-  do axis = 1 , 3                                      ! for x, y and z
-    ! correction if the number of pixel(s) on 'axis' is too small
-    if ( grid%n_pix(axis) .lt. |\quatre| ) then
-      grid%n_pix(axis) = 1
-    endif
-  enddo
   
+  call adjust_pixel_numbers (use_pbc, grid, cmin, cmax, pixel_size)
+    
   grid%n_xy = grid%n_pix(1) * grid%n_pix(2)            ! number of pixels on the plan 'xy'
   grid%pixels = grid%n_xy * grid%n_pix(3)              ! total number of pixels in the grid
 
@@ -172,7 +231,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
     grid%pixel_list(pixel_num)%tested = .false.
   enddo
   if ( use_pbc ) then                                  ! using periodic boundary conditions
-  do aid = 1 , atoms                                 ! for all atoms
+  do aid = 1 , atoms                                   ! for all atoms
      f_coord = MATMUL ( c_coord(aid), cart_to_frac )
      do axis = 1 , 3                                   ! for x, y and z
        f_coord(axis) = f_coord(axis) - floor(f_coord(axis))
@@ -184,7 +243,11 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   else                                                 ! without periodic boundary conditions
     do aid = 1 , atoms                                 ! for all atoms
       do axis = 1 , 3                                  ! for x, y and z
-        pixel_pos(axis) = INT( (c_coord(aid,axis) - cmin(axis) )/ cutoff)
+        if (grid%n_pix(axis) .eq. 1) then
+          pixel_pos(axis) = 0
+        else
+          pixel_pos(axis) = INT((c_coord(aid,axis) - cmin(axis))/pixel_size)
+        endif
       enddo
       pixel_num = pixel_pos(1) + pixel_pos(2) * grid%n_pix(1) + pixel_pos(3) * grid%n_xy + 1
       call add_atom_to_pixel (grid%pixel_list(pixel_num), pixel_pos, aid, c_coord(aid,:))
@@ -254,7 +317,7 @@ SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
           ! evaluating neighbor pixel number in the grid
           nid = the_pix%pid + pmod(x_pos) + pmod(y_pos) * the_grid%n_pix(1) + pmod(z_pos) * the_grid%n_xy
           if ( use_pbc ) then
-	    ! corrections if required in the case where PBC are applied
+            ! corrections if required in the case where PBC are applied
             nid = nid + pbc_shift(x_pos, y_pos, z_pos)
           endif
           the_pix%pixel_neighbors(nnp) = nid

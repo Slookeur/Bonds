@@ -137,7 +137,7 @@ END SUBROUTINE add_atom_to_pixel
 
 \clearpage
 
-\subsection{FORTRAN90 code: adjusting the number of pixel in the grid}
+\subsection{FORTRAN90 code: adjusting the number of pixels in the grid}
 \label{f-adjust-pixel-grid}
 
 \begin{lstlisting}[language={[90]FORTRAN}]
@@ -158,15 +158,16 @@ SUBROUTINE adjust_pixel_numbers (use_pbc, grid, cmin, cmax, pixel_size)
 
   rhonum = atoms
   if (use_pbc) then
+    ! if PBC are used then use the exact volume
     rhonum = rhonum / volume
   else
-    // Approximation using a cubic box
+    ! otherwise approximate a cubic box
     do |\dbtt{axis}| = |\un| , |\trois|                    ! for x, y and z
       rhonum = rhonum / (cmax(|\dbtt{axis}|) - cmin(|\dbtt{axis}|))
     enddo
   endif
 
-  // if the number density if < 0.01 atom / |\AA$^3$|
+  ! if the number density if < 0.01 atom / |\blue{\AA$^3$}|
   if (rhonum .lt. |\mbtt{0.01}|) then
   
     rhopix = atomes
@@ -178,10 +179,10 @@ SUBROUTINE adjust_pixel_numbers (use_pbc, grid, cmin, cmax, pixel_size)
       ! we modify only the pixel size if the cutoff increases
       ! otherwise we would increase the number of pixels
       pixel_size = pixel_size*mpsize
-      do |\dbtt{axis}|= |\un| , |\trois|                    ! for x, y and z
+      do |\dbtt{axis}|= |\un| , |\trois|                   ! for x, y and z
         if ( use_pbc ) then
           grid%n_pix(|\dbtt{axis}|) = INT(l_params(|\dbtt{axis}|) / pixel_size)
-	else
+        else
           grid%n_pix(|\dbtt{axis}|) = INT((cmax(|\dbtt{axis}|) - cmin(|\dbtt{axis}|)) / pixel_size) 
         endif
       endif
@@ -189,7 +190,7 @@ SUBROUTINE adjust_pixel_numbers (use_pbc, grid, cmin, cmax, pixel_size)
 
   endif
 
-  do |\dbtt{axis}| = |\un| , |\trois|                                      ! for x, y and z
+  do |\dbtt{axis}| = |\un| , |\trois|                      ! for x, y and z
     ! correction if the number of pixel(s) on 'axis' is too small
     if ( grid%n_pix(|\dbtt{axis}|) .lt. |\trois| ) then
       grid%n_pix(|\dbtt{axis}|) = |\un|
@@ -244,7 +245,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
     enddo
   endif
   
-  call adjust_pixel_numbers (use_pbc, grid, cmi, cmax, pixel_size)
+  call adjust_pixel_numbers (use_pbc, grid, cmin, cmax, pixel_size)
     
   grid%n_xy = grid%n_pix(|\un|) * grid%n_pix(|\deux|)            ! number of pixels on the plan 'xy'
   grid%pixels = grid%n_xy * grid%n_pix(|\trois|)              ! total number of pixels in the grid
@@ -256,7 +257,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
     grid%pixel_list(pixel_num)%tested = .false.
   enddo
   if ( use_pbc ) then                                  ! using periodic boundary conditions
-  do |\cbtt{aid}| = |\un| , atoms                                 ! for all atoms
+  do |\cbtt{aid}| = |\un| , atoms                                   ! for all atoms
      f_coord = MATMUL ( c_coord(|\cbtt{aid}|), cart_to_frac )
      do |\dbtt{axis}| = |\un| , |\trois|                                   ! for x, y and z
        f_coord(|\dbtt{axis}|) = f_coord(|\dbtt{axis}|) - floor(f_coord(|\dbtt{axis}|))
@@ -268,11 +269,11 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   else                                                 ! without periodic boundary conditions
     do |\cbtt{aid}| = |\un| , atoms                                 ! for all atoms
       do |\dbtt{axis}| = |\un| , |\trois|                                  ! for x, y and z
-	if (grid%n_pix(|\dbtt{axis}|) .eq. |\un|) then
-          pixel_pos(|\dbtt{axis}|) = 0
-	else
+        if (grid%n_pix(|\dbtt{axis}|) .eq. |\un|) then
+          pixel_pos(|\dbtt{axis}|) = |\zero|
+        else
           pixel_pos(|\dbtt{axis}|) = INT((c_coord(|\cbtt{aid}|,|\dbtt{axis}|) - cmin(|\dbtt{axis}|))/pixel_size)
-	endif
+        endif
       enddo
       pixel_num = pixel_pos(|\un|) + pixel_pos(|\deux|) * grid%n_pix(|\un|) + pixel_pos(|\trois|) * grid%n_xy + |\un|
       call add_atom_to_pixel (grid%pixel_list(pixel_num), pixel_pos, |\cbtt{aid}|, c_coord(|\cbtt{aid}|,:))
@@ -347,7 +348,7 @@ SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
           ! evaluating neighbor pixel number in the grid
           nid = the_pix%pid + pmod(|\vbtt{x\_pos}|) + pmod(|\rbtt{y\_pos}|) * the_grid%n_pix(|\un|) + pmod(|\obtt{z\_pos}|) * the_grid%n_xy
           if ( use_pbc ) then
-	    ! corrections if required in the case where PBC are applied
+            ! corrections if required in the case where PBC are applied
             nid = nid + pbc_shift(|\vbtt{x\_pos}|, |\rbtt{y\_pos}|, |\obtt{z\_pos}|)
           endif
           the_pix%pixel_neighbors(|\bftt{nnp}|) = nid

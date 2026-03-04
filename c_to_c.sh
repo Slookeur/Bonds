@@ -31,10 +31,15 @@ function clean {
   sed 's/|\\obtt{zpos}|/zpos/g' tmp_b > tmp_a
   sed 's/%\/\//\/\//g' tmp_a > tmp_b
   sed 's/|\\textquotesingle|/'"'"'/g' tmp_b > tmp_a
-  sed 's/\\AA\\/Angstrom/g' tmp_a > tmp_b
+  sed 's/|\\mbtt{1.85}|/1.85/g' tmp_a > tmp_b
+  sed 's/|\\mbtt{1.0}|/1.0/g' tmp_b > tmp_a
+  sed 's/|\\mbtt{3.0}|/3.0/g' tmp_a > tmp_b
+  sed 's/|\\mbtt{0.01}|/0.01/g' tmp_b > tmp_a
+  sed 's/|\\blue{\\AA\$^3\$}|/Angstrom^3/g' tmp_a > tmp_b
+  sed 's/\\AA\\/Angstrom/g' tmp_b > tmp_a
 
-  rm -f tmp_a
-  mv tmp_b codes/$out
+  rm -f tmp_b
+  mv tmp_a codes/$out
 }
 
 

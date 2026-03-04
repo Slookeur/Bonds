@@ -53,13 +53,14 @@ float ** c_coord;          // list of Cartesian coordinates: c_coord[atoms][3]
 float cutoff;              // the cutoff to define atomic bond(s)
 float cutoff_squared;      // squared value for the cutoff
 
-// model box description
+// model box description, if PBC are applied
+float volume;              // the lattice volume
 float l_params[3];         // lattice a, b and c
 float cart_to_frac[3][3];  // Cartesian to fractional coordinates matrix
 float frac_to_cart[3][3];  // fractional to Cartesian coordinates matrix
 
 
-// Adjust, if needed, shift to search for pixel neighbor(s) using PBC
+// Adjust, if needed, the shift to search for pixel neighbor(s) using PBC
 // - pixel_grid * grid      : the pixel grid
 // - int pixel_coord[3]     : the pixel coordinates in the grid
 // - int pbc_shift[3][3][3] : the shift, correction, to be calculated
@@ -169,6 +170,67 @@ void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[3], int atom_id, floa
 
 
 
+float adjust_pixels (bool use_pbc, pixel_grid * grid, float cmin[3], float cmax[3], float pixel_size)
+{
+  
+  int axis;                       // loop iterator axis id (1=x , 2=y , 3= z)
+  float targetdp = 1.85;          // target atom density per pixel
+  float rhonum;                   // number density
+  float rhopix;                   // number density by pixel
+  float mpsize;                   // modifier of the pixel size
+ 
+  rhonum = atoms;
+  if ( use_pbc )
+  {
+    // if PBC are used then use the exact volume
+    rhonum = rhonum / volume;
+  }
+  else
+  {
+    // otherwise approximate a cubic box
+    for ( axis = 0 ; axis < 3 ; axis ++ )      // For x, y and z
+    {
+      rhonum /= (cmax[axis] - cmin[axis]);
+    }
+  }
+  
+  // if the number density if < 0.01 atom / Angstrom^3
+  if (rhonum < 0.01)
+  {
+    rhopix = atomes;
+    for ( axis = 0 ; axis < 3 ; axis ++ )      // For x, y and z
+    {
+      rhopix /= grid->n_pix[axis];
+    }
+    mpsize = (targetdp/rhopix)**(1.0/3.0);
+    if (mpsize > 1.0)
+    {
+      // we modify only the pixel size if the cutoff increases
+      // otherwise we would increase the number of pixels
+      pixel_size = pixel_size*mpsize;
+      for ( axis = 0 ; axis < 3 ; axis ++ )
+      {
+        if ( use_pbc )
+        {
+          grid->n_pix[axis] = (int)(l_params[axis] / pixel_size);
+        }
+        else
+        {
+          grid->n_pix[axis] = (int)((cmax[axis] - cmin[axis]) / pixel_size);
+        }
+      }
+   }
+ }
+ for ( axis = 0 ; axis < 3 ; axis ++ )         // For x, y and z
+ {
+   // correction if the number of pixel(s) on 'axis' is too small
+   grid->n_pix[axis] = (grid->n_pix[axis] < 3) ? 1 : grid->n_pix[axis];
+ }
+ return pixel_size;
+}
+
+
+
 pixel_grid * prepare_pixel_grid (bool use_pbc)
 {
   pixel_grid * grid;        // pointer to the pixel grid to create
@@ -178,13 +240,15 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
   int pixel_pos[3];         // pixel coordinates in the grid
   float cmin[3], cmax[3];   // float coordinates min, max values
   float f_coord[3];         // float fractional coordinates
+  float pixel_size;         // the size of the pixel
 
   grid = malloc(sizeof*grid);
+  pixel_size = cutoff + 0.5;                    // set a pixel size slightly higher than the cutoff
   if ( use_pbc )                                // using periodic boundary conditions
   {
     for ( axis = 0 ; axis < 3 ; axis ++ )       // For x, y and z
     {
-      grid->n_pix[axis] = (int)(l_params[axis] / cutoff) + 1; // number of pixel(s) on 'axis'
+      grid->n_pix[axis] = (int)(l_params[axis] / pixel_size); // number of pixel(s) on 'axis'
     }
   }
   else                                          // without periodic boundary conditions
@@ -200,14 +264,11 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     }
     for ( axis = 0 ; axis < 3 ; axis ++ )       // For x, y and z
     {
-      grid->n_pix[axis] = (int)((cmax[axis] - cmin[axis]) / cutoff) + 1; // number of pixel(s) on 'axis'
+      grid->n_pix[axis] = (int)((cmax[axis] - cmin[axis])/pixel_size); // number of pixel(s) on 'axis'
     }
   }
-  for ( axis = 0 ; axis < 3 ; axis ++ )         // For x, y and z
-  {
-    // correction if the number of pixel(s) on 'axis' is too small
-    grid->n_pix[axis] = (grid->n_pix[axis] < |\quatre|) ? 1 : grid->n_pix[axis];
-  }
+  pixel_size = adjut_grid_pixels (use_pbc, grid, cmin, cmax, pixel_size);
+
   grid->n_xy = grid->n_pix[0] * grid->n_pix[1]; // number of pixels on the plan 'xy'
   grid->pixels = grid->n_xy * grid->n_pix[2];   // total number of pixels in the grid
   grid->pixel_list = malloc (grid->pixels*sizeof*grid->pixel_list);
@@ -238,7 +299,14 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     {
       for ( axis = 0 ; axis < 3 ; axis ++ )     // for x, y and z
       {
-        pixel_pos[axis] = (int)((c_coord[aid][axis] - cmin[axis])/cutoff);
+        if (grid->n_pix[axis] == 1)
+        {
+          pixel_pos[axis] = 0;
+        }
+        else
+        {
+          pixel_pos[axis] = (int)((c_coord[aid][axis] - cmin[axis])/pixel_size);
+        }
       }
       pixel_num = pixel_pos[0] + pixel_pos[1] * grid->n_pix[0] + pixel_pos[2] * grid->n_xy;
       add_atom_to_pixel (grid, pixel_num, pixel_pos, aid, c_coord[aid]);
@@ -369,9 +437,9 @@ distance evaluate_distance (bool use_pbc, pixel_atom * at_i, pixel_atom * at_j)
 // - bool use_pbc : flag to set if PBC are used or not
 void pixel_search_for_neighbors (bool use_pbc)
 {
-  pixel_grid * all_pixels;   // pointer to the pixel grid for to analyze
-  int pix, pjx;              // integer pixel ID numbers
-  int aid, bid;              // integer loop atom numbers
+  pixel_grid * all_pixels;    // pointer to the pixel grid for to analyze
+  int pix, pjx;               // integer pixel ID numbers
+  int aid, bid;               // integer loop atom numbers
   int pid;
   int l_start, l_end;         // integer loop modifier
   pixel * pix_i, * pix_j;     // pointers on pixel data structure
