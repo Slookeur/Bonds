@@ -266,13 +266,14 @@ def evaluate_distance(use_pbc : bool, at_i : PixelAtom, at_j : PixelAtom):
   # calculating the squared distance (no square root for efficiency)
   dist.length = np.sum(Rij ** |\deux|)
   dist.Rij = Rij  # store the distance vector components
+
   # returning the 'distance' data structure that contains:
   # - the squared value for Dij
   # - the components of the distance vector on x, y, and z
   return dist
 \end{lstlisting}
 
-\clearpage
+%\clearpage
 
 \subsection{Python code: pixel search for first neighbor atoms}
 \label{p-pc-pixel}
