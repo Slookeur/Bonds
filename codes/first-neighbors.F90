@@ -111,6 +111,7 @@ SUBROUTINE add_atom_to_pixel (the_pixel, pixel_coord, atom_id, atom_coord)
     allocate(tmp_atoms(the_pixel%patoms+1))
     tmp_atoms(1:the_pixel%patoms) = the_pixel%pix_atoms
     call move_alloc (tmp_atoms, the_pixel%pix_atoms)
+    deallocate (tmp_atoms)
   endif
   ! increment the number of atom(s) in the pixel
   the_pixel%patoms = the_pixel%patoms + 1
