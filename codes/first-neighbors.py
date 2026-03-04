@@ -128,9 +128,9 @@ def adjust_pixel_numbers (use_pbc : bool, grid : PixelGrid, cmin : np.ndarray, c
       pixel_size = pixel_size * mpsize
       for axis in range(3):                          # for x, y and z
         if use_pbc: 
-          grid.n_pix[axis] = int ( l_params[axis] / pixel_size )
-	else
-          grid.n_pix[axis] = int (( cmax[axis] - cmin[axis]) / pixel_size )
+          grid.n_pix[axis] = int(l_params[axis] / pixel_size)
+        else
+          grid.n_pix[axis] = int((cmax[axis] - cmin[axis]) / pixel_size)
 
   for axis in range(3):                              # for x, y and z
     # correction if the number of pixels on 'axis' is too small
