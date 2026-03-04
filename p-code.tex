@@ -254,15 +254,15 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
         if not use_pbc and boundary:
           if the_pix.p_xyz[|\zero|] == |\zero| and |\vbtt{x\_pos}| == |\zero|:
             keep_neighbor = False
-          elif the_pix.p_xyz[|\zero|] == the_grid.n_pix[|\zero|] and |\vbtt{x\_pos}| == |\deux|:
+          elif the_pix.p_xyz[|\zero|] == the_grid.n_pix[|\zero|]-|\un| and |\vbtt{x\_pos}| == |\deux|:
             keep_neighbor = False
           elif the_pix.p_xyz[|\un|] == |\zero| and |\rbtt{y\_pos}| == |\zero|:
             keep_neighbor = False
-          elif the_pix.p_xyz[|\un|] == the_grid.n_pix[|\un|] and |\rbtt{y\_pos}| == |\deux|:
+          elif the_pix.p_xyz[|\un|] == the_grid.n_pix[|\un|]-|\un| and |\rbtt{y\_pos}| == |\deux|:
             keep_neighbor = False
           elif the_pix.p_xyz[|\deux|] == |\zero| and |\obtt{z\_pos}| == |\zero|:
             keep_neighbor = False
-          elif the_pix.p_xyz[|\deux|] == the_grid.n_pix[|\deux|] and |\obtt{z\_pos}| == |\deux|:
+          elif the_pix.p_xyz[|\deux|] == the_grid.n_pix[|\deux|]-|\un| and |\obtt{z\_pos}| == |\deux|:
             keep_neighbor = False
 
         if keep_neighbor:

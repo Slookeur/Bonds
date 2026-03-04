@@ -76,21 +76,21 @@ SUBROUTINE set_pbc_shift (grid, pixel_coord, pbc_shift)
   
   pbc_shift(:,:,:) = |\zero|                                            ! initialization without any shift
 
-  if ( pixel_coord(|\un|) .eq. |\un| ) then                               ! pixel position on 'x' is min
+  if ( pixel_coord(|\un|) .eq. |\zero| ) then                               ! pixel position on 'x' is min
     pbc_shift(|\un|,:,:) = grid%n_pix(|\un|)
-  else if ( pixel_coord(|\un|) .eq. grid%n_pix(|\un|) ) then              ! pixel position on 'x' is max
+  else if ( pixel_coord(|\un|) .eq. grid%n_pix(|\un|-|\un|) ) then              ! pixel position on 'x' is max
     pbc_shift(|\trois|,:,:) = - grid%n_pix(|\un|)
   endif
   
-  if ( pixel_coord(|\deux|) .eq. |\un| ) then                               ! pixel position on 'y' is min
+  if ( pixel_coord(|\deux|) .eq. |\zero| ) then                               ! pixel position on 'y' is min
     pbc_shift(:,|\un|,:) = pbc_shift(:,|\un|,:) + grid%n_xy
-  else if ( pixel_coord(|\deux|) .eq. grid%n_pix(|\deux|) ) then              ! pixel position on 'y' is max
+  else if ( pixel_coord(|\deux|) .eq. grid%n_pix(|\deux|-|\un|) ) then              ! pixel position on 'y' is max
     pbc_shift(:,|\trois|,:) = pbc_shift(:,|\trois|,:) - grid%n_xy
   endif
   
-  if ( pixel_coord(|\trois|) .eq. |\un| ) then                               ! pixel position on 'z' is min
+  if ( pixel_coord(|\trois|) .eq. |\zero| ) then                               ! pixel position on 'z' is min
     pbc_shift(:,:,|\un|) = pbc_shift(:,:,|\un|) + grid%pixels
-  else if ( pixel_coord(|\trois|) .eq. grid%n_pix(|\trois|) ) then              ! pixel position on 'z' is max
+  else if ( pixel_coord(|\trois|) .eq. grid%n_pix(|\trois|-|\un|) ) then              ! pixel position on 'z' is max
     pbc_shift(:,:,|\trois|) = pbc_shift(:,:,|\trois|) - grid%pixels
   endif
   
@@ -267,8 +267,8 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
        f_coord(|\dbtt{axis}|) = f_coord(|\dbtt{axis}|) - floor(f_coord(|\dbtt{axis}|))
        pixel_pos(|\dbtt{axis}|) = INT(f_coord(|\dbtt{axis}|) * grid%n_pix(|\dbtt{axis}|))
      enddo
-     pixel_num = pixel_pos(|\un|) + pixel_pos(|\deux|) * grid%n_pix(|\un|) + pixel_pos(|\trois|) * grid%n_xy + |\un|
-     call add_atom_to_pixel (grid%pixel_list(pixel_num), pixel_pos, |\cbtt{aid}|, f_coord)
+     pixel_num = pixel_pos(|\un|) + pixel_pos(|\deux|) * grid%n_pix(|\un|) + pixel_pos(|\trois|) * grid%n_xy
+     call add_atom_to_pixel (grid%pixel_list(pixel_num+|\un|), pixel_pos, |\cbtt{aid}|, f_coord)
     enddo
   else                                                 ! without periodic boundary conditions
     do |\cbtt{aid}| = |\un| , atoms                                 ! for all atoms
@@ -279,8 +279,8 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
           pixel_pos(|\dbtt{axis}|) = INT((c_coord(|\cbtt{aid}|,|\dbtt{axis}|) - cmin(|\dbtt{axis}|))/pixel_size)
         endif
       enddo
-      pixel_num = pixel_pos(|\un|) + pixel_pos(|\deux|) * grid%n_pix(|\un|) + pixel_pos(|\trois|) * grid%n_xy + |\un|
-      call add_atom_to_pixel (grid%pixel_list(pixel_num), pixel_pos, |\cbtt{aid}|, c_coord(|\cbtt{aid}|,:))
+      pixel_num = pixel_pos(|\un|) + pixel_pos(|\deux|) * grid%n_pix(|\un|) + pixel_pos(|\trois|) * grid%n_xy
+      call add_atom_to_pixel (grid%pixel_list(pixel_num+|\un|), pixel_pos, |\cbtt{aid}|, c_coord(|\cbtt{aid}|,:))
     enddo
   endif
 
@@ -316,7 +316,7 @@ SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
     call set_pbc_shift (the_grid, the_pix%p_xyz, pbc_shift)
   else
     do |\dbtt{axis}| = |\un| , |\trois|
-      if ( the_pix%p_xyz(|\dbtt{axis}|) .eq. |\un| .or. the_pix%p_xyz(|\dbtt{axis}|) .eq. the_grid%n_pix(|\dbtt{axis}|) ) then
+      if ( the_pix%p_xyz(|\dbtt{axis}|) .eq. |\zero| .or. the_pix%p_xyz(|\dbtt{axis}|) .eq. the_grid%n_pix(|\dbtt{axis}|)-|\un| ) then
         boundary = .true.
       endif
     enddo
@@ -334,17 +334,17 @@ SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
       do |\obtt{z\_pos}| = l_start(|\trois|) , l_end(|\trois|)
         keep_neighbor = .true.
         if ( .not. use_pbc .and. boundary ) then
-          if ( the_pix%p_xyz(|\un|) .eq. |\un| .and. |\vbtt{x\_pos}| .eq. |\un| ) then
+          if ( the_pix%p_xyz(|\un|) .eq. |\zero| .and. |\vbtt{x\_pos}| .eq. |\un| ) then
             keep_neighbor = .false.
-          else if ( the_pix%p_xyz(|\un|) .eq. the_grid%n_pix(|\un|) .and. |\vbtt{x\_pos}| .eq. |\trois| ) then
+          else if ( the_pix%p_xyz(|\un|) .eq. the_grid%n_pix(|\un|)-|\un| .and. |\vbtt{x\_pos}| .eq. |\trois| ) then
             keep_neighbor = .false.
-          else if ( the_pix%p_xyz(|\deux|) .eq. |\un| .and. |\rbtt{y\_pos}| .eq. |\un| ) then
+          else if ( the_pix%p_xyz(|\deux|) .eq. |\zero| .and. |\rbtt{y\_pos}| .eq. |\un| ) then
             keep_neighbor = .false.
-          else if ( the_pix%p_xyz(|\deux|) .eq. the_grid%n_pix(|\deux|) .and. |\rbtt{y\_pos}| .eq. |\trois| ) then
+          else if ( the_pix%p_xyz(|\deux|) .eq. the_grid%n_pix(|\deux|)-|\un| .and. |\rbtt{y\_pos}| .eq. |\trois| ) then
             keep_neighbor = .false.
-          else if ( the_pix%p_xyz(|\trois|) .eq. |\un| .and. |\obtt{z\_pos}| .eq. |\un| ) then
+          else if ( the_pix%p_xyz(|\trois|) .eq. |\zero| .and. |\obtt{z\_pos}| .eq. |\un| ) then
             keep_neighbor = .false.
-          else if ( the_pix%p_xyz(|\trois|) .eq. the_grid%n_pix(|\trois|) .and. |\obtt{z\_pos}| .eq. |\trois| ) then
+          else if ( the_pix%p_xyz(|\trois|) .eq. the_grid%n_pix(|\trois|)-|\un| .and. |\obtt{z\_pos}| .eq. |\trois| ) then
             keep_neighbor = .false.
           endif
         endif

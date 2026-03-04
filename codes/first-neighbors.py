@@ -229,15 +229,15 @@ def find_pixel_neighbors(use_pbc : bool, the_grid : PixelGrid, the_pix : Pixel):
         if not use_pbc and boundary:
           if the_pix.p_xyz[0] == 0 and x_pos == 0:
             keep_neighbor = False
-          elif the_pix.p_xyz[0] == the_grid.n_pix[0] and x_pos == 2:
+          elif the_pix.p_xyz[0] == the_grid.n_pix[0]-1 and x_pos == 2:
             keep_neighbor = False
           elif the_pix.p_xyz[1] == 0 and y_pos == 0:
             keep_neighbor = False
-          elif the_pix.p_xyz[1] == the_grid.n_pix[1] and y_pos == 2:
+          elif the_pix.p_xyz[1] == the_grid.n_pix[1]-1 and y_pos == 2:
             keep_neighbor = False
           elif the_pix.p_xyz[2] == 0 and z_pos == 0:
             keep_neighbor = False
-          elif the_pix.p_xyz[2] == the_grid.n_pix[2] and z_pos == 2:
+          elif the_pix.p_xyz[2] == the_grid.n_pix[2]-1 and z_pos == 2:
             keep_neighbor = False
 
         if keep_neighbor:

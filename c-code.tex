@@ -390,15 +390,15 @@ void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
         keep_neighbor = TRUE;
         if ( ! use_pbc && boundary )
         {
-          if (( the_pix->p_xyz[|\zero|] == |\zero| && |\vbtt{x\_pos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_xyz[|\zero|] == the_grid->n_pix[|\zero|] && |\vbtt{x\_pos}| == |\deux| ))
+          if (( the_pix->p_xyz[|\zero|] == |\zero| && |\vbtt{x\_pos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_xyz[|\zero|] == the_grid->n_pix[|\zero|]-|\un| && |\vbtt{x\_pos}| == |\deux| ))
           {
             keep_neighbor = FALSE;
           }
-          else if (( the_pix->p_xyz[|\un|] == |\zero| && |\rbtt{y\_pos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_xyz[|\un|] == the_grid->n_pix[|\un|] && |\rbtt{y\_pos}| == |\deux| ))
+          else if (( the_pix->p_xyz[|\un|] == |\zero| && |\rbtt{y\_pos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_xyz[|\un|] == the_grid->n_pix[|\un|]-|\un| && |\rbtt{y\_pos}| == |\deux| ))
           {
             keep_neighbor = FALSE;
           }
-          else if (( the_pix->p_xyz[|\deux|] == |\zero| && |\obtt{z\_pos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_xyz[|\deux|] == the_grid->n_pix[|\deux|] && |\obtt{z\_pos}| == |\deux| ))
+          else if (( the_pix->p_xyz[|\deux|] == |\zero| && |\obtt{z\_pos}| == |\zero| ) |\textbar\textbar| ( the_pix->p_xyz[|\deux|] == the_grid->n_pix[|\deux|]-|\un| && |\obtt{z\_pos}| == |\deux| ))
           {
             keep_neighbor = FALSE;
           }

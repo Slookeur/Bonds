@@ -360,15 +360,15 @@ void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
         keep_neighbor = TRUE;
         if ( ! use_pbc && boundary )
         {
-          if (( the_pix->p_xyz[0] == 0 && x_pos == 0 ) || ( the_pix->p_xyz[0] == the_grid->n_pix[0] && x_pos == 2 ))
+          if (( the_pix->p_xyz[0] == 0 && x_pos == 0 ) || ( the_pix->p_xyz[0] == the_grid->n_pix[0]-1 && x_pos == 2 ))
           {
             keep_neighbor = FALSE;
           }
-          else if (( the_pix->p_xyz[1] == 0 && y_pos == 0 ) || ( the_pix->p_xyz[1] == the_grid->n_pix[1] && y_pos == 2 ))
+          else if (( the_pix->p_xyz[1] == 0 && y_pos == 0 ) || ( the_pix->p_xyz[1] == the_grid->n_pix[1]-1 && y_pos == 2 ))
           {
             keep_neighbor = FALSE;
           }
-          else if (( the_pix->p_xyz[2] == 0 && z_pos == 0 ) || ( the_pix->p_xyz[2] == the_grid->n_pix[2] && z_pos == 2 ))
+          else if (( the_pix->p_xyz[2] == 0 && z_pos == 0 ) || ( the_pix->p_xyz[2] == the_grid->n_pix[2]-1 && z_pos == 2 ))
           {
             keep_neighbor = FALSE;
           }
