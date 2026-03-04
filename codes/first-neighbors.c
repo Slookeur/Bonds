@@ -171,7 +171,7 @@ void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[3], int atom_id, floa
 
 
 
-float adjust_pixels (bool use_pbc, pixel_grid * grid, float cmin[3], float cmax[3], float pixel_size)
+float adjust_pixel_numbers (bool use_pbc, pixel_grid * grid, float cmin[3], float cmax[3], float pixel_size)
 {
   
   int axis;                       // loop iterator axis id (1=x, 2=y, 3= z)
@@ -268,7 +268,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
       grid->n_pix[axis] = (int)((cmax[axis] - cmin[axis])/pixel_size); // number of pixel(s) on 'axis'
     }
   }
-  pixel_size = adjust_pixels (use_pbc, grid, cmin, cmax, pixel_size);
+  pixel_size = adjust_pixel_numbers (use_pbc, grid, cmin, cmax, pixel_size);
 
   grid->n_xy = grid->n_pix[0] * grid->n_pix[1]; // number of pixels on the plan 'xy'
   grid->pixels = grid->n_xy * grid->n_pix[2];   // total number of pixels in the grid
@@ -284,7 +284,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     for ( aid = 0 ; aid < atoms ; aid ++ )      // for all atoms
     {
       // with 'matrix_multiplication' a user defined function to perform the operation
-      f_coord = matrix_multiplication (cart_to_frac, c_coord[aid]);
+      matrix_multiplication (f_coord, cart_to_frac, c_coord[aid]);
       for ( axis = 0 ; axis < 3 ; axis ++ )     // for x, y and z
       {
         f_coord[axis] = f_coord[axis] - floorf(f_coord[axis]);
@@ -412,7 +412,7 @@ distance evaluate_distance (bool use_pbc, pixel_atom * at_i, pixel_atom * at_j)
     }
     // transform back to Cartesian coordinates
     // with 'matrix_multiplication' a user defined function to perform the operation
-    dist.Rij = matrix_multiplication (frac_to_cart, dist.Rij);
+    matrix_multiplication (dist.Rij, frac_to_cart, dist.Rij);
   }
   dist.length = 0.0;
   for ( axis = 0 ; axis < 3 ; axis ++ )

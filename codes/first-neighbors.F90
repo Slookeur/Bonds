@@ -92,11 +92,12 @@ SUBROUTINE add_atom_to_pixel (the_pixel, pixel_coord, atom_id, atom_coord)
   USE parameters
   IMPLICIT NONE
 
-  TYPE (pixel), INTENT(INOUT) :: the_pixel          ! pointer to the pixel
-  INTEGER, DIMENSION(3), INTENT(IN) :: pixel_coord  ! the pixel coordinates in the grid
-  INTEGER, INTENT(IN)                :: atom_id     ! the atom ID number
-  INTEGER                            :: axis        ! loop iterator axis id (1=x, 2=y, 3=z)
-  REAL, DIMENSION(3), INTENT(IN)     :: atom_coord  ! the atomic coordinates
+  TYPE (pixel), INTENT(INOUT)                 :: the_pixel   ! pointer to the pixel
+  INTEGER, DIMENSION(3), INTENT(IN)           :: pixel_coord ! the pixel coordinates in the grid
+  INTEGER, INTENT(IN)                         :: atom_id     ! the atom ID number
+  INTEGER                                     :: axis        ! loop iterator axis id (1=x, 2=y, 3=z)
+  REAL, DIMENSION(3), INTENT(IN)              :: atom_coord  ! the atomic coordinates
+  TYPE(pixel_atom), DIMENSION(:), ALLOCATABLE :: tmp_atoms
 
   if (the_pixel%patoms .eq. 0) then
     ! if the pixel do not contains any atom yet, then save its coordinates in the grid
@@ -106,8 +107,10 @@ SUBROUTINE add_atom_to_pixel (the_pixel, pixel_coord, atom_id, atom_coord)
      ! allocate the memory to store the first pixel_atom information
     allocate(the_pixel%pix_atoms(1))
   else
-    ! otherwise reallocate memory to store the new pixel_atom informatio
-    the_pixel%pix_atoms = realloc(the_pixel%pix_atoms, the_pixel%patoms+1)
+    ! otherwise reallocate memory to store the new pixel_atom information
+    allocate(tmp_atoms(the_pixel%patoms+1))
+    tmp_atoms(1:the_pixel%patoms) = the_pixel%pix_atoms
+    call move_alloc (tmp_atoms, the_pixel%pix_atoms)
   endif
   ! increment the number of atom(s) in the pixel
   the_pixel%patoms = the_pixel%patoms + 1
@@ -162,7 +165,7 @@ SUBROUTINE adjust_pixel_numbers (use_pbc, grid, cmin, cmax, pixel_size)
         if ( use_pbc ) then
           grid%n_pix(axis) = INT(l_params(axis) / pixel_size)
         else
-	  grid%n_pix(axis) = INT((cmax(axis) - cmin(axis)) / pixel_size) 
+          grid%n_pix(axis) = INT((cmax(axis) - cmin(axis)) / pixel_size) 
         endif
       endif
     endif
@@ -232,7 +235,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
   enddo
   if ( use_pbc ) then                                  ! using periodic boundary conditions
   do aid = 1 , atoms                                   ! for all atoms
-     f_coord = MATMUL ( c_coord(aid), cart_to_frac )
+     f_coord = MATMUL ( c_coord(aid,:), cart_to_frac )
      do axis = 1 , 3                                   ! for x, y and z
        f_coord(axis) = f_coord(axis) - floor(f_coord(axis))
        pixel_pos(axis) = INT(f_coord(axis) * grid%n_pix(axis))
@@ -267,10 +270,10 @@ SUBROUTINE find_pixel_neighbors (use_pbc, the_grid, the_pix)
   TYPE (pixel_grid), INTENT(INOUT)     :: the_grid                ! pointer to the pixel grid
   TYPE (pixel), POINTER, INTENT(INOUT) :: the_pix                 ! pointer to the pixel
   INTEGER                              :: axis                    ! loop iterator axis id (1=x, 2=y, 3=z)
-  INTEGER                              :: x_pos, y_pos, z_pos     ! neighbor position on x, y and z
-  INTEGER, DIMENSION(3)                :: l_start = (\1, 1, 1)    ! loop iterators starting value
-  INTEGER, DIMENSION(3)                :: l_end = (\3, 3, 3)      ! loop iterators ending value
-  INTEGER, DIMENSION(3)                :: pmod = (\-1, 0, 1)      ! position modifiers
+  INTEGER                              :: x_pos, y_pos, z_pos    ! neighbor position on x, y and z
+  INTEGER, DIMENSION(3)                :: l_start = (/1, 1, 1/)   ! loop iterators starting value
+  INTEGER, DIMENSION(3)                :: l_end = (/3, 3, 3/)     ! loop iterators ending value
+  INTEGER, DIMENSION(3)                :: pmod = (/-1, 0, 1/)     ! position modifiers
   INTEGER                              :: nnp                     ! number of neighbors for pixel
   INTEGER                              :: nid                     ! neighbor id for pixel
   INTEGER, DIMENSION(3,3,3)            :: pbc_shift               ! shift, correction, due to PBC
