@@ -194,7 +194,7 @@ float adjust_pixels (bool use_pbc, pixel_grid * grid, float cmin[3], float cmax[
     }
   }
   
-  // if the number density if < 0.01 atom / |\AA|^3
+  // if the number density if < 0.01 atom / Angstrom^3
   if (rhonum < 0.01)
   {
     rhopix = atomes;
@@ -299,14 +299,7 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     {
       for ( axis = 0 ; axis < 3 ; axis ++ )     // for x, y and z
       {
-        if (grid->n_pix[axis] == 1)
-        {
-          pixel_pos[axis] = 0;
-        }
-        else
-        {
-          pixel_pos[axis] = (int)((c_coord[aid][axis] - cmin[axis])/pixel_size);
-        }
+        pixel_pos[axis = (grid->n_pix[axis] == 1) ? 0 : (int)((c_coord[aid][axis] - cmin[axis])/pixel_size);
       }
       pixel_num = pixel_pos[0] + pixel_pos[1] * grid->n_pix[0] + pixel_pos[2] * grid->n_xy;
       add_atom_to_pixel (grid, pixel_num, pixel_pos, aid, c_coord[aid]);
@@ -383,7 +376,7 @@ void find_pixel_neighbors (bool use_pbc, pixel_grid * the_grid, pixel * the_pix)
         {
           // evaluating neighbor pixel number in the grid
           nid = the_pix->pid + pmod[x_pos] + pmod[y_pos] * the_grid->n_pix[0] + pmod[z_pos] * the_grid->n_xy;
-	  // corrections if required in the case where PBC are applied
+          // corrections if required in the case where PBC are applied
           if ( use_pbc ) nid += pbc_shift[x_pos][y_pos][z_pos];
           the_pix->pixel_neighbors[nnp] = nid;
           nnp ++ ;

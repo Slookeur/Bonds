@@ -35,7 +35,7 @@ function clean {
   sed 's/|\\mbtt{1.0}|/1.0/g' tmp_b > tmp_a
   sed 's/|\\mbtt{3.0}|/3.0/g' tmp_a > tmp_b
   sed 's/|\\mbtt{0.01}|/0.01/g' tmp_b > tmp_a
-  sed 's/|\\blue{\\AA\$^3\$}|/Angstrom^3/g' tmp_a > tmp_b
+  sed 's/|\\blue{\\AA}|/Angstrom/g' tmp_a > tmp_b
   sed 's/\\AA\\/Angstrom/g' tmp_b > tmp_a
 
   rm -f tmp_b

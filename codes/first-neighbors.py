@@ -43,7 +43,8 @@ c_coord = None                                                                # 
 cutoff = 0.0                                                                  # the cutoff to define atomic bond(s)
 cutoff_squared = 0.0                                                          # squared value for the cutoff
 
-# model box description
+# model box description, if PBC are applied
+volume                                                                        # the lattice volume
 l_params = np.zeros(3)                                                        # lattice a, b and c
 cart_to_frac = np.zeros((3, 3))                                               # Cartesian to fractional coordinates matrix
 frac_to_cart = np.zeros((3, 3))                                               # fractional to Cartesian coordinates matrix
@@ -105,6 +106,39 @@ def add_atom_to_pixel(the_pixel: Pixel, pixel_coord: np.ndarray, atom_id: int, a
 
 
 
+def adjust_pixels (use_pbc : bool, grid : PixelGrid, cmin : np.ndarray, cmax : np.ndarray, pixel_size :  )
+
+  targetdp = 1.85  # target atom density per pixel
+  rhonum = atomes
+  if use_pbc:
+    rhonum = rhonum / volume
+  else:
+    for axis in range(3):                            # for x, y and z
+      rhonum = rhonum / (cmax[axis] - cmin[axis])
+
+  if rhonum < 0.01:
+    rhopix = atomes
+    for axis in range(3):                            # for x, y and z
+      rhopix = rhopix / grid.n_pix[axis]
+ 
+    mpsize = (targetdp / rhopix ) **(1.0/3.0)
+    if mpsize > 1.0:
+      # we modify only the pixel size if the cutoff increases
+      # otherwise we would increase the number of pixels
+      pixel_size = pixel_size * mpsize
+      for axis in range(3):                          # for x, y and z
+        if use_pbc: 
+	  grid.n_pix[axis] = int ( l_params [axis] / pixel_size )
+	else
+          grid.n_pix[axis] = int (( cmax [axis] - cmin [axis]) / pixel_size )
+
+  for axis in range(3):                              # for x, y and z
+    # correction if the number of pixels on 'axis' is too small
+    grid.n_pix[axis] = 1 if grid.n_pix[axis] < 3 else grid.n_pix[axis]
+
+  retrun pixel_size
+
+
 
 # preparation of the pixel grid
 # - bool use_pbc : flag to set if PBC are used or not
@@ -128,12 +162,10 @@ def prepare_pixel_grid(use_pbc : bool):
         cmax[axis] = max(cmax[axis], c_coord[aid][axis])
     for axis in range(3):                            # for x, y and z
       # number of pixels on 'axis'
-      grid.n_pix[axis] = int((cmax[axis] - cmin[axis]) / cutoff)
+      grid.n_pix[axis] = int((cmax[axis] - cmin[axis]) / pixel_size)
   
-  for axis in range(3):                              # for x, y and z
-    # correction if the number of pixels on 'axis' is too small
-    grid.n_pix[axis] = 1 if grid.n_pix[axis] < |\quatre| else grid.n_pix[axis]
-  
+  pixel_size = adjust_pixel_numbers (use_pbc, grid, cmin, cmax, pixel_size)
+
   grid.n_xy = grid.n_pix[0] * grid.n_pix[1]          # number of pixels on the plan 'xy'
   grid.pixels = grid.n_xy * grid.n_pix[2]            # total number of pixels in the grid
   
