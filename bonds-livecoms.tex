@@ -492,9 +492,10 @@ However some issues might arise when dealing with a very large system containing
 \item The description of the model relies on a very large box, usually with a simple cubic periodicity, that contains a single or few isolated molecule. 
 \end{itemize}
 In such rare cases the number density, in atoms / \AA$^3$, can be very low  (< 0.01  atom / \AA$^3$), 
-but the number of pixels to describe the entire system to build the entire pixel grid can be too high for the memory allocation(s) required to perform the analysis. 
-To overcome this issue the size of the pixel $\Pc$ can be increased, to a value significantly higher than the cutoff radius $\Rc$, so that the density of atom(s) per pixel can be adjusted 
-to match a proper target value to ensure that the analysis will be successfull, for instance between 1.5 and 2 atoms per pixel. 
+but the number of pixels required to build the entire pixel grid can be too high for the memory allocation(s) required to perform the analysis. 
+To overcome this issue the size of the pixel $\Pc$ can be increased, to a value significantly higher than the cutoff radius $\Rc$, 
+so that the density of atom(s) per pixel can be adjusted to match a proper target value to ensure that memory allocation will not be an issue,
+so that the analysis will be successfull, for instance between 1.5 and 2 atoms per pixel. 
 
 \section{Example codes}
 
