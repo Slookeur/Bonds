@@ -73,7 +73,7 @@ void set_pbc_shift (pixel_grid * grid, int pixel_coord[3], int pbc_shift[3][3][3
     {
       for ( z_pos = 0 ; z_pos < 3 ; z_pos ++ )
       {
-        pbc_shift[x_pos][y_pos][z_pos] = 0;             // initialization without any shift
+        pbc_shift[x_pos][y_pos][z_pos] = 0;               // initialization without any shift
       }
     }
   }
@@ -173,7 +173,7 @@ void add_atom_to_pixel (pixel * the_pixel, int pixel_coord[3], int atom_id, floa
 float adjust_pixels (bool use_pbc, pixel_grid * grid, float cmin[3], float cmax[3], float pixel_size)
 {
   
-  int axis;                       // loop iterator axis id (1=x , 2=y , 3= z)
+  int axis;                       // loop iterator axis id (1=x, 2=y, 3= z)
   float targetdp = 1.85;          // target atom density per pixel
   float rhonum;                   // number density
   float rhopix;                   // number density by pixel
@@ -194,7 +194,7 @@ float adjust_pixels (bool use_pbc, pixel_grid * grid, float cmin[3], float cmax[
     }
   }
   
-  // if the number density if < 0.01 atom / Angstrom^3
+  // if the number density if < 0.01 atom / |\AA|^3
   if (rhonum < 0.01)
   {
     rhopix = atomes;

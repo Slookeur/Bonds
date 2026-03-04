@@ -146,7 +146,7 @@ SUBROUTINE adjust_pixel_numbers (use_pbc, grid, cmin, cmax, pixel_size)
     enddo
   endif
 
-  ! if the number density if < 0.01 atom / Angstrom^3
+  ! if the number density if < 0.01 atom / |\AA|^3
   if (rhonum .lt. 0.01) then
   
     rhopix = atomes

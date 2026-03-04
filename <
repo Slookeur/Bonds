@@ -214,7 +214,7 @@ float adjust_pixels (bool use_pbc, pixel_grid * grid, float cmin[|\trois|], floa
     }
   }
   
-  // if the number density if < 0.01 atom / |\AA|^3
+  // if the number density if < 0.01 atom / |\blue{\AA$^3$}|
   if (rhonum < |\mbtt{0.01}|)
   {
     rhopix = atomes;
@@ -324,7 +324,14 @@ pixel_grid * prepare_pixel_grid (bool use_pbc)
     {
       for ( |\dbtt{axis}| = |\zero| ; |\dbtt{axis}| < |\trois| ; |\dbtt{axis}| ++ )     // for x, y and z
       {
-        pixel_pos[|\dbtt{axis}| = (grid->n_pix[|\dbtt{axis}|] == 1) ?  |\zero| : (int)((c_coord[|\cbtt{aid}|][|\dbtt{axis}|] - cmin[|\dbtt{axis}|])/pixel_size);
+        if (grid->n_pix[|\dbtt{axis}|] == 1)
+        {
+          pixel_pos[|\dbtt{axis}|] = |\zero|;
+        }
+        else
+        {
+          pixel_pos[|\dbtt{axis}|] = (int)((c_coord[|\cbtt{aid}|][|\dbtt{axis}|] - cmin[|\dbtt{axis}|])/pixel_size);
+        }
       }
       pixel_num = pixel_pos[|\zero|] + pixel_pos[|\un|] * grid->n_pix[|\zero|] + pixel_pos[|\deux|] * grid->n_xy;
       add_atom_to_pixel (grid, pixel_num, pixel_pos, |\cbtt{aid}|, c_coord[|\cbtt{aid}|]);
