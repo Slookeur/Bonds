@@ -44,7 +44,7 @@ cutoff = 0.0                                                                  # 
 cutoff_squared = 0.0                                                          # squared value for the cutoff
 
 # model box description, if PBC are applied
-volume                                                                        # the lattice volume
+volume = 0.0                                                                  # the lattice volume
 l_params = np.zeros(3)                                                        # lattice a, b and c
 cart_to_frac = np.zeros((3, 3))                                               # Cartesian to fractional coordinates matrix
 frac_to_cart = np.zeros((3, 3))                                               # fractional to Cartesian coordinates matrix
