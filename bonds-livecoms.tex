@@ -73,7 +73,7 @@
 \newcommand{\Tc}{{\text{\bf{T}}_{\bf{c}}}}
 \newcommand{\Tf}{{\text{\bf{T}}_{\bf{f}}}}
 \newcommand{\Rc}{{\text{R}_{cut}}}
-\newcommand{\Pc}{{\text{P}_{cut}}}
+\newcommand{\Pc}{\text{R}_{pix}}
 \newcommand{\Dij}{{\text{D}_{ij}}}
 \newcommand{\pwdi}{3.5cm}
 \newcommand{\pwdj}{2.5375cm}
@@ -285,7 +285,7 @@ Which, as long as the size of the system remains within the thousand or few thou
 The time order for the entire analysis is then proportional to $\frac{N \times (N-1)}{2}$, with $N$ the total number of atoms in the model. 
 However as the number of atoms increases, time required to performed the entire analysis increases even more dramatically, 
 soon enough reaching a point where the program will likely seem to be completely frozen. \\
-Therefore a step is required to optimize the procedure for large atomic scale models, and that is 
+Therefore another approach is required to optimize the procedure for large atomic scale models, and that is 
 to distinguish atom(s) that are of interest for the purpose of the calculation from atom(s) that are not. 
 This is done by dividing, or partitioning, the model box in smaller parts, or pixels. \\
 \begin{figure*}[!h]
@@ -294,9 +294,9 @@ This is done by dividing, or partitioning, the model box in smaller parts, or pi
 \end{figure*}
 \\ Atomic coordinates will allow to associate an atom to a particular pixel. 
 Then for this particular atom neighbors candidates will only be search for in that same pixel and its immediate surrounding pixel neighbors. 
-The pixel dimension $\Pc$ should be close but sligtly superior to $\Rc$ the cutoff radius used to search for first neighbors atoms, ex: $\Pc = \Rc + 0.5$. \\
+Idealy the pixel dimension $\Pc$ should be close but sligtly superior to $\Rc$ the cutoff radius used to search for first neighbors atoms, ex: $\Pc = \Rc + 0.5$. \\
 \\ 
-This approach will limit the area of interest to the smallest possible size. 
+For any atom in the model this approach will limit the area of interest to the smallest possible size. 
 Using this methodology the time order for the entire analysis becomes proportional to $N_p \times \frac{N_c \times (N_c - 1)}{2} $, 
 with $N_p$ is the total number of pixels in the grid, and $N_c$ is the average number of atom(s) in the pixel and its 26 surrounding neighbor pixels: $N_c <<< N_p << N$. \\ 
 The idea behind this approach is illustrated in figure~\ref{pixelise}. 
@@ -347,7 +347,6 @@ First neighbors list is calculated as follow:
 \item[3.] First neighbor(s) for an atom will then be search for in the pixel this atom belong to and in its surrounding pixel neighbors only, all other pixel(s) being safely ignored. \\ 
 The list of pixel neighbors is constructed using the mathematical relationships between each pixel index in the grid, 
 two cases must considered:
-\newpage
 \begin{itemize}
 \item Pixel inside the pixel grid: \\ 
 \begin{center}
@@ -355,7 +354,7 @@ two cases must considered:
 Self + 26 neighbors\\[0.5cm]
 \end{center}
 \item Pixel on the boundary of the pixel grid :\\
-$p_{axis} = 0$ or $p_{axis} =  n_{p}(axis)-1$ \\
+$p_{axis} = 0$ or $p_{axis} =  n_{p}(axis)-1$ 
 %\begin{blockarray}{cp{1cm}cp{1cm}c}
 %Face of the pixel grid & & Edge of the pixel grid & & Corner of the pixel grid \\[0.25cm]
 %\includegraphics[width=3cm]{img/pixel-18-2.eps} & &
@@ -385,7 +384,6 @@ Pixel neighbors are determined as illustrated in figure~\ref{pixelmap}: \\
 \vspace{0.5cm}
 Note that this kind of approach only makes sense if the number of pixels in the grid is high enough so that all pixels are not neighbors. 
 
-\newpage
 \subsection{With Periodic Boundary Conditions}
 
 Non-cubic symmetries make it more complicated to offer a general methodology to deal with periodic systems:  
@@ -393,8 +391,8 @@ Non-cubic symmetries make it more complicated to offer a general methodology to 
 \item[1.] Evaluate the number of pixel(s) on each axis, $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$, using equations \ref{e_npix} and \ref{e_dmax}. 
 \vspace{0.125cm}
 \item[2.] Convert atomic Cartesian coordinates to fractional coordinates using $\Tf$. \\
-Using the transformation to fractional coordinates is the easiest way to compute the distance between atoms in the model.  
-The problem requires to consider the periodicity of the system, and, in the case of non-cubic symmetry transformations, could be tricky when using Cartesian coordinates. 
+Using fractional coordinates is the easiest way to propose a general methodoly to compute interatomic distances in the model.  
+Indeed this requires to consider the periodicity of the system, and, in the case of non-cubic symmetry transformations, could be tricky when using Cartesian coordinates. 
 Working with fractional coordinates is much easier since in that case corrections are performed simply adding or subtracting multiples of 1.0 on any fractional direction.
 \begin{itemize}
 \item Convert Cartesian coordinates to fractional coordinates ($f_{x}$, $f_{y}$, $f_{z}$) using Eq.~\ref{c2f}. 
@@ -416,16 +414,16 @@ With:
 \begin{equation}
 p_{axis} \in [0, n_{p}(axis)-1]
 \end{equation}
-\vspace{0.125cm}
 \item[4.] Determine each pixel neighbors: 
 \begin{itemize}
-\item Pixel inside the pixel grid:
-\begin{center}\includegraphics[width=4cm]{img/pixel-27-2.eps} \\[0.25cm]
-Self + 26 neighbors, no PBC transformation required. 
+\item Pixel inside the pixel grid: \\
+\begin{center}
+\includegraphics[width=\pwdi]{img/pixel-27-2.eps} \\[0.25cm]
+Self + 26 neighbors, no PBC transformation required.\\[0.5cm] 
 \end{center}
 \newpage
 \item Pixel on the boundary of the pixel grid :\\
-$p_{axis} = 0$ or $p_{axis} =  n_{p}(axis)-1$ 
+$p_{axis} = 0$ or $p_{axis} =  n_{p}(axis)-1$\\ 
 \begin{center}
 Face of the pixel grid: \\[0.25cm] 
 \begin{blockarray}{ccc}\includegraphics[width=\pwdi]{img/pixel-18-2.eps} & \raisebox{\rsv}{+} & \includegraphics[width=\pwdi]{img/pixel-18-9.eps} \end{blockarray} \\
@@ -456,7 +454,7 @@ n_{p}(xy) = n_{p}(x) \times n_{p}(y)
 \end{equation}
 And: 
 \begin{equation}
-n_{p}(xyy) = n_{p}(x) \times n_{p}(y) \times n_{p}(z)
+n_{p}(xyy) = n_{p}(xy) \times n_{p}(z)
 \end{equation}
 \vspace{0.125cm}
 \item[5.] When searching for first neighbor atoms between atoms $i$ and $j$ of the same pixel or one of its surrounding pixel neighbor, 
@@ -499,7 +497,7 @@ and that the analysis will be successfull. By experience a value between 1.5 and
 
 \section{Example codes}
 
-Commented codes that illustrate the entire work procedure are provided in: 
+Commented codes that illustrate the entire work procedure are provided in the manuscript appendixes: 
 \begin{itemize}
 \item C codes: \ref{c-pc-data} through \ref{c-pc-pixel}.
 \item FORTRAN90 codes: \ref{f-pc-data} through \ref{f-pc-pixel}.
