@@ -78,19 +78,19 @@ SUBROUTINE set_pbc_shift (grid, pixel_coord, pbc_shift)
 
   if ( pixel_coord(|\un|) .eq. |\zero| ) then                               ! pixel position on 'x' is min
     pbc_shift(|\un|,:,:) = grid%n_pix(|\un|)
-  else if ( pixel_coord(|\un|) .eq. grid%n_pix(|\un|)-|\un| ) then             ! pixel position on 'x' is max
+  else if ( pixel_coord(|\un|) .eq. grid%n_pix(|\un|)-|\un| ) then            ! pixel position on 'x' is max
     pbc_shift(|\trois|,:,:) = - grid%n_pix(|\un|)
   endif
   
   if ( pixel_coord(|\deux|) .eq. |\zero| ) then                               ! pixel position on 'y' is min
     pbc_shift(:,|\un|,:) = pbc_shift(:,|\un|,:) + grid%n_xy
-  else if ( pixel_coord(|\deux|) .eq. grid%n_pix(|\deux|)-|\un| ) then             ! pixel position on 'y' is max
+  else if ( pixel_coord(|\deux|) .eq. grid%n_pix(|\deux|)-|\un| ) then            ! pixel position on 'y' is max
     pbc_shift(:,|\trois|,:) = pbc_shift(:,|\trois|,:) - grid%n_xy
   endif
   
   if ( pixel_coord(|\trois|) .eq. |\zero| ) then                               ! pixel position on 'z' is min
     pbc_shift(:,:,|\un|) = pbc_shift(:,:,|\un|) + grid%pixels
-  else if ( pixel_coord(|\trois|) .eq. grid%n_pix(|\trois|)-|\un| ) then             ! pixel position on 'z' is max
+  else if ( pixel_coord(|\trois|) .eq. grid%n_pix(|\trois|)-|\un| ) then            ! pixel position on 'z' is max
     pbc_shift(:,:,|\trois|) = pbc_shift(:,:,|\trois|) - grid%pixels
   endif
   
@@ -228,7 +228,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
 
   pixel_size = cutoff + 0.5                            ! set a pixel size slightly higher than the cutoff
   if ( use_pbc ) then                                  ! using periodic boundary conditions
-      do |\dbtt{axis}| = |\un| , |\trois|                                    ! for x, y and z
+      do |\dbtt{axis}| = |\un| , |\trois|                                  ! for x, y and z
       ! number of pixel(s) on 'axis'
       grid%n_pix(|\dbtt{axis}|) = INT(l_params(|\dbtt{axis}|) / pixel_size)
     enddo

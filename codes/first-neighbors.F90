@@ -67,19 +67,19 @@ SUBROUTINE set_pbc_shift (grid, pixel_coord, pbc_shift)
 
   if ( pixel_coord(1) .eq. 0 ) then                               ! pixel position on 'x' is min
     pbc_shift(1,:,:) = grid%n_pix(1)
-  else if ( pixel_coord(1) .eq. grid%n_pix(1)-1 ) then             ! pixel position on 'x' is max
+  else if ( pixel_coord(1) .eq. grid%n_pix(1)-1 ) then            ! pixel position on 'x' is max
     pbc_shift(3,:,:) = - grid%n_pix(1)
   endif
   
   if ( pixel_coord(2) .eq. 0 ) then                               ! pixel position on 'y' is min
     pbc_shift(:,1,:) = pbc_shift(:,1,:) + grid%n_xy
-  else if ( pixel_coord(2) .eq. grid%n_pix(2)-1 ) then             ! pixel position on 'y' is max
+  else if ( pixel_coord(2) .eq. grid%n_pix(2)-1 ) then            ! pixel position on 'y' is max
     pbc_shift(:,3,:) = pbc_shift(:,3,:) - grid%n_xy
   endif
   
   if ( pixel_coord(3) .eq. 0 ) then                               ! pixel position on 'z' is min
     pbc_shift(:,:,1) = pbc_shift(:,:,1) + grid%pixels
-  else if ( pixel_coord(3) .eq. grid%n_pix(3)-1 ) then             ! pixel position on 'z' is max
+  else if ( pixel_coord(3) .eq. grid%n_pix(3)-1 ) then            ! pixel position on 'z' is max
     pbc_shift(:,:,3) = pbc_shift(:,:,3) - grid%pixels
   endif
   
@@ -202,7 +202,7 @@ SUBROUTINE prepare_pixel_grid (use_pbc, grid)
 
   pixel_size = cutoff + 0.5                            ! set a pixel size slightly higher than the cutoff
   if ( use_pbc ) then                                  ! using periodic boundary conditions
-      do axis = 1 , 3                                    ! for x, y and z
+      do axis = 1 , 3                                  ! for x, y and z
       ! number of pixel(s) on 'axis'
       grid%n_pix(axis) = INT(l_params(axis) / pixel_size)
     enddo
