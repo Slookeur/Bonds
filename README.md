@@ -35,7 +35,7 @@ To build the PDF file of the manuscript:
 >  - [MacTeX][mactex] distribution for MacOS
 >  - [MiKTeX][miktex] distribution for Windows
 > 
-> It also requires all needed dependencies, in particular the [`livecoms`][livecoms_class] document class.
+> As well as all needed dependencies, in particular the [`livecoms`][livecoms_class] document class.
 
 
 ## Sample codes
