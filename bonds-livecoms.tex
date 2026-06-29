@@ -1,4 +1,4 @@
-\documentclass[9pt,bestpractices]{livecoms}
+\documentclass[9pt,tutorials]{livecoms}
 % Use the 'onehalfspacing' option for 1.5 line spacing
 % Use the 'doublespacing' option for 2.0 line spacing
 % Use the 'lineno' option for adding line numbers.
@@ -142,7 +142,7 @@
 \begin{abstract}
 This article describes how lattice mathematical properties can be combined with the 3D space pixelation method 
 to evaluate interatomic distances in large atomic scale 3D models with the purpose of searching for first neighbor atoms. 
-It aims to be an educative tool for students and researchers who want to develop structural analysis or 3D visualization tools 
+It aims to be an educational tool for students and researchers who want to develop structural analysis or 3D visualization tools 
 that requires to implement and compute efficiently the search for first neighbor atoms. \\
 Examples codes are provided in C, FORTRAN90 and Python. 
 \end{abstract}
@@ -294,7 +294,7 @@ This is done by dividing, or partitioning, the model box in smaller parts, or pi
 \end{figure*}
 \\ Atomic coordinates will allow to associate an atom to a particular pixel. 
 Then for this particular atom neighbors candidates will only be search for in that same pixel and its immediate surrounding pixel neighbors. 
-Idealy the pixel dimension $\Pc$ should be close but sligtly superior to $\Rc$ the cutoff radius used to search for first neighbors atoms, ex: $\Pc = \Rc + 0.5$. \\
+Ideally the pixel dimension $\Pc$ should be close but slightly superior to $\Rc$ the cutoff radius used to search for first neighbors atoms, ex: $\Pc = \Rc + 0.5$. \\
 \\ 
 For any atom in the model this approach will limit the area of interest to the smallest possible size. 
 Using this methodology the time order for the entire analysis becomes proportional to $N_p \times \frac{N_c \times (N_c - 1)}{2} $, 
@@ -391,7 +391,7 @@ Non-cubic symmetries make it more complicated to offer a general methodology to 
 \item[1.] Evaluate the number of pixel(s) on each axis, $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$, using equations \ref{e_npix} and \ref{e_dmax}. 
 \vspace{0.125cm}
 \item[2.] Convert atomic Cartesian coordinates to fractional coordinates using $\Tf$. \\
-Using fractional coordinates is the easiest way to propose a general methodoly to compute interatomic distances in the model.  
+Using fractional coordinates is the easiest way to propose a general methodology to compute interatomic distances in the model.  
 Indeed this requires to consider the periodicity of the system, and, in the case of non-cubic symmetry transformations, could be tricky when using Cartesian coordinates. 
 Working with fractional coordinates is much easier since in that case corrections are performed simply adding or subtracting multiples of 1.0 on any fractional direction.
 \begin{itemize}
@@ -454,7 +454,7 @@ n_{p}(xy) = n_{p}(x) \times n_{p}(y)
 \end{equation}
 And: 
 \begin{equation}
-n_{p}(xyy) = n_{p}(xy) \times n_{p}(z)
+n_{p}(xyz) = n_{p}(xy) \times n_{p}(z)
 \end{equation}
 \vspace{0.125cm}
 \item[5.] When searching for first neighbor atoms between atoms $i$ and $j$ of the same pixel or one of its surrounding pixel neighbor, 
@@ -483,7 +483,7 @@ In the case where PBC are applied this means that the number of pixels on one di
 
 \section{Limitations}
 
-Overall the pixelation, or partioning, of the model box approach is extremely efficient. 
+Overall the pixelation, or partitioning, of the model box approach is extremely efficient. 
 However some issues might arise when dealing with a very large system containing very few atoms, which could happen if: 
 \begin{itemize}
 \item No periodicity is involved but the model is very large and describes a single, or few, isolated molecule(s) that are far apart.
@@ -493,7 +493,7 @@ In such rare cases the number density, in atoms / \AA$^3$, can be very low  (< 0
 but the number of pixels required to build the entire pixel grid can be too high for the memory allocation(s) required to perform the analysis. 
 To overcome this issue the size of the pixel $\Pc$ can be increased, to a value significantly higher than the cutoff radius $\Rc$, 
 so that the density of atom(s) per pixel can be adjusted to match a proper target value to ensure that memory allocation will not be an issue,
-and that the analysis will be successfull. By experience a value between 1.5 and 2 atoms per pixel is a safe window to avoid any issue in these peculiar cases. 
+and that the analysis will be successful. By experience a value between 1.5 and 2 atoms per pixel is a safe window to avoid any issue in these peculiar cases. 
 
 \section{Example codes}
 
