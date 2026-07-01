@@ -169,13 +169,13 @@ of the calculation of interatomic bond distances in 3D atomic scale models using
 Note that this section can safely be ignored when dealing with non periodic systems. 
 
 \subsection{Simulation box or lattice parameters\label{param}}
-\noindent Box, or lattice parameters can be expressed with two different sets of parameters, using: 
+\noindent Box, or lattice parameters can be expressed with two different sets of parameters, using either: 
 \begin{itemize}
-\item[1.]\label{abc} Using the box parameters \boxA, \boxB, \boxC\ and the associated angles $\alpha$, $\beta$ and $\gamma$
-\item[2.]\label{uvw} Using the components of the lattice vectors \\
+\item[1.]\label{abc} the box parameters \boxA, \boxB, \boxC\ and the associated angles $\alpha$, $\beta$ and $\gamma$
+\item[2.]\label{uvw} the components of the lattice vectors \\
 $\ \vec{a} (a_x, a_y, a_z)$, $\ \vec{b} (b_x, b_y, b_z)\ $ and $\ \vec{c} (c_x, c_y, c_z)$
 \end{itemize}
-Then lattice vectors (\ref{uvw}) can be calculated using box parameters (\ref{abc}) with: \\ 
+Lattice vectors can be calculated from the box parameters by: \\ 
 \begin{equation}
 \left[ \begin{blockarray}{ccc} 
  \boxA & 0.0 & 0.0 \\
@@ -188,7 +188,7 @@ With:
 L = \frac{\cos{\alpha} - \cos{\beta}\times\cos{\gamma}}{\sin{\gamma}}
 \end{equation}
 \\
-While box parameters (\ref{abc}) can be calculated using lattice vectors (\ref{uvw}) with: 
+While box parameters can be calculated from the lattice vectors by: 
 \begin{equation}
 \boxA = \mid\vec{a}\mid \quad \boxB = \mid\vec{b}\mid \quad \boxC = \mid\vec{c}\mid
 \end{equation}
@@ -214,7 +214,7 @@ With:
 %       &   & + & (a_x \times b_y - a_y \times b_x) \times c_z  \\
 %\end{blockarray}
 Knowledge of these properties is a basic requirement, from there it possible to compute transformation matrices 
-that allow the conversion from Cartesian $r$ to Fractional $f$ coordinates and the conversion from Fractional to Cartesian coordinates. 
+that allow to convert Cartesian $r$ to Fractional $f$ coordinates, and vice versa, Fractional $f$ to Cartesian $r$ coordinates. 
 These mathematical tools are extremely useful, if not almost mandatory prerequisites to the calculation, when dealing with non-cubic periodic systems.
 
 \subsection{From Cartesian to fractional coordinates}
@@ -274,12 +274,12 @@ Where the transformation matrix $\Tc$ is defined as:
 \label{pixel}
 
 \noindent The idea of pixelation, or partitioning, of the model box illustrated in this section is mandatory to deal efficiently with 
-searching for neighbor atoms in large atomic scale models. 
+searching for first neighbor atoms in large atomic scale models. 
 Indeed the intuitive way to implement the procedure would be to test every pair $i-j$ of atoms in the model: compute the interatomic 
 distance $\Dij$ between $i$ ($\alpha$) and $j$ ($\beta$), and then compared this distance to a cutoff radius $\Rc(\alpha,\beta)$, 
 that could appropriately be determined when looking at the radial distribution function $g_{\alpha\beta}(r)$. 
 Then if $\Dij$ is smaller or equal to $\Rc(\alpha,\beta)$ then atoms $i$ and $j$ are first neighbors, otherwise they are not. 
-For a program which purpose is to render the atomic scale model in 3D space, the result of the analysis would be then to draw, or not, a bond between atoms $i$ and $j$. \\
+For a program which purpose is to render the atomic scale model in 3D space, the result of the analysis would then be to draw, or not, a bond between atoms $i$ and $j$. \\
 As intuitive and logical as this approach could seem to be, it requires to perform the testing for every pair of atoms in the model. 
 Which, as long as the size of the system remains within the thousand or few thousands of atoms, could work in a seemingly efficient manner. 
 The time order for the entire analysis is then proportional to $\frac{N \times (N-1)}{2}$, with $N$ the total number of atoms in the model. 
@@ -293,7 +293,7 @@ This is done by dividing, or partitioning, the model box in smaller parts, or pi
 \caption{Pixelation of the model box\label{pixelise}}
 \end{figure*}
 \\ Atomic coordinates will allow to associate an atom to a particular pixel. 
-Then for this particular atom neighbors candidates will only be search for in that same pixel and its immediate surrounding pixel neighbors. 
+Then for this particular atom, neighbors candidates will only be search for in that same pixel and its immediate surrounding pixel neighbors. 
 Ideally the pixel dimension $\Pc$ should be close but slightly superior to $\Rc$ the cutoff radius used to search for first neighbors atoms, ex: $\Pc = \Rc + 0.5$. \\
 \\ 
 For any atom in the model this approach will limit the area of interest to the smallest possible size. 
