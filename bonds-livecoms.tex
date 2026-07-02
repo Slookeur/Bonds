@@ -140,7 +140,7 @@
 \maketitle
 
 \begin{abstract}
-This article describes how lattice mathematical properties can be combined with the 3D space pixelation method 
+This tutorial article describes how lattice mathematical properties can be combined with the 3D space pixelation method 
 to evaluate interatomic distances in large atomic scale 3D models with the purpose of searching for first neighbor atoms. 
 It aims to be an educational tool for students and researchers who want to develop structural analysis or 3D visualization tools 
 that requires to implement and compute efficiently the search for first neighbor atoms. \\
@@ -162,14 +162,14 @@ and the visualization of atomic scale models with more than tens of thousands of
 This manuscript illustrates how lattice mathematical properties can be combined with the pixelation of the model box approach, to offer 
 both a general, symmetry independent, methodology, and, an extremely efficient implementation of the search for first neighbor atoms.
 
-\section{Simulation box, lattice parameters and transformation matrices}
+\section{Prerequisites}
 \label{mat}
 Knowledge and understanding of the mathematics of lattice parameters and atomic coordinates is a prerequisite to the general formulation 
-of the calculation of interatomic bond distances in 3D atomic scale models using periodic boundary conditions. \\
+of the calculation of interatomic bond distances in 3D atomic scale models using {\bf{P}}eriodic {\bf{B}}oundary {\bf{C}}onditions. \\
 Note that this section can safely be ignored when dealing with non periodic systems. 
 
 \subsection{Simulation box or lattice parameters\label{param}}
-\noindent Box, or lattice parameters can be expressed with two different sets of parameters, using either: 
+\noindent Periodicity can expressed with two different sets of parameters, using either: 
 \begin{itemize}
 \item[1.]\label{abc} the box parameters \boxA, \boxB, \boxC\ and the associated angles $\alpha$, $\beta$ and $\gamma$
 \item[2.]\label{uvw} the components of the lattice vectors \\
@@ -281,7 +281,7 @@ that could appropriately be determined when looking at the radial distribution f
 Then if $\Dij$ is smaller or equal to $\Rc(\alpha,\beta)$ then atoms $i$ and $j$ are first neighbors, otherwise they are not. 
 For a program which purpose is to render the atomic scale model in 3D space, the result of the analysis would then be to draw, or not, a bond between atoms $i$ and $j$. \\
 As intuitive and logical as this approach could seem to be, it requires to perform the testing for every pair of atoms in the model. 
-Which, as long as the size of the system remains within the thousand or few thousands of atoms, could work in a seemingly efficient manner. 
+Which, as long as the size of the system remains within the thousand or few thousands of atoms range, could work in a seemingly efficient manner. 
 The time order for the entire analysis is then proportional to $\frac{N \times (N-1)}{2}$, with $N$ the total number of atoms in the model. 
 However as the number of atoms increases, time required to performed the entire analysis increases even more dramatically, 
 soon enough reaching a point where the program will likely seem to be completely frozen. \\
@@ -293,7 +293,7 @@ This is done by dividing, or partitioning, the model box in smaller parts, or pi
 \caption{Pixelation of the model box\label{pixelise}}
 \end{figure*}
 \\ Atomic coordinates will allow to associate an atom to a particular pixel. 
-Then for this particular atom, neighbors candidates will only be search for in that same pixel and its immediate surrounding pixel neighbors. 
+Then for this particular atom, first neighbors candidates will only be search for in that same pixel and its immediate surrounding pixel neighbors. 
 Ideally the pixel dimension $\Pc$ should be close but slightly superior to $\Rc$ the cutoff radius used to search for first neighbors atoms, ex: $\Pc = \Rc + 0.5$. \\
 \\ 
 For any atom in the model this approach will limit the area of interest to the smallest possible size. 
@@ -308,15 +308,15 @@ The number of pixels on each axis, $n_{p}(x)$, $n_{p}(y)$ and $n_{p}(z)$, are ca
 \label{e_npix}
 n_{p}(axis) = \left\lceil \frac{D_{max}(axis)}{\Pc} \right\rceil 
 \end{equation}
-Where $D_{max}(axis)$ is the maximum interatomic distance separating two atoms on $axis$, and $\Pc \simeq \Rc$ is the pixel dimension, close to the cutoff distance that separates neighbor atoms. \\
+Where $D_{max}(axis)$ is the maximum interatomic distance separating two atoms on $axis$, and $\Pc \simeq \Rc$ is the pixel dimension, close to the cutoff distance that separates first neighbor atoms. \\
 Providing a model box, with parameters A, B, and C, encompassing the entire model could prove useful here, allowing the simplifications: 
 \begin{equation}
 \label{e_dmax}
 D_{max}(x) = A,\qquad D_{max}(y) = B\qquad \textrm{and}\qquad D_{max}(z) = C 
 \end{equation}
 Otherwise calculations to determine $D_{max}$ for each axis are needed. 
-It is then required to test each pair of atomic coordinates in the model on $x$, $y$ and $z$. 
-However as long as only subtractions and min/max comparisons are involved calculation time will remain acceptable. \\[0.25cm]
+It is then required to test each and every pair of atomic coordinates in the model on $x$, $y$ and $z$. 
+However as long as only subtractions and min/max comparisons are involved calculation time will remain completely acceptable. \\[0.25cm]
 Then the total number of pixels in the model box, $pixels$, is calculated using: 
 \begin{equation}
 pixels = n_{p}(x) \times n_{p}(y) \times n_{p}(z) 
@@ -344,7 +344,7 @@ First neighbors list is calculated as follow:
 \vspace{0.125cm}
 \item[2.] Accordingly a list of atom containing pixels is created, the list of atom(s) in each pixel being stored. 
 \vspace{0.125cm}
-\item[3.] First neighbor(s) for an atom will then be search for in the pixel this atom belong to and in its surrounding pixel neighbors only, all other pixel(s) being safely ignored. \\ 
+\item[3.] First neighbor(s) for an atom will then be search for in the pixel this atom belong to, and, in its surrounding pixel neighbors only, all other pixel(s) being safely ignored. \\ 
 The list of pixel neighbors is constructed using the mathematical relationships between each pixel index in the grid, 
 two cases must considered:
 \begin{itemize}
