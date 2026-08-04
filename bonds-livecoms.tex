@@ -157,10 +157,10 @@ Examples codes are provided in C, FORTRAN90 and Python.
 Every student, every researcher in computational material science, has already spent time calculating interatomic distances. 
 This problem is even likely to be the first one computational material scientists will spend some time over during their studies. 
 As simple as the evaluation of a distance in 3D space could seem to be, the complexity of the problem increases considerably 
-when dealing with the periodicity of non-cubic systems, and even more with the search for performance that is driving the analysis
+when dealing with the periodicity of non-cubic systems, and even more dramatically with the search for performance that is driving the analysis
 and the visualization of atomic scale models with more than tens of thousands of atoms. \\[0.25cm]
 This manuscript illustrates how lattice mathematical properties can be combined with the pixelation of the model box approach, to offer 
-both a general, symmetry independent, methodology, and, an extremely efficient implementation of the search for first neighbor atoms.
+both a general, symmetry independent, methodology, and, an extremely efficient implementation of the search for first neighbor atoms. 
 
 \section{Prerequisites}
 \label{mat}
@@ -273,8 +273,9 @@ Where the transformation matrix $\Tc$ is defined as:
 \section{Pixelation of the model box}
 \label{pixel}
 
-\noindent The idea of pixelation, or partitioning, of the model box illustrated in this section is mandatory to deal efficiently with 
-searching for first neighbor atoms in large atomic scale models. 
+\noindent Frequently used in MD simulations under the name linked cell algorithm(s) \cite{CSL,WELLING2011611}, 
+the idea of pixelation, or partitioning, of the model box illustrated in this section is mandatory to deal efficiently with 
+searching for first neighbor atoms in large atomic scale models.\\[0.125cm] 
 Indeed the intuitive way to implement the procedure would be to test every pair $i-j$ of atoms in the model: compute the interatomic 
 distance $\Dij$ between $i$ ($\alpha$) and $j$ ($\beta$), and then compared this distance to a cutoff radius $\Rc(\alpha,\beta)$, 
 that could appropriately be determined when looking at the radial distribution function $g_{\alpha\beta}(r)$. 
